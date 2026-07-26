@@ -263,6 +263,28 @@ document.getElementById('obscrim').addEventListener('click',e=>{if(e.target.id==
 try{if(!localStorage.getItem('rh_home_tour_v1'))setTimeout(rhTour,800);}catch(e){}
 </script>
 
+<!-- Floating "star the repo" bubble — persistent growth CTA with live star count -->
+<a class="rh-star" href="https://github.com/meetziggy/repohunter" target="_blank" rel="noopener" aria-label="Star RepoHunter on GitHub">
+  <img src="/logo.svg" alt="" width="22" height="22">
+  <span class="st">★</span> <span class="lbl">Star the repo</span> <b id="rh-stars"></b>
+</a>
+<style>
+  .rh-star{position:fixed;bottom:18px;right:18px;z-index:50;display:inline-flex;align-items:center;gap:8px;
+    background:#0b1220;border:1px solid #2c4a1e;color:#e6edf7;border-radius:999px;padding:9px 16px 9px 10px;
+    font-weight:700;font-size:14px;text-decoration:none;box-shadow:0 12px 30px rgba(0,0,0,.45);transition:.15s}
+  .rh-star:hover{border-color:#b8ff3c;transform:translateY(-2px);box-shadow:0 16px 40px rgba(184,255,60,.22)}
+  .rh-star .st{color:#b8ff3c}
+  .rh-star b{color:#b8ff3c;font-variant-numeric:tabular-nums;font-weight:800}
+  @media(max-width:520px){.rh-star .lbl{display:none}}
+</style>
+<script>
+  fetch('https://api.github.com/repos/meetziggy/repohunter').then(function(r){return r.json();}).then(function(d){
+    var n=d&&d.stargazers_count;
+    if(typeof n==='number'){var s=n>=1000?(n/1000).toFixed(1).replace(/\.0$/,'')+'k':String(n);
+      var el=document.getElementById('rh-stars'); if(el) el.textContent='· '+s;}
+  }).catch(function(){});
+</script>
+
 <!-- Cloudflare Web Analytics — cookieless, no cookie banner required -->
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"03db8d874ff44447832e44f5533aedbd"}'></script>
 </body>

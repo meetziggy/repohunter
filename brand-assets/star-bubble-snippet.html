@@ -1,0 +1,34 @@
+<!-- ============================================================================
+  RepoHunter "Star bubble" — a drop-in floating button that drives GitHub stars.
+  Reusable on ANY of your sites/software. Paste this whole block before </body>.
+
+  To reuse for a DIFFERENT repo: change the two OWNER/REPO spots marked below.
+  - Shows a live star count (social proof) and links to the repo.
+  - Self-contained: no build step, no dependencies, no cookies.
+============================================================================ -->
+<a class="rh-star" href="https://github.com/OWNER/REPO" target="_blank" rel="noopener"
+   aria-label="Star on GitHub">
+  <span class="st">★</span> <span class="lbl">Star on GitHub</span> <b data-stars></b>
+</a>
+<style>
+  .rh-star{position:fixed;bottom:18px;right:18px;z-index:2147483000;display:inline-flex;align-items:center;gap:8px;
+    background:#0b1220;border:1px solid #2c4a1e;color:#e6edf7;border-radius:999px;padding:10px 16px;
+    font:700 14px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;text-decoration:none;
+    box-shadow:0 12px 30px rgba(0,0,0,.45);transition:.15s}
+  .rh-star:hover{border-color:#b8ff3c;transform:translateY(-2px);box-shadow:0 16px 40px rgba(184,255,60,.22)}
+  .rh-star .st{color:#b8ff3c;font-size:15px}
+  .rh-star b{color:#b8ff3c;font-variant-numeric:tabular-nums;font-weight:800}
+  @media(max-width:520px){.rh-star .lbl{display:none}}
+</style>
+<script>
+(function(){
+  var REPO='OWNER/REPO';                                   /* <-- change this */
+  fetch('https://api.github.com/repos/'+REPO).then(function(r){return r.json();}).then(function(d){
+    var n=d&&d.stargazers_count;
+    if(typeof n==='number'){
+      var s=n>=1000?(n/1000).toFixed(1).replace(/\.0$/,'')+'k':String(n);
+      var el=document.querySelector('.rh-star [data-stars]'); if(el) el.textContent='· '+s;
+    }
+  }).catch(function(){});
+})();
+</script>
