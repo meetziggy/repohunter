@@ -260,7 +260,10 @@ function rhClose(){document.getElementById('obscrim').classList.remove('on');try
 function rhNext(){if(rhStep<RHTOUR.length-1){rhStep++;rhRender();}}
 function rhPrev(){if(rhStep>0){rhStep--;rhRender();}}
 document.getElementById('obscrim').addEventListener('click',e=>{if(e.target.id==='obscrim')rhClose();});
-try{if(!localStorage.getItem('rh_home_tour_v1'))setTimeout(rhTour,800);}catch(e){}
+try{
+  var forceTour = /[?&]tour=1\b/.test(location.search) || location.hash==='#tour';
+  if(forceTour || !localStorage.getItem('rh_home_tour_v1')) setTimeout(rhTour, forceTour?200:800);
+}catch(e){}
 </script>
 
 <!-- Floating "star the repo" bubble — persistent growth CTA with live star count -->
