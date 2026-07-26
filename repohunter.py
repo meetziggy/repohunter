@@ -536,10 +536,16 @@ def serve():
     http.server.HTTPServer(("127.0.0.1", port), H).serve_forever()
 
 
-if __name__ == "__main__":
-    cmd = sys.argv[1] if len(sys.argv) > 1 else "refresh"
-    a = sys.argv[2:]
+def main(argv=None):
+    """CLI entry point. Also the console_scripts target so `repohunter <cmd>` works."""
+    argv = list(sys.argv[1:] if argv is None else argv)
+    cmd = argv[0] if argv else "refresh"
+    a = argv[1:]
     fn = {"evaluate": lambda: evaluate(a[0]), "plan": lambda: plan_mode(a[0]),
           "decide": lambda: decide_mode(a[0], a[1]), "ingest-video": lambda: ingest_video(a[0]),
           "serve": serve, "refresh": refresh}.get(cmd, refresh)
-    sys.exit(fn() or 0)
+    return fn() or 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
