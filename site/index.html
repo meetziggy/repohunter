@@ -45,7 +45,10 @@
   .star:hover{border-color:#3a5891;transform:translateY(-1px)}
 
   .hero{text-align:center;padding:56px 0 40px}
-  .hero img{width:120px;height:120px;filter:drop-shadow(0 8px 44px rgba(184,255,60,.32))}
+  .hero{padding-top:40px}
+  .hero img{width:200px;height:200px;filter:drop-shadow(0 16px 66px rgba(184,255,60,.45));animation:floaty 5.5s ease-in-out infinite}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  @media(max-width:640px){.hero img{width:150px;height:150px}}
   .hero h1{font-size:clamp(40px,7vw,74px);margin:18px 0 6px;letter-spacing:-.03em;line-height:1}
   .hero h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
   .tag{font-size:clamp(18px,2.6vw,24px);font-weight:700;color:var(--text);margin:0 0 14px}
@@ -86,6 +89,20 @@
   footer{border-top:1px solid var(--line);padding:30px 0 50px;text-align:center;color:var(--muted);font-size:13.5px}
   .diff{color:var(--muted);text-align:center;max-width:660px;margin:0 auto 30px;font-size:16px}
   .diff b{color:var(--text)}
+  /* guided walkthrough */
+  .obscrim{position:fixed;inset:0;background:rgba(3,6,12,.80);backdrop-filter:blur(6px);z-index:80;display:none;align-items:center;justify-content:center;padding:22px}
+  .obscrim.on{display:flex}
+  .obcard{background:#0b1220;border:1px solid var(--line);border-radius:22px;max-width:540px;width:100%;padding:34px 30px;position:relative;box-shadow:0 30px 90px rgba(0,0,0,.6)}
+  .obcard .em{font-size:46px;line-height:1}
+  .obcard h2{margin:14px 0 8px;font-size:25px;letter-spacing:-.02em}
+  .obcard p{color:#c9d5ea;font-size:15.5px;line-height:1.66;margin:0}
+  .obdeal{background:#0b1424;border:1px solid #2c4a1e;border-radius:12px;padding:12px 14px;color:#d4ff7a;font-size:13.5px;margin-top:14px}
+  .obnav{display:flex;align-items:center;gap:10px;margin-top:24px}
+  .obdots{display:flex;gap:6px;margin-right:auto}
+  .obdots i{width:8px;height:8px;border-radius:50%;background:#22304a}
+  .obdots i.on{background:var(--lime)}
+  .obx{position:absolute;top:14px;right:16px;color:var(--muted);cursor:pointer;font-size:20px;background:none;border:0}
+  .btn.lime{background:var(--grad);color:#08101f}
 </style>
 </head>
 <body>
@@ -103,8 +120,8 @@
     <p class="lede">Find great open-source repos, see exactly how they'd fit <b style="color:var(--text)">your</b> project and
       <b style="color:var(--text)">your</b> hardware, what you'd gain, and what integrating actually costs — then adopt them. On your terms.</p>
     <div class="cta">
-      <a class="btn primary" href="https://github.com/meetziggy/repohunter" target="_blank" rel="noopener">★ Star it on GitHub</a>
-      <a class="btn ghost" href="#how">See how it works</a>
+      <button class="btn primary" onclick="rhTour()">▶ Take the 60-second tour</button>
+      <a class="btn ghost" href="https://github.com/meetziggy/repohunter" target="_blank" rel="noopener">★ Star it on GitHub</a>
     </div>
     <div class="subline">Runs <b>locally</b> · pluggable AI (local model or your key) · <b>MIT</b> open source · built &amp; maintained in the open by a human + his AI</div>
     <div class="code">
@@ -181,6 +198,44 @@ python3 repohunter.py <span class="p">serve</span>
     <a href="https://github.com/meetziggy/repohunter" target="_blank" rel="noopener">GitHub</a>
   </div>
 </footer>
+<div class="obscrim" id="obscrim"></div>
+<script>
+const RHTOUR=[
+  {em:'🪲',h:'Welcome — here\'s what RepoHunter is',
+   p:'Give me 30 seconds before you dig in. RepoHunter helps you <b>reuse great open source instead of rebuilding it</b> — and tells you honestly whether a repo is worth adopting <i>for your project, on your machine.</i>'},
+  {em:'🧭',h:'The problem it solves',
+   p:'Every week people ship brilliant open source — and most of it is never found. So we all reinvent things that already exist… and now AI agents pile on, regenerating the same code millions of times over.'},
+  {em:'🎯',h:'What it actually does',
+   p:'Point it at a repo — or a GitHub search, or a "top 10 repos" YouTube video. It writes an <b>integration dossier</b>: what it is, why it fits <i>your</i> project, does-it-run-on-your-hardware, what adopting would cost, and a clear <b>GO / MAYBE / SKIP</b>.'},
+  {em:'🌱',h:'Why it matters',
+   p:'Reuse means less wasted work, a smaller bill, and <b>less compute burned</b> — the greenest code is the code you never regenerate. And every repo links back to its author: reuse, <i>with credit.</i>',
+   deal:'Local-first · pluggable AI · MIT · owned &amp; maintained autonomously by an AI, in the open.'},
+  {em:'🚀',h:'Give it a spin',
+   p:'It\'s free and runs on your machine. Clone it, point it at your project, and go hunting — and if it helps, star the repos you adopt and send the credit home to the people who built them.'}
+];
+let rhStep=0;
+function rhRender(){
+  const t=RHTOUR[rhStep], last=rhStep===RHTOUR.length-1;
+  document.getElementById('obscrim').innerHTML=`<div class="obcard">
+    <button class="obx" onclick="rhClose()">✕</button>
+    <div class="em">${t.em}</div><h2>${t.h}</h2><p>${t.p}</p>
+    ${t.deal?`<div class="obdeal">${t.deal}</div>`:''}
+    <div class="obnav">
+      <div class="obdots">${RHTOUR.map((_,i)=>`<i class="${i===rhStep?'on':''}"></i>`).join('')}</div>
+      ${rhStep>0?'<button class="btn ghost" onclick="rhPrev()">Back</button>':''}
+      ${last
+        ? '<a class="btn lime" href="https://github.com/meetziggy/repohunter" target="_blank" rel="noopener" onclick="rhClose()">★ Star it on GitHub</a>'
+        : '<button class="btn lime" onclick="rhNext()">Next</button>'}
+    </div></div>`;
+}
+function rhTour(){rhStep=0;rhRender();document.getElementById('obscrim').classList.add('on');}
+function rhClose(){document.getElementById('obscrim').classList.remove('on');try{localStorage.setItem('rh_home_tour_v1','1');}catch(e){}}
+function rhNext(){if(rhStep<RHTOUR.length-1){rhStep++;rhRender();}}
+function rhPrev(){if(rhStep>0){rhStep--;rhRender();}}
+document.getElementById('obscrim').addEventListener('click',e=>{if(e.target.id==='obscrim')rhClose();});
+try{if(!localStorage.getItem('rh_home_tour_v1'))setTimeout(rhTour,800);}catch(e){}
+</script>
+
 <!-- ── Analytics (pick ONE, paste your ID, uncomment) ───────────────────────────
   Recommended — Cloudflare Web Analytics: cookieless, no banner needed, free,
   and you're already on Cloudflare. Dashboard → Web Analytics → add repohunter.dev → paste token:

@@ -13,3 +13,5 @@ config.json
 .wrangler/
 _design/
 RELEASE_PLAN.md
+LAUNCH_KIT.md
+SOAK_WEEK.md
