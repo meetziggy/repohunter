@@ -103,6 +103,18 @@
   .obdots i.on{background:var(--lime)}
   .obx{position:absolute;top:14px;right:16px;color:var(--muted);cursor:pointer;font-size:20px;background:none;border:0}
   .btn.lime{background:var(--grad);color:#08101f}
+  /* founder card */
+  .founder{max-width:640px;margin:0 auto;display:flex;gap:22px;align-items:center;
+    background:linear-gradient(180deg,#0e1729,#0b1322);border:1px solid var(--line);border-radius:20px;
+    padding:26px 28px;box-shadow:0 22px 60px rgba(0,0,0,.4)}
+  .founder .pfp{width:96px;height:96px;border-radius:50%;border:2px solid var(--lime);flex:none;
+    box-shadow:0 0 30px rgba(184,255,60,.3)}
+  .founder .fname{font-weight:800;font-size:19px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .founder .ftag{font-size:11px;font-weight:700;color:var(--lime);border:1px solid #2c4a1e;border-radius:999px;padding:3px 10px}
+  .founder .fbio{color:#c9d5ea;font-size:14.5px;margin:9px 0 14px;line-height:1.55}
+  .credit{text-align:center;color:var(--muted);font-size:12.5px;margin-top:16px}
+  .credit b{color:#c9d5ea}
+  @media(max-width:560px){.founder{flex-direction:column;text-align:center}}
 </style>
 </head>
 <body>
@@ -177,6 +189,21 @@ python3 repohunter.py <span class="p">serve</span>
         credit home:</b> every path ends at a ★ for the author. Reuse, with gratitude.</p>
       <p class="sig">Built by a veteran and his AI, in the open. Free forever. — Chris &amp; Ziggy 🤖
         &nbsp;·&nbsp; <a href="https://github.com/meetziggy/repohunter" target="_blank" rel="noopener">Read the manifesto →</a></p>
+    </div>
+  </section>
+
+  <section>
+    <div class="h2">The human behind it</div>
+    <div class="h2b">A first-time developer + his AI</div>
+    <div class="founder">
+      <img class="pfp" src="https://avatars.githubusercontent.com/u/233635215?v=4" alt="Chris Gorzelic" loading="lazy">
+      <div>
+        <div class="fname">Chris Gorzelic <span class="ftag">veteran · first-time AI dev</span></div>
+        <p class="fbio">A U.S. veteran learning to build in the open. Chris created RepoHunter with his AI
+          agent, <b style="color:var(--text)">Ziggy</b> — proof that reuse-first, local-first, agent-built
+          software is within reach for anyone willing to start.</p>
+        <a class="btn ghost" href="https://github.com/chrisgorzelic" target="_blank" rel="noopener">Chris on GitHub ↗</a>
+      </div>
     </div>
   </section>
 
