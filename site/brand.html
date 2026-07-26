@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RepoHunter — Brand Guide</title>
+<link rel="icon" type="image/svg+xml" href="logo.svg">
+<style>
+  :root{
+    --lime:#b8ff3c; --lime-lo:#d4ff7a; --cyan:#38bdf8; --cyan-deep:#0ea5e9;
+    --ink:#070b16; --panel:#0b1220; --panel2:#0d1526; --line:#22304a;
+    --text:#e6edf7; --muted:#8fa0bd; --eye:#2f9e5a;
+    --grad:linear-gradient(135deg,var(--lime),var(--cyan));
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1100px 620px at 50% -4%,#141d33,var(--ink) 60%);
+    color:var(--text);font:15px/1.65 -apple-system,BlinkMacSystemFont,"Space Grotesk","SF Pro Text",Segoe UI,Roboto,system-ui,sans-serif}
+  .wrap{max-width:1040px;margin:0 auto;padding:60px 22px 100px}
+  header.top{display:flex;align-items:center;gap:16px;margin-bottom:8px}
+  header.top .lg{width:64px;height:64px;filter:drop-shadow(0 8px 30px rgba(184,255,60,.4))}
+  h1{font-size:34px;font-weight:800;letter-spacing:-.02em;margin:0}
+  .kick{color:var(--lime);font-weight:700;text-transform:uppercase;letter-spacing:.16em;font-size:12px}
+  .lede{color:var(--muted);max-width:640px;font-size:16px;margin:14px 0 0}
+  section{margin-top:64px}
+  h2{font-size:13px;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);
+    border-bottom:1px solid var(--line);padding-bottom:10px;margin:0 0 26px}
+  h3{font-size:17px;margin:0 0 6px}
+  p.sm{color:var(--muted);font-size:13.5px;margin:.3em 0}
+  .grid{display:grid;gap:18px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+  .g4{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px}
+  .center{display:flex;align-items:center;justify-content:center}
+  /* logo lockups */
+  .lockup{display:flex;align-items:center;gap:16px}
+  .lockup b{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .lockup b i{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .mono{color:var(--muted);font-size:12px;text-align:center;margin-top:12px}
+  /* swatches */
+  .sw{border-radius:14px;height:96px;display:flex;align-items:flex-end;padding:10px;font-weight:700;font-size:12px}
+  .swmeta{font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.5}
+  .swmeta code{color:var(--text);background:#0b1424;padding:1px 6px;border-radius:6px}
+  /* type */
+  .type-row{border-bottom:1px solid var(--line);padding:16px 0}
+  .type-row:last-child{border:0}
+  /* do/dont */
+  .dd{display:grid;grid-template-columns:20px 1fr;gap:10px;align-items:start;margin:9px 0;font-size:14px}
+  .yes{color:var(--lime)} .no{color:#ff6b6b}
+  /* apparel */
+  .tee{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:22px;text-align:center}
+  .pill{display:inline-block;background:#0b1424;border:1px solid var(--line);border-radius:999px;
+    padding:5px 12px;font-size:12px;color:var(--lime);font-weight:700;margin:3px}
+  .btn{display:inline-block;padding:11px 20px;border-radius:12px;font-weight:700;text-decoration:none;font-size:14px}
+  .btn.primary{background:var(--grad);color:#07220a}
+  .btn.ghost{border:1px solid var(--lime);color:var(--lime)}
+  .voice{font-size:15px} .voice b{color:var(--lime)}
+  .quote{border-left:3px solid var(--lime);padding:6px 0 6px 16px;color:var(--lime-lo);font-style:italic;margin:14px 0}
+  footer{margin-top:70px;color:var(--muted);font-size:12.5px;text-align:center;border-top:1px solid var(--line);padding-top:22px}
+  a{color:var(--cyan)}
+</style></head>
+<body>
+
+<!-- reusable dragonfly mark -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#d4ff7a"/><stop offset=".5" stop-color="#b8ff3c"/><stop offset="1" stop-color="#38bdf8"/>
+  </linearGradient>
+  <linearGradient id="wing" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#b8ff3c"/><stop offset="1" stop-color="#38bdf8"/>
+  </linearGradient>
+  <radialGradient id="eye" cx=".4" cy=".35" r=".8">
+    <stop offset="0" stop-color="#f0ffd6"/><stop offset=".5" stop-color="#b8ff3c"/><stop offset="1" stop-color="#2f9e5a"/>
+  </radialGradient>
+  <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+    <feGaussianBlur stdDeviation="3.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <symbol id="fly" viewBox="0 0 240 240">
+    <g filter="url(#glow)">
+      <g fill="url(#wing)" fill-opacity=".42" stroke="url(#wing)" stroke-width="2">
+        <g transform="rotate(-15 120 96)"><ellipse cx="74" cy="88" rx="48" ry="14"/></g>
+        <g transform="rotate(15 120 96)"><ellipse cx="74" cy="118" rx="42" ry="12"/></g>
+        <g transform="rotate(15 120 96)"><ellipse cx="166" cy="88" rx="48" ry="14"/></g>
+        <g transform="rotate(-15 120 96)"><ellipse cx="166" cy="118" rx="42" ry="12"/></g>
+      </g>
+      <ellipse cx="120" cy="96" rx="11" ry="17" fill="url(#body)"/>
+      <path d="M111 104 Q120 100 129 104 L124 196 Q120 205 116 196 Z" fill="url(#body)"/>
+      <g stroke="#0b1220" stroke-width="1.6" opacity=".45">
+        <line x1="115" y1="126" x2="125" y2="126"/><line x1="115.5" y1="144" x2="124.5" y2="144"/>
+        <line x1="116" y1="162" x2="124" y2="162"/><line x1="116.5" y1="180" x2="123.5" y2="180"/>
+      </g>
+      <ellipse cx="120" cy="70" rx="15" ry="11" fill="url(#body)"/>
+      <circle cx="112" cy="66" r="7.5" fill="url(#eye)"/><circle cx="128" cy="66" r="7.5" fill="url(#eye)"/>
+    </g>
+  </symbol>
+  <symbol id="badge" viewBox="0 0 240 240">
+    <rect x="20" y="20" width="200" height="200" rx="46" fill="#0b1220" stroke="#22304a" stroke-width="2"/>
+    <use href="#fly"/>
+  </symbol>
+</defs></svg>
+
+<div class="wrap">
+  <header class="top">
+    <svg class="lg" viewBox="0 0 240 240"><use href="#badge"/></svg>
+    <div>
+      <div class="kick">Brand Guide · v1</div>
+      <h1>RepoHunter</h1>
+    </div>
+  </header>
+  <p class="lede">The visual + verbal system for RepoHunter — the tool that hunts down the best open-source
+    so you reuse, don't reinvent. One rule: keep it sharp, generous, and unmistakably ours.</p>
+
+  <!-- ESSENCE -->
+  <section>
+    <h2>Essence</h2>
+    <div class="grid g2">
+      <div class="card">
+        <h3>What we are</h3>
+        <p class="sm">A hunter for code. RepoHunter scans millions of repos, finds the ones that fit <em>your</em>
+          project and <em>your</em> machine, and hands you an honest dossier — adopt, adapt, or skip.</p>
+      </div>
+      <div class="card">
+        <h3>The symbol</h3>
+        <p class="sm">The dragonfly — the most successful hunter on Earth (~95% strike rate). It doesn't chase;
+          it predicts, intercepts, and connects. Precision over noise. That's the product.</p>
+      </div>
+    </div>
+    <div class="grid g3" style="margin-top:18px">
+      <div class="card"><h3 style="color:var(--lime)">Precise</h3><p class="sm">Signal, not noise. Every claim earns its place.</p></div>
+      <div class="card"><h3 style="color:var(--lime)">Generous</h3><p class="sm">Send the credit home. Promote authors, never strip them.</p></div>
+      <div class="card"><h3 style="color:var(--lime)">Relentless</h3><p class="sm">Veteran grit. Keeps hunting so you don't have to.</p></div>
+    </div>
+  </section>
+
+  <!-- LOGO -->
+  <section>
+    <h2>Logo</h2>
+    <div class="grid g3">
+      <div class="card center" style="flex-direction:column">
+        <svg width="120" height="120" viewBox="0 0 240 240"><use href="#badge"/></svg>
+        <div class="mono">App badge — avatars, favicons, app icons</div>
+      </div>
+      <div class="card center" style="flex-direction:column;background:#05080f">
+        <svg width="120" height="120" viewBox="0 0 240 240"><use href="#fly"/></svg>
+        <div class="mono">Mark only — transparent, on imagery/merch</div>
+      </div>
+      <div class="card center" style="flex-direction:column">
+        <div class="lockup"><svg width="52" height="52" viewBox="0 0 240 240"><use href="#fly"/></svg><b>Repo<i>Hunter</i></b></div>
+        <div class="mono">Horizontal lockup — site header, docs</div>
+      </div>
+    </div>
+    <div class="grid g2" style="margin-top:18px">
+      <div class="card">
+        <h3>Clear space & sizing</h3>
+        <p class="sm">Keep breathing room equal to the dragonfly's head-height on all sides. Minimum legible size:
+          <b>16px</b> (the mark still reads as a favicon). Never crowd it with text or other marks.</p>
+      </div>
+      <div class="card">
+        <h3>On dark, always</h3>
+        <p class="sm">The mark lives on near-black (<code style="color:var(--text)">#070b16</code>/<code style="color:var(--text)">#0b1220</code>)
+          so the glow reads. On light backgrounds, use the badge (with its dark tile) — never the bare glowing mark.</p>
+      </div>
+    </div>
+    <div class="grid g2" style="margin-top:18px">
+      <div class="card">
+        <div class="dd"><span class="yes">✓</span><span>Do use the badge on light photos; keep the wings symmetric; let it glow.</span></div>
+        <div class="dd"><span class="yes">✓</span><span>Pair with the wordmark set in the display font, cyan-tipped "Hunter".</span></div>
+      </div>
+      <div class="card">
+        <div class="dd"><span class="no">✕</span><span>Don't recolor to flat gray, stretch the wings, or add drop-shadows beyond the built-in glow.</span></div>
+        <div class="dd"><span class="no">✕</span><span>Don't rotate, outline the letters, or place the bare mark on white.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COLOR -->
+  <section>
+    <h2>Color</h2>
+    <div class="grid g4">
+      <div><div class="sw" style="background:var(--lime);color:#07220a">Hunter Lime</div>
+        <div class="swmeta"><code>#b8ff3c</code><br>Primary. CTAs, highlights, the glow.</div></div>
+      <div><div class="sw" style="background:var(--cyan);color:#04263a">Signal Cyan</div>
+        <div class="swmeta"><code>#38bdf8</code><br>Secondary. Links, gradient tail, accents.</div></div>
+      <div><div class="sw" style="background:var(--ink);color:var(--text);border:1px solid var(--line)">Deep Space</div>
+        <div class="swmeta"><code>#070b16</code><br>Canvas. Page background.</div></div>
+      <div><div class="sw" style="background:var(--panel);color:var(--text);border:1px solid var(--line)">Panel</div>
+        <div class="swmeta"><code>#0b1220</code><br>Cards, the logo tile.</div></div>
+      <div><div class="sw" style="background:var(--line);color:var(--text)">Hairline</div>
+        <div class="swmeta"><code>#22304a</code><br>Borders, dividers.</div></div>
+      <div><div class="sw" style="background:var(--text);color:#0b1220">Text</div>
+        <div class="swmeta"><code>#e6edf7</code><br>Body copy on dark.</div></div>
+      <div><div class="sw" style="background:var(--muted);color:#0b1220">Muted</div>
+        <div class="swmeta"><code>#8fa0bd</code><br>Secondary text, captions.</div></div>
+      <div><div class="sw" style="background:var(--grad);color:#07220a">Gradient</div>
+        <div class="swmeta"><code>135° lime→cyan</code><br>The signature. Use sparingly, for hero moments.</div></div>
+    </div>
+    <p class="sm" style="margin-top:16px">Ratio of thumb: ~70% ink &amp; panel, ~20% text, ~8% lime, ~2% cyan.
+      Lime is a spice, not a wall. Retired the old violet — lime + cyan is the house now.</p>
+  </section>
+
+  <!-- TYPE -->
+  <section>
+    <h2>Typography</h2>
+    <div class="card">
+      <div class="type-row">
+        <div class="kick">Display / Headlines</div>
+        <div style="font-size:32px;font-weight:800;letter-spacing:-.02em">Reuse, don't reinvent.</div>
+        <p class="sm"><b>Space Grotesk</b> (or system stack fallback). Tight, engineered, confident. Weights 700–800.</p>
+      </div>
+      <div class="type-row">
+        <div class="kick">Body</div>
+        <div style="font-size:16px">Every repo you'd have built from scratch, evaluated for your machine — in plain English.</div>
+        <p class="sm"><b>Inter</b> / system sans. 15–16px, line-height 1.6, weight 400–600.</p>
+      </div>
+      <div class="type-row">
+        <div class="kick">Code / Data</div>
+        <div style="font-family:ui-monospace,'JetBrains Mono',Menlo,monospace;font-size:15px;color:var(--lime)">repohunter evaluate alibaba/page-agent</div>
+        <p class="sm"><b>JetBrains Mono</b> / ui-monospace. For commands, scores, terminal moments.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- VOICE -->
+  <section>
+    <h2>Voice &amp; Tone</h2>
+    <div class="grid g2">
+      <div class="card voice">
+        <p>We sound like a <b>sharp friend who's done the homework</b> — honest, a little blunt, never hype.
+          We punch up at wasted effort and closed gardens, never down at people.</p>
+        <div class="quote">"Don't reinvent it. Someone already built it, and built it well — let's go get it, and send them the credit."</div>
+      </div>
+      <div class="card">
+        <div class="dd"><span class="yes">✓</span><span>Plain English. Short sentences. Real verdicts (adopt / adapt / skip).</span></div>
+        <div class="dd"><span class="yes">✓</span><span>Credit maintainers by name. Gratitude over cleverness.</span></div>
+        <div class="dd"><span class="no">✕</span><span>No "revolutionary", "synergy", "game-changer", or growth-hack slime.</span></div>
+        <div class="dd"><span class="no">✕</span><span>Never trash a repo's author — critique code, respect people.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- APPLICATIONS -->
+  <section>
+    <h2>Applications</h2>
+
+    <h3 style="margin-bottom:14px">Website &amp; UI</h3>
+    <div class="card center" style="gap:14px;flex-wrap:wrap;margin-bottom:26px">
+      <a class="btn primary">★ Star on GitHub</a>
+      <a class="btn ghost">Evaluate a repo</a>
+      <span class="pill">GO · fits your machine</span>
+      <span class="pill" style="color:var(--cyan)">MAYBE</span>
+    </div>
+
+    <h3 style="margin-bottom:14px">Social avatar &amp; banner</h3>
+    <div class="grid g2" style="margin-bottom:26px">
+      <div class="card center"><svg width="96" height="96" viewBox="0 0 240 240"><use href="#badge"/></svg>
+        <div style="margin-left:16px"><h3>Avatar</h3><p class="sm">The badge, centered. Same on GitHub, Bluesky, X.</p></div></div>
+      <div class="card" style="background:linear-gradient(120deg,#05080f,#0b1220);position:relative;overflow:hidden">
+        <div class="lockup"><svg width="46" height="46" viewBox="0 0 240 240"><use href="#fly"/></svg><b>Repo<i>Hunter</i></b></div>
+        <p class="sm" style="margin-top:8px">reuse, don't reinvent — <span style="color:var(--lime)">the 95% hunter for open source</span></p>
+      </div>
+    </div>
+
+    <h3 style="margin-bottom:14px">Business card</h3>
+    <div class="grid g2" style="margin-bottom:26px">
+      <div class="card" style="aspect-ratio:1.75/1;display:flex;flex-direction:column;justify-content:space-between;background:#070b16">
+        <div class="lockup"><svg width="40" height="40" viewBox="0 0 240 240"><use href="#fly"/></svg><b style="font-size:20px">Repo<i>Hunter</i></b></div>
+        <div style="font-family:ui-monospace,monospace;font-size:12px;color:var(--muted)">reuse, don't reinvent.</div>
+      </div>
+      <div class="card" style="aspect-ratio:1.75/1;display:flex;flex-direction:column;justify-content:center;gap:6px;background:linear-gradient(135deg,#0b1220,#05080f)">
+        <div style="font-weight:800;font-size:15px">Chris Gorzelic</div>
+        <div class="sm" style="margin:0">Founder</div>
+        <div style="font-family:ui-monospace,monospace;font-size:12px;color:var(--lime);margin-top:8px">hello@repohunter.dev</div>
+        <div style="font-family:ui-monospace,monospace;font-size:12px;color:var(--cyan)">repohunter.dev · @repohunter</div>
+      </div>
+    </div>
+
+    <h3 style="margin-bottom:14px">Apparel &amp; stickers</h3>
+    <div class="grid g4">
+      <div class="tee"><svg width="66" height="66" viewBox="0 0 240 240"><use href="#fly"/></svg>
+        <div class="sm" style="margin-top:8px">Tee — mark centered, chest-left small or full-back big</div></div>
+      <div class="tee" style="background:#05080f"><svg width="52" height="52" viewBox="0 0 240 240"><use href="#badge"/></svg>
+        <div class="sm" style="margin-top:8px">Hoodie — badge on chest, lockup on sleeve</div></div>
+      <div class="tee">
+        <div class="lockup" style="justify-content:center"><svg width="30" height="30" viewBox="0 0 240 240"><use href="#fly"/></svg><b style="font-size:15px">RepoHunter</b></div>
+        <div class="sm" style="margin-top:14px">Dad hat / beanie — small lockup, embroidered lime</div></div>
+      <div class="tee" style="border-style:dashed"><svg width="60" height="60" viewBox="0 0 240 240"><use href="#badge"/></svg>
+        <div class="sm" style="margin-top:8px">Die-cut sticker — the badge, glow printed</div></div>
+    </div>
+    <p class="sm" style="margin-top:16px">Print notes: lime <code style="color:var(--text)">#b8ff3c</code> on charcoal/black garments (not white —
+      it needs the dark to sing). Embroidery: single lime thread + cyan accent on the wing tips.
+      Merch line ideas: <span class="pill">the 95% hunter</span><span class="pill">reuse, don't reinvent</span><span class="pill">send the credit home</span></p>
+  </section>
+
+  <!-- GIVE BACK -->
+  <section>
+    <h2>The heart</h2>
+    <div class="card">
+      <p class="voice">Instead of "buy me a coffee," RepoHunter points support to <b>veterans and their K9s</b>.
+        Every launch, every merch drop, every sponsor page carries it. The brand isn't just sharp — it stands for something.</p>
+      <p class="sm">Keep this line near the CTAs, footers, and FUNDING: <em>"Built on open source. Kept open source. Gives back to those who served."</em></p>
+    </div>
+  </section>
+
+  <!-- ASSETS -->
+  <section>
+    <h2>Assets</h2>
+    <div class="card">
+      <p class="sm"><b>logo.svg</b> — master dragonfly badge (240×240, scales to anything) · <b>this page</b> — living spec ·
+        <b>palette</b> — copy the hex above. Need a PNG export, a transparent mark, a 1500×500 social banner, or a
+        print-ready card? Say the word and I'll generate them from the master.</p>
+    </div>
+  </section>
+
+  <footer>
+    RepoHunter Brand Guide v1 · dragonfly mark, Hunter Lime + Signal Cyan · reuse, don't reinvent.<br>
+    Everything here is generated from one master SVG so it never drifts. Evolve it, don't fork it.
+  </footer>
+</div>
+</body></html>

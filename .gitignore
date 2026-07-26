@@ -1,0 +1,15 @@
+# venvs & caches
+**/venv/
+yt-venv/
+__pycache__/
+*.pyc
+# generated data + local config with secrets
+data/
+repostore.json
+config.json
+.cache/
+
+# internal / local-only
+.wrangler/
+_design/
+RELEASE_PLAN.md

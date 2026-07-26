@@ -1,0 +1,27 @@
+{
+  "_readme": "Copy to config.json and edit. RepoHunter scores each repo's relevance against YOUR project profile, runs the LLM dossier through whatever backend you pick, and never needs any specific vendor.",
+
+  "project": {
+    "name": "My Project",
+    "profile": "Describe your project in a few sentences: what it is, its stack, its goals and constraints, and what kinds of tools/libraries would help it. RepoHunter uses this to judge how relevant each repo is TO YOU.",
+    "relevance_keywords": ["cli", "library", "api", "self-hosted", "local", "agent", "llm"]
+  },
+
+  "llm": {
+    "_note": "Any OpenAI-compatible endpoint. Default: local Ollama (no API bill). For OpenAI/OpenRouter set base_url + api_key_env. For the Claude CLI set backend to 'claude-cli'.",
+    "backend": "ollama",
+    "base_url": "http://localhost:11434/v1",
+    "model": "qwen2.5:7b",
+    "api_key_env": ""
+  },
+
+  "github_token_env": "GITHUB_TOKEN",
+
+  "seed": [
+    { "slug": "owner/repo", "category": "Example", "featured": true,
+      "why": "Why this repo matters to your project (shown on the card)." }
+  ],
+
+  "output": "data/repostore.json",
+  "port": 8130
+}

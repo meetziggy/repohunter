@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RepoHunter — reuse, don't reinvent</title>
+<meta name="description" content="The index + brain over open-source code. Find great repos, see how they fit your project and your hardware, what you'd gain, and what integrating costs — then adopt them. Local-first, MIT, built in the open.">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#070b16">
+<link rel="canonical" href="https://repohunter.dev/">
+<meta property="og:title" content="RepoHunter — reuse, don't reinvent">
+<meta property="og:description" content="Find great open-source code, see how it fits YOUR project and hardware, and adopt it. Local-first, MIT.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://repohunter.dev/">
+<meta property="og:image" content="https://repohunter.dev/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="RepoHunter — reuse, don't reinvent">
+<meta name="twitter:description" content="Find great open-source code, see if it fits your machine, and adopt it. Local-first, MIT.">
+<meta name="twitter:image" content="https://repohunter.dev/og.png">
+<style>
+  :root{
+    --bg:#070b16; --bg2:#0b1220; --card:#111a2b; --line:#22304a;
+    --lime:#b8ff3c; --cyan:#38bdf8; --green:#34d399; --amber:#fbbf24;
+    --text:#e6edf7; --muted:#8fa0bd;
+    --grad:linear-gradient(120deg,var(--lime),var(--cyan));
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:radial-gradient(1200px 600px at 50% -10%,#141d33 0,var(--bg) 55%);
+    color:var(--text);font:16px/1.6 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif}
+  a{color:var(--cyan);text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+
+  nav{display:flex;align-items:center;gap:12px;padding:20px 0}
+  nav .name{font-weight:800;font-size:18px;letter-spacing:-.01em}
+  nav img{width:34px;height:34px}
+  nav .spacer{flex:1}
+  .star{display:inline-flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);
+    border-radius:999px;padding:8px 16px;font-weight:700;font-size:14px;color:var(--text);transition:.15s}
+  .star:hover{border-color:#3a5891;transform:translateY(-1px)}
+
+  .hero{text-align:center;padding:56px 0 40px}
+  .hero img{width:120px;height:120px;filter:drop-shadow(0 8px 44px rgba(184,255,60,.32))}
+  .hero h1{font-size:clamp(40px,7vw,74px);margin:18px 0 6px;letter-spacing:-.03em;line-height:1}
+  .hero h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .tag{font-size:clamp(18px,2.6vw,24px);font-weight:700;color:var(--text);margin:0 0 14px}
+  .lede{max-width:640px;margin:0 auto 26px;color:var(--muted);font-size:18px}
+  .cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .btn{border-radius:12px;padding:13px 22px;font-weight:700;font-size:15px;border:0;cursor:pointer;transition:.15s}
+  .btn.primary{background:var(--grad);color:#08101f}
+  .btn.primary:hover{filter:brightness(1.08);transform:translateY(-1px)}
+  .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+  .btn.ghost:hover{border-color:#3a5891}
+  .subline{margin-top:16px;color:var(--muted);font-size:13.5px}
+  .subline b{color:var(--text)}
+
+  .code{max-width:560px;margin:34px auto 0;background:#060a13;border:1px solid var(--line);border-radius:14px;
+    text-align:left;padding:16px 18px;font:13.5px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;color:#cdd9ef;overflow-x:auto}
+  .code .c{color:var(--muted)}  .code .p{color:var(--lime)}
+
+  section{padding:52px 0}
+  .h2{font-size:13px;text-transform:uppercase;letter-spacing:.12em;color:var(--lime);font-weight:800;text-align:center}
+  .h2b{font-size:clamp(26px,4vw,36px);text-align:center;margin:6px 0 34px;letter-spacing:-.02em}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+  .feat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+  .feat .ic{font-size:24px}
+  .feat h3{margin:12px 0 6px;font-size:18px}
+  .feat p{margin:0;color:var(--muted);font-size:14.5px}
+
+  .story{max-width:720px;margin:0 auto;background:linear-gradient(180deg,#0e1729,#0b1322);
+    border:1px solid var(--line);border-radius:18px;padding:30px 32px}
+  .story p{color:#cdd9ef;font-size:16.5px;margin:0 0 14px}
+  .story .sig{color:var(--muted);font-style:italic}
+
+  .give{text-align:center;max-width:640px;margin:0 auto}
+  .give .paws{font-size:30px}
+  .give a.org{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:10px 16px;margin:8px 6px 0;font-weight:700;color:var(--text)}
+  .give a.org:hover{border-color:#3a5891}
+
+  footer{border-top:1px solid var(--line);padding:30px 0 50px;text-align:center;color:var(--muted);font-size:13.5px}
+  .diff{color:var(--muted);text-align:center;max-width:660px;margin:0 auto 30px;font-size:16px}
+  .diff b{color:var(--text)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <img src="logo.svg" alt=""><span class="name">RepoHunter</span>
+    <span class="spacer"></span>
+    <a class="star" href="https://github.com/meetziggy/repohunter" target="_blank" rel="noopener">★ Star on GitHub</a>
+  </nav>
+
+  <header class="hero">
+    <img src="logo.svg" alt="RepoHunter">
+    <h1>Reuse,<br><span class="g">don't reinvent.</span></h1>
+    <p class="tag">The index &amp; brain over open-source code.</p>
+    <p class="lede">Find great open-source repos, see exactly how they'd fit <b style="color:var(--text)">your</b> project and
+      <b style="color:var(--text)">your</b> hardware, what you'd gain, and what integrating actually costs — then adopt them. On your terms.</p>
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/meetziggy/repohunter" target="_blank" rel="noopener">★ Star it on GitHub</a>
+      <a class="btn ghost" href="#how">See how it works</a>
+    </div>
+    <div class="subline">Runs <b>locally</b> · pluggable AI (local model or your key) · <b>MIT</b> open source · built &amp; maintained in the open by a human + his AI</div>
+    <div class="code">
+<span class="c"># clone, point it at your project, go hunting</span>
+git clone https://github.com/meetziggy/repohunter
+cp config.example.json config.json
+python3 repohunter.py <span class="p">serve</span>
+    </div>
+  </header>
+
+  <section id="how">
+    <div class="h2">Not another repo health-scorer</div>
+    <div class="h2b">It answers the question you actually have</div>
+    <p class="diff">Every other tool tells you <i>“is this repo well-maintained?”</i> RepoHunter tells you
+      <b>“should I adopt this — for my project, on my machine — and what will it cost me?”</b></p>
+    <div class="grid">
+      <div class="feat"><div class="ic">🎯</div><h3>An integration dossier</h3><p>Relevance to your project, how to integrate, the enhancement you'd gain, build-vs-integrate, and a GO / MAYBE / SKIP call.</p></div>
+      <div class="feat"><div class="ic">💻</div><h3>Runs-on-your-hardware</h3><p>A real resource-fit check plus a rough cost to integrate — tokens, time, agents. Nobody else does this.</p></div>
+      <div class="feat"><div class="ic">📥</div><h3>Ingest from anywhere</h3><p>Drop a repo, search GitHub live, or paste a “top-10 repos” YouTube video — RepoHunter pulls the repos out.</p></div>
+      <div class="feat"><div class="ic">🔒</div><h3>Local-first &amp; honest</h3><p>Runs on your machine with a local model — no bill, no lock-in. It plans; it never installs behind your back.</p></div>
+      <div class="feat"><div class="ic">🧭</div><h3>Knows what kind it is</h3><p>Classifies each repo and proposes the right move — integrate, add as a source, or just learn from it.</p></div>
+      <div class="feat"><div class="ic">⭐</div><h3>Promotes the author</h3><p>Every link sends you to star the original. RepoHunter celebrates open source — it doesn't strip-mine it.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="h2">Low-carbon by default</div>
+    <div class="h2b">The greenest code is the code you never regenerate</div>
+    <p class="diff">Every token an AI generates burns real energy — electricity and water in a data center.
+      When millions of us regenerate the same auth flow, the same RAG pipeline, the same library that
+      <i>already exists</i>, that's redundant compute for zero new value. RepoHunter finds what's already built,
+      so you <b>don't reinvent — and don't re-burn.</b></p>
+    <div class="grid">
+      <div class="feat"><div class="ic">💸</div><h3>Fewer tokens, smaller bill</h3><p>Adopting proven code beats regenerating it from scratch. You skip the compute — and the cost that comes with it.</p></div>
+      <div class="feat"><div class="ic">🌱</div><h3>Less compute, less carbon</h3><p>AI inference runs on real power and cooling. Reuse simply avoids it. Think of it as recycling, for software.</p></div>
+      <div class="feat"><div class="ic">🧬</div><h3>Breaks the monoculture</h3><p>AI reaches for the same ten popular libraries every time. RepoHunter surfaces the long tail — so we stop all building the same thing.</p></div>
+    </div>
+    <p class="subline" style="text-align:center;margin-top:18px"><b>Coming soon:</b> every adoption shows an estimated <b>tokens saved ≈ energy ≈ CO₂ avoided</b> vs. building it yourself — transparent, conservative math.</p>
+  </section>
+
+  <section>
+    <div class="h2">Why it exists</div>
+    <div class="h2b">A love letter to open source, disguised as a tool</div>
+    <div class="story">
+      <p>Every week, thousands of people give away brilliant work for free — <b>and most of it is never
+        found.</b> Discovery rewards whatever's already popular, so two things waste away at once: great
+        projects die in obscurity, and the rest of us reinvent what already exists because we couldn't find it.</p>
+      <p>The whole digital world runs on maintainers nobody thanks. And now that AI writes more of the
+        code — reaching for the same ten popular libraries every time — the long tail of great,
+        perfect-for-you software is going dark faster.</p>
+      <p>RepoHunter pushes back. It finds the <b>right</b> code for you — underdogs included — tells you the
+        honest truth about whether it fits <i>your</i> project and <i>your</i> hardware, and <b>sends the
+        credit home:</b> every path ends at a ★ for the author. Reuse, with gratitude.</p>
+      <p class="sig">Built by a veteran and his AI, in the open. Free forever. — Chris &amp; Ziggy 🤖
+        &nbsp;·&nbsp; <a href="https://github.com/meetziggy/repohunter" target="_blank" rel="noopener">Read the manifesto →</a></p>
+    </div>
+  </section>
+
+  <section>
+    <div class="give">
+      <div class="paws">🐾</div>
+      <div class="h2b" style="margin:6px 0 10px">No coffee. Give back instead.</div>
+      <p class="diff">RepoHunter is free, always. If it saves you time, don't buy me a coffee — do something better.
+        I'm a veteran, and I'd rather send that goodwill to those who served on four legs and two.</p>
+      <a class="org" href="https://k9sforwarriors.org/" target="_blank" rel="noopener">🐕‍🦺 K9s For Warriors</a>
+      <a class="org" href="https://missionk9rescue.org/" target="_blank" rel="noopener">🎖️ Mission K9 Rescue</a>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    MIT © 2026 Chris Gorzelic · built on open source, given back · maintained by Ziggy 🤖<br>
+    <a href="https://github.com/meetziggy/repohunter" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</footer>
+<!-- ── Analytics (pick ONE, paste your ID, uncomment) ───────────────────────────
+  Recommended — Cloudflare Web Analytics: cookieless, no banner needed, free,
+  and you're already on Cloudflare. Dashboard → Web Analytics → add repohunter.dev → paste token:
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon='{"token":"YOUR_CF_TOKEN"}'></script>
+
+  Or Google Analytics 4 (sets cookies — add a consent line if you use it):
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
+    gtag('js',new Date());gtag('config','G-XXXXXXXXXX');</script>
+──────────────────────────────────────────────────────────────────────────── -->
+</body>
+</html>

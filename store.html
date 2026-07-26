@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RepoHunter — reuse, don't reinvent</title>
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<style>
+  :root{
+    --bg:#070b16; --card:#111a2b; --card2:#0d1424; --cyan:#38bdf8; --violet:#a78bfa;
+    --green:#34d399; --amber:#fbbf24; --rose:#fb7185; --muted:#8fa0bd; --text:#e6edf7;
+    --line:#22304a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text);
+    font:15px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif}
+  a{color:var(--cyan);text-decoration:none}
+  .wrap{max-width:1180px;margin:0 auto;padding:24px 20px 80px}
+
+  /* header */
+  header{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
+  .brand{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .brand .zap{color:var(--violet)}
+  .sub{color:var(--muted);font-size:14px;margin-top:2px;max-width:640px}
+  .machine{margin-left:auto;background:var(--card);border:1px solid var(--line);
+    border-radius:12px;padding:8px 14px;font-size:12.5px;color:var(--muted);white-space:nowrap}
+  .machine b{color:var(--text)}
+
+  /* drop bar */
+  .drop{display:flex;gap:10px;margin:20px 0 6px;flex-wrap:wrap}
+  .drop input{flex:1;min-width:240px;background:var(--card2);border:1px solid var(--line);
+    border-radius:12px;color:var(--text);padding:12px 16px;font:inherit}
+  .drop input::placeholder{color:#5f7095}
+  .btn{background:var(--violet);color:#0a0f1e;border:0;border-radius:12px;padding:12px 20px;
+    font:inherit;font-weight:700;cursor:pointer;transition:filter .15s}
+  .btn:hover{filter:brightness(1.1)}
+  .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+  .hint{color:var(--muted);font-size:12.5px;margin:2px 2px 18px}
+
+  /* filter chips */
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 20px;align-items:center}
+  .chip{background:var(--card);border:1px solid var(--line);color:var(--muted);
+    border-radius:999px;padding:7px 15px;font-size:13px;cursor:pointer;transition:.15s}
+  .chip.on{background:var(--violet);color:#0a0f1e;border-color:var(--violet);font-weight:700}
+  .chip:hover{color:var(--text)}
+  .search{margin-left:auto;background:var(--card2);border:1px solid var(--line);border-radius:999px;
+    color:var(--text);padding:7px 15px;font:inherit;min-width:200px}
+
+  /* grid */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+  .repo{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;
+    cursor:pointer;transition:transform .12s,border-color .12s;position:relative;overflow:hidden}
+  .repo:hover{transform:translateY(-3px);border-color:#33507e}
+  .repo .rank{position:absolute;top:14px;right:16px;font-size:12px;color:var(--muted)}
+  .repo h3{margin:0 0 2px;font-size:17px}
+  .repo .owner{color:var(--muted);font-size:12.5px}
+  .repo .desc{color:#b9c6de;font-size:13.5px;margin:10px 0 12px;min-height:38px}
+  .meta{display:flex;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-bottom:12px}
+  .meta .lang::before{content:"●";color:var(--cyan);margin-right:5px}
+  .badges{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .verdict{font-size:11.5px;font-weight:800;padding:4px 10px;border-radius:999px;letter-spacing:.03em}
+  .v-GO{background:rgba(52,211,153,.16);color:var(--green)}
+  .v-MAYBE{background:rgba(251,191,36,.16);color:var(--amber)}
+  .v-SKIP{background:rgba(251,113,133,.16);color:var(--rose)}
+  .v-NEW{background:rgba(56,189,248,.16);color:var(--cyan)}
+  .fit{font-size:11.5px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+  .ring{--p:0;width:44px;height:44px;border-radius:50%;flex:0 0 auto;
+    background:conic-gradient(var(--violet) calc(var(--p)*1%),#20304c 0);
+    display:grid;place-items:center;font-size:13px;font-weight:800}
+  .ring i{width:34px;height:34px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-style:normal}
+  .cardfoot{display:flex;align-items:center;gap:12px;margin-top:4px}
+  .cardfoot .badges{flex:1}
+
+  .section-h{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;
+    margin:26px 2px 12px;font-weight:700}
+
+  /* detail drawer */
+  .scrim{position:fixed;inset:0;background:rgba(3,6,14,.72);backdrop-filter:blur(4px);
+    opacity:0;pointer-events:none;transition:.2s;z-index:40}
+  .scrim.on{opacity:1;pointer-events:auto}
+  .drawer{position:fixed;top:0;right:0;height:100%;width:min(620px,94vw);background:var(--card2);
+    border-left:1px solid var(--line);transform:translateX(100%);transition:transform .24s;z-index:50;
+    overflow-y:auto;padding:26px 28px 60px}
+  .drawer.on{transform:none}
+  .drawer .x{position:absolute;top:18px;right:20px;font-size:22px;color:var(--muted);cursor:pointer;line-height:1}
+  .drawer h2{margin:0 6px 0 0;font-size:23px;display:inline}
+  .dossier h4{margin:20px 0 6px;font-size:12px;color:var(--violet);text-transform:uppercase;letter-spacing:.07em}
+  .dossier p{margin:0;color:#cdd9ef;font-size:14px}
+  .kpis{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:12px;color:var(--muted)}
+  .kpi b{display:block;color:var(--text);font-size:18px;font-weight:800}
+  .integrate{margin-top:24px;display:flex;gap:10px;flex-wrap:wrap}
+  .note{color:var(--muted);font-size:12.5px;margin-top:10px}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--card);
+    border:1px solid var(--line);border-radius:12px;padding:12px 20px;z-index:60;opacity:0;transition:.2s}
+  .toast.on{opacity:1}
+  .empty{color:var(--muted);text-align:center;padding:60px 0}
+  .intbox{margin-top:22px;border-top:1px solid var(--line);padding-top:16px}
+  ol.steps{margin:6px 0 4px;padding-left:20px;color:#cdd9ef;font-size:13.5px}
+  ol.steps li{margin:4px 0}
+  .kindline{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 6px}
+  .tag{font-size:11.5px;font-weight:700;padding:4px 11px;border-radius:999px;
+    background:rgba(56,189,248,.14);color:var(--cyan);letter-spacing:.02em}
+  .tag2{background:rgba(167,139,250,.16);color:var(--violet)}
+  .ghcard{cursor:default}
+  .ghcard .integrate{margin-top:8px}
+  .ghcard .note{margin-top:8px}
+  @media(max-width:640px){.machine{margin-left:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="brand"><span class="zap">⚡</span> RepoHunter</div>
+      <div class="sub">Open-source projects, ranked for your project. The idea: <b>reuse, don't reinvent</b> —
+        find someone's great code, see how it'd plug into your project and what you'd gain, and only then integrate.</div>
+    </div>
+    <div class="machine" id="machine">runs on: —</div>
+  </header>
+
+  <div class="drop">
+    <input id="url" placeholder="Drop a GitHub repo — or a YouTube “top repos” video — to ingest…">
+    <button class="btn" id="go">Ingest</button>
+  </div>
+  <div class="hint">Drop a repo (owner/name or URL) and RepoHunter scores it, checks it runs on your hardware,
+    and writes a dossier. Drop a YouTube video and RepoHunter pulls every repo out of it. Nothing is installed without your say-so.</div>
+
+  <div class="filters" id="filters">
+    <span class="chip on" data-f="top">Top rated</span>
+    <span class="chip" data-f="relevant">Most relevant</span>
+    <span class="chip" data-f="go">Ready to integrate</span>
+    <span class="chip" data-f="video">📺 From videos</span>
+    <span class="chip" data-f="github">🔎 Search GitHub</span>
+    <select class="search" id="sort" title="Sort by" style="min-width:0;cursor:pointer">
+      <option value="overall">Sort · Best fit</option>
+      <option value="relevance">Sort · Relevance</option>
+      <option value="stars">Sort · Most stars</option>
+      <option value="maturity">Sort · Most mature</option>
+      <option value="fresh">Sort · Recently active</option>
+    </select>
+    <input class="search" id="search" placeholder="Filter the store…">
+  </div>
+
+  <div id="cats"></div>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" style="display:none">Loading the store…</div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="drawer" id="drawer"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const APP='';
+let STORE={repos:[]}, filter='top', q='';
+
+const el=id=>document.getElementById(id);
+const esc=s=>(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function toast(m){const t=el('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2600);}
+
+async function load(){
+  try{
+    const r=await fetch('repostore.json?t='+Date.now());
+    STORE=await r.json();
+  }catch(e){ el('empty').textContent='Store data not built yet — run: ziggy-repostore.py refresh'; el('empty').style.display='block'; return; }
+  const m=STORE.machine||{};
+  el('machine').innerHTML='runs on: <b>'+esc(m.chip||'—')+'</b> · '+esc(m.cores||'?')+' cores · <b>'+esc((m.ram_gb||'?')+' GB')+'</b> · '+esc(m.disk_free||'')+' free';
+  render();
+}
+
+function verdictOf(r){ return (r.dossier&&r.dossier.verdict)|| (r.scores.overall>=70?'GO':r.scores.overall>=45?'MAYBE':'NEW'); }
+
+function passes(r){
+  if(q){ const hay=(r.id+' '+(r.desc||'')+' '+(r.category||'')+' '+(r.topics||[]).join(' ')).toLowerCase();
+         if(!hay.includes(q)) return false; }
+  if(filter==='go')  return verdictOf(r)==='GO';
+  if(filter==='video') return (r.sources||[]).some(s=>s.type==='youtube');
+  return true;
+}
+function videoSource(r){ return (r.sources||[]).find(s=>s.type==='youtube'); }
+let sortMode='overall';
+function sortKey(r){
+  const s=r.scores;
+  const mode = filter==='relevant' ? 'relevance' : sortMode;
+  switch(mode){
+    case 'relevance': return s.relevance*1000+s.overall;
+    case 'stars':     return (r.stars||0);
+    case 'maturity':  return (s.maturity||0)*1000+s.overall;
+    case 'fresh':     return (s.freshness||0)*1000+s.overall;
+    default:          return s.overall*1000+s.relevance;
+  }
+}
+
+function card(r,i){
+  const v=verdictOf(r), rel=r.scores.relevance, ring=r.scores.overall;
+  return `<div class="repo" data-id="${esc(r.id)}">
+    <div class="rank">#${i+1}</div>
+    <h3>${esc(r.name)}</h3>
+    <div class="owner">${esc(r.owner)} · ${esc(r.category||'')}</div>
+    <div class="desc">${esc(r.desc||'')}</div>
+    <div class="meta">
+      ${r.language?`<span class="lang">${esc(r.language)}</span>`:''}
+      <span>★ ${(r.stars||0).toLocaleString()}</span>
+      <span>${esc(r.license||'')}</span>
+      ${videoSource(r)?`<span title="${esc(videoSource(r).title)}">📺 from a video</span>`:''}
+    </div>
+    <div class="cardfoot">
+      <div class="ring" style="--p:${ring}"><i>${ring}</i></div>
+      <div class="badges">
+        <span class="verdict v-${v}">${v}</span>
+        ${(r.integration&&r.integration.status&&r.integration.status!=='evaluated')?`<span class="fit" style="color:var(--cyan);border-color:#2b5a86">${esc(r.integration.status)}</span>`:''}
+        <span class="fit">${esc((r.resource_fit||{}).verdict||'')}</span>
+        <span class="fit">relevance ${rel}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function render(){
+  if(filter==='github') return;   // GitHub-search results own the grid in this mode
+  const repos=(STORE.repos||[]).filter(passes).sort((a,b)=>sortKey(b)-sortKey(a));
+  el('empty').style.display=repos.length?'none':'block';
+  if(!repos.length && !q) el('empty').textContent='No repos yet.';
+  // category rail (only on default view)
+  const cats=el('cats'); cats.innerHTML='';
+  el('grid').innerHTML=repos.map((r,i)=>card(r,i)).join('');
+  document.querySelectorAll('.repo').forEach(n=>n.onclick=()=>openDrawer(n.dataset.id));
+}
+
+function scoreKpis(r){
+  const s=r.scores;
+  const k=(l,v)=>`<div class="kpi">${l}<b>${v}</b></div>`;
+  return `<div class="kpis">${k('Relevance',s.relevance)}${k('Popularity',s.popularity)}${k('Health',s.health)}${k('Freshness',s.freshness)}</div>`;
+}
+const ADOPT={'integrate':'Integrate the code','discovery-source':'Add as a discovery source',
+  'mine-for-candidates':'Mine it for candidate repos','reference-only':'Reference only — learn, don’t install','skip':'Skip'};
+const adoptLabel=a=>ADOPT[a]||a||'';
+function dossierHtml(d){
+  if(!d) return `<p class="note">No deep dossier yet — click Evaluate to have RepoHunter analyze this one.</p>`;
+  const row=(h,v)=>(v&&v!=='n/a')?`<h4>${h}</h4><p>${esc(v)}</p>`:'';
+  const kindline=(d.kind||d.adopt_as)?`<div class="kindline">${d.kind?`<span class="tag">${esc(d.kind)}</span>`:''}${d.adopt_as?`<span class="tag tag2">best move: ${esc(adoptLabel(d.adopt_as))}</span>`:''}</div>`:'';
+  return `<div class="dossier">
+    ${kindline}
+    ${row('What it is',d.what)}
+    ${row('Why it matters to your project',d.relevance)}
+    ${row(d.adopt_as==='integrate'?'How to integrate':'How to adopt it',d.integration)}
+    ${row('The enhancement',d.enhancement)}
+    ${row('How we’d make it better',d.improvements)}
+    ${row('Runs on your hardware?',d.feasibility)}
+    ${row('Build it ourselves, or integrate?',d.build_vs_integrate)}
+    ${row('Rough cost',d.cost)}
+    ${row('Recommendation',d.recommendation)}
+  </div>`;
+}
+function planHtml(pl){
+  if(!pl) return '';
+  const row=(h,v)=>v?`<h4>${h}</h4><p>${esc(v)}</p>`:'';
+  const list=(h,a)=>(a&&a.length)?`<h4>${h}</h4><ol class="steps">${a.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>`:'';
+  return `<div class="dossier">
+    ${row('Plan',pl.summary)}
+    ${row('How we get it (verified, no curl│bash)',pl.install_method)}
+    ${list('Steps',pl.steps)}
+    ${list('Proof it works (smoke test)',pl.smoke_test)}
+    ${row('Rollback',pl.rollback)}
+    ${list('Risks',pl.risks)}
+    ${row('Effort',pl.effort)}
+  </div>`;
+}
+function integrationSection(r){
+  const ig=r.integration||{}, st=ig.status||'';
+  if(st==='planning') return `<div class="intbox"><h4>Integration</h4><p class="note">⏳ RepoHunter is drafting the integration plan… (about a minute)</p></div>`;
+  if(st==='planned') return `<div class="intbox"><h4>Integration plan · Gate 1 — your call</h4>
+    <span class="verdict v-${(ig.plan||{}).verdict==='GO'?'GO':'MAYBE'}">${esc((ig.plan||{}).verdict||'')}</span>
+    ${planHtml(ig.plan)}
+    <div class="integrate">
+      <button class="btn" onclick="planDecide('${esc(r.id)}','approve')">Approve plan</button>
+      <button class="btn ghost" onclick="planDecide('${esc(r.id)}','reject')">Reject</button>
+    </div>
+    <div class="note">Approving hands it to the builder — which works in an isolated copy and opens a PR for your final OK (Gate 2). Nothing is installed yet.</div></div>`;
+  if(st==='approved') return `<div class="intbox"><h4>Integration</h4>
+    <p>✅ Plan approved — ready for the builder stage, which opens a PR for your final review.</p>
+    <p class="note">The builder stage (Gate 2) is the next slice being built.</p></div>`;
+  // Dynamic: only code-type repos get a "Plan integration". Lists/references get the right move.
+  const adopt=(r.dossier||{}).adopt_as;
+  if(adopt && adopt!=='integrate'){
+    return `<div class="intbox"><h4>How to adopt this</h4>
+      <p>RepoHunter classified this as <b>${esc((r.dossier||{}).kind||'special')}</b> — the right move is
+         <b>${esc(adoptLabel(adopt))}</b>, not installing it as code.</p>
+      <p class="note">Using aggregate lists as live discovery sources is the next feature; for now, open it and Evaluate the good ones you find.</p>
+      <div class="integrate"><a class="btn ghost" href="${esc(r.url)}" target="_blank" rel="noopener">★ Star on GitHub ↗</a></div></div>`;
+  }
+  return `<div class="integrate">
+      <button class="btn" onclick="integrate('${esc(r.id)}')">Plan integration</button>
+      <a class="btn ghost" href="${esc(r.url)}" target="_blank" rel="noopener">★ Star on GitHub</a>
+    </div>
+    <div class="note">“Plan integration” has RepoHunter draft a concrete, checksum-pinned plan for your approval — it installs nothing on its own.</div>`;
+}
+function openDrawer(id){
+  const r=(STORE.repos||[]).find(x=>x.id===id); if(!r)return;
+  const v=verdictOf(r), fit=r.resource_fit||{};
+  el('drawer').innerHTML=`
+    <span class="x" onclick="closeDrawer()">✕</span>
+    <div><h2>${esc(r.name)}</h2> <span class="verdict v-${v}">${v}</span></div>
+    <div class="owner" style="color:var(--muted);margin:4px 0 2px">${esc(r.owner)} · ${esc(r.category||'')} · ${esc(r.license||'')} · ★ ${(r.stars||0).toLocaleString()}</div>
+    <a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.url)}</a>
+    ${(r.sources||[]).some(s=>s.type==='youtube')?`<div class="note" style="margin-top:8px">📺 Found in: ${(r.sources||[]).filter(s=>s.type==='youtube').map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a>`).join(' · ')}</div>`:''}
+    <div class="kpi" style="margin-top:14px">Fits this machine? <b style="font-size:14px">${esc(fit.verdict||'—')}</b> <span style="color:var(--muted)">— ${esc(fit.note||'')}</span></div>
+    ${scoreKpis(r)}
+    ${dossierHtml(r.dossier)}
+    ${integrationSection(r)}`;
+  el('drawer').classList.add('on'); el('scrim').classList.add('on');
+}
+function closeDrawer(){el('drawer').classList.remove('on');el('scrim').classList.remove('on');}
+el('scrim').onclick=closeDrawer;
+
+async function evaluate(){
+  const u=el('url').value.trim(); if(!u)return;
+  el('url').value='';
+  if(/youtu\.?be/.test(u)){
+    toast('Mining the video for repos… (about a minute)');
+    try{ await fetch(APP+'/api/repo/ingest-video',{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({url:u})}); }
+    catch(e){ toast('Run: ziggy-repostore.py ingest-video '+u); return; }
+    [8000,20000,40000,60000,80000].forEach(ms=>setTimeout(load,ms));
+    return;
+  }
+  toast('RepoHunter is evaluating '+u+' …');
+  try{ await fetch(APP+'/api/repo/queue',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({url:u})}); }
+  catch(e){ toast('Add it with: ziggy-repostore.py evaluate '+u); return; }
+  [4000,20000,45000].forEach(ms=>setTimeout(load,ms));
+}
+async function integrate(id){
+  toast('RepoHunter is drafting the integration plan…');
+  try{ await fetch(APP+'/api/repo/integrate',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({id})}); }
+  catch(e){ toast('Run: ziggy-repostore.py plan '+id); return; }
+  [4000,12000,24000,40000,60000].forEach(ms=>setTimeout(async()=>{
+    await load(); if(el('drawer').classList.contains('on')) openDrawer(id);
+  },ms));
+}
+async function planDecide(id,decision){
+  toast(decision==='approve'?'Plan approved — ready for the builder.':'Plan rejected.');
+  try{ await fetch(APP+'/api/repo/plan-decision',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({id,decision})}); }catch(e){}
+  setTimeout(async()=>{ await load(); if(el('drawer').classList.contains('on')) openDrawer(id); },2500);
+}
+
+/* ── Live GitHub search — summary is free; the dossier only runs on demand ── */
+let GH=[]; // last GitHub search results
+async function ghSearch(query){
+  const grid=el('grid'); grid.innerHTML='';
+  el('empty').style.display='block'; el('empty').textContent='Searching GitHub…';
+  try{
+    const r=await fetch('https://api.github.com/search/repositories?sort=stars&per_page=24&q='+encodeURIComponent(query),
+      {headers:{'Accept':'application/vnd.github+json'}});
+    const d=await r.json(); GH=d.items||[];
+  }catch(e){ el('empty').textContent='GitHub search failed (rate limit?) — try again in a minute.'; return; }
+  el('empty').style.display=GH.length?'none':'block';
+  if(!GH.length){ el('empty').textContent='No repos found.'; return; }
+  const inStore=new Set((STORE.repos||[]).map(x=>x.id.toLowerCase()));
+  grid.innerHTML=GH.map(g=>{
+    const done=inStore.has((g.full_name||'').toLowerCase());
+    return `<div class="repo ghcard">
+      <h3>${esc(g.name)}</h3>
+      <div class="owner">${esc((g.owner||{}).login||'')} · ${esc(g.language||'—')} · ${esc((g.license||{}).spdx_id||'—')}</div>
+      <div class="desc">${esc(g.description||'No description.')}</div>
+      <div class="meta"><span>★ ${(g.stargazers_count||0).toLocaleString()}</span>
+        <span>updated ${esc((g.pushed_at||'').slice(0,10))}</span></div>
+      <div class="integrate">
+        ${done
+          ? `<button class="btn ghost" onclick="event.stopPropagation();openDrawer('${esc(g.full_name)}')">In store — view</button>`
+          : `<button class="btn" onclick="event.stopPropagation();evaluateRepo('${esc(g.full_name)}',this)">Evaluate for this machine</button>`}
+        <a class="btn ghost" href="${esc(g.html_url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">GitHub ↗</a>
+      </div>
+      <div class="note">Free summary above · evaluating spends tokens to write the full dossier.</div>
+    </div>`;
+  }).join('');
+}
+async function evaluateRepo(full,btn){
+  if(btn){ btn.textContent='Evaluating…'; btn.disabled=true; }
+  toast('Evaluating '+full+' for this machine…');
+  try{ await fetch(APP+'/api/repo/queue',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({url:full})}); }
+  catch(e){ toast('Run: ziggy-repostore.py evaluate '+full); return; }
+  [8000,20000,40000,60000].forEach(ms=>setTimeout(async()=>{ await load(); openDrawer(full); },ms));
+}
+el('go').onclick=evaluate;
+el('sort').addEventListener('change',e=>{ sortMode=e.target.value; render(); });
+el('url').addEventListener('keydown',e=>{if(e.key==='Enter')evaluate();});
+el('search').addEventListener('input',e=>{ if(filter==='github')return; q=e.target.value.trim().toLowerCase(); render(); });
+el('search').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&filter==='github'){ const query=e.target.value.trim(); if(query) ghSearch(query); }
+});
+document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{
+  document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
+  c.classList.add('on'); filter=c.dataset.f;
+  if(filter==='github'){
+    el('search').placeholder='Search all of GitHub…  then press Enter'; el('search').value=''; el('search').focus();
+    el('grid').innerHTML=''; el('empty').style.display='block';
+    el('empty').textContent='Type what you need and press Enter — RepoHunter searches GitHub. Summaries are free; you only spend tokens on the ones you choose to evaluate.';
+  } else { el('search').placeholder='Filter the store…'; render(); }
+});
+window.closeDrawer=closeDrawer; window.integrate=integrate;
+window.planDecide=planDecide; window.evaluateRepo=evaluateRepo; window.openDrawer=openDrawer;
+load();
+</script>
+</body>
+</html>
