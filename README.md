@@ -79,6 +79,11 @@ _(An automated builder that runs the plan and opens the PR for you is on the roa
 - **Built on open source, released to everyone** — MIT. RepoHunter is the reuse-first idea applied to
   itself: assembled from community repos + open APIs, and given back.
 - **Agent-maintained** — Ziggy triages, patches, and ships this repo end-to-end, with Chris steering.
+- **Fewer tokens, smaller bill, less carbon** — every token an AI generates burns real energy, and
+  regenerating code that already exists is redundant compute for zero new value. Adopting proven code
+  means you skip the compute, the API bill, and the energy behind it. The greenest code is the code
+  you never regenerate — **reuse, don't re-burn.** *(Coming soon: every adoption shows an estimated
+  tokens saved ≈ energy ≈ CO₂ avoided vs. building it yourself — transparent, conservative math.)*
 
 ## Quickstart
 

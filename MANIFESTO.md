@@ -30,6 +30,11 @@ popular libraries every time — because popularity is the only signal it has. I
 age of AI turns a vibrant, diverse commons into a monoculture, and the long tail of great, weird,
 perfect-for-you software goes dark for good.
 
+There's a third waste, and nobody itemizes it: every token an AI generates burns real energy —
+electricity and water in a data center somewhere. When millions of us regenerate the same auth flow,
+the same RAG pipeline, the same library that *already exists*, that's redundant compute for zero new
+value. The greenest code is the code you never regenerate. **Reuse, don't re-burn.**
+
 That's the world RepoHunter was built to push back on.
 
 ## What we're actually here to do
