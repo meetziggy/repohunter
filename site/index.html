@@ -184,6 +184,16 @@
   .est-say{margin-top:18px;text-align:center;font-size:15.5px;color:var(--text);line-height:1.6}
   .est-say b{color:var(--lime)}
   .tokchip{display:inline-block;border-bottom:1px dashed var(--cyan);color:var(--cyan);cursor:help}
+  .est-models{margin-top:14px;background:#0b1424;border:1px solid var(--line);border-radius:14px;padding:15px 16px}
+  .em-title{font-size:13px;color:var(--muted);text-align:center;margin-bottom:13px}
+  .em-title b{color:var(--text)}
+  .em-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .em{text-align:center;font-size:12px;color:var(--muted);line-height:1.5;background:#0e1729;border:1px solid var(--line);border-radius:11px;padding:11px 6px;transition:box-shadow .35s,border-color .35s}
+  .em.pulse{border-color:rgba(184,255,60,.5);box-shadow:0 0 20px rgba(184,255,60,.14)}
+  .em b{display:block;margin-top:3px;font-size:clamp(17px,3.6vw,23px);color:var(--lime);font-family:ui-monospace,monospace}
+  .em .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
+  .em .dot.g{background:var(--green)}.em .dot.y{background:var(--amber)}.em .dot.r{background:#fb7185}
+  .em-note{font-size:10.5px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.5}
   .fullstore{max-width:900px;margin:28px auto 0}
   .fullstore summary{color:var(--cyan);cursor:pointer;text-align:center;font-size:13.5px;list-style:none}
   .fullstore img{width:100%;border:1px solid var(--line);border-radius:14px;margin-top:12px;box-shadow:0 20px 50px rgba(0,0,0,.4)}
@@ -285,8 +295,8 @@
       A GO / MAYBE / SKIP call and a plan to do it — and now a <b style="color:var(--text)">skill your AI agent calls</b> before it installs anything.</p>
     <div class="htok">
       <div class="msg">🔥 Every token spent regenerating code that <b>already exists</b> is wasted.</div>
-      <div class="fig">Regenerating a ~400-line module ≈ <b>~5,000 tokens</b> ≈ <b>$0.03–$0.15</b>
-        <span class="note">real tokenizer math · ~4 chars/token · current model pricing</span></div>
+      <div class="fig">Regenerating a ~500-line module ≈ <b>~20,000 tokens</b> all-in ≈ <b>$0.04–$0.80</b>
+        <span class="note">cheap model → premium · all-in = the code <i>plus</i> the context &amp; retries it takes to generate it</span></div>
       <details>
         <summary>…now multiply that by everyone, every day ↓</summary>
         <table>
@@ -391,12 +401,12 @@ python3 repohunter.py <span class="p">serve</span>
       <div class="est-row">
         <label>Times a month you reach for something that likely already exists
           <span class="hint">every reuse is a build you skip</span></label>
-        <input id="e_reuses" type="number" min="0" step="1" value="4" inputmode="numeric">
+        <input id="e_reuses" type="number" min="0" step="1" value="8" inputmode="numeric">
       </div>
       <div class="est-row">
         <label>Hours it'd take you to build &amp; maintain one yourself
           <span class="hint">writing is the cheap part; owning it forever isn't</span></label>
-        <input id="e_hours" type="number" min="0" step="0.5" value="8" inputmode="decimal">
+        <input id="e_hours" type="number" min="0" step="0.5" value="6" inputmode="decimal">
       </div>
       <div class="est-row">
         <label>Your time, per hour ($)
@@ -405,13 +415,21 @@ python3 repohunter.py <span class="p">serve</span>
       </div>
       <div class="est-row">
         <label>Avg size of what you'd have rebuilt (lines)
-          <span class="hint">tokens ≈ lines × ~13 (real tokenizer ratio)</span></label>
-        <input id="e_lines" type="number" min="0" step="50" value="400" inputmode="numeric">
+          <span class="hint">all-in ≈ lines × ~40 tokens (code + context + retries)</span></label>
+        <input id="e_lines" type="number" min="0" step="50" value="500" inputmode="numeric">
       </div>
       <div class="est-tiles">
         <div class="est-tile" id="e_tile_h"><div class="et-ic">⏱️</div><div class="et-num" id="e_hrs">—</div><div class="et-lbl">hours / month<br>you don't rebuild</div></div>
-        <div class="est-tile" id="e_tile_d"><div class="et-ic">💵</div><div class="et-num" id="e_usd">—</div><div class="et-lbl">value / month<br>(add your rate)</div></div>
-        <div class="est-tile" id="e_tile_t"><div class="et-ic">🔥</div><div class="et-num" id="e_tokens">—</div><div class="et-lbl">tokens / month<br>you don't burn</div></div>
+        <div class="est-tile" id="e_tile_t"><div class="et-ic">🔥</div><div class="et-num" id="e_tokens">—</div><div class="et-lbl">AI tokens / month<br>you don't burn (all-in)</div></div>
+      </div>
+      <div class="est-models">
+        <div class="em-title">💵 In AI compute, that's roughly this much saved <b>per year</b> — by model tier:</div>
+        <div class="em-row">
+          <div class="em" id="e_em_b"><span class="dot g"></span>Budget model<b id="e_mb">$—</b></div>
+          <div class="em" id="e_em_s"><span class="dot y"></span>Standard model<b id="e_ms">$—</b></div>
+          <div class="em" id="e_em_p"><span class="dot r"></span>Premium model<b id="e_mp">$—</b></div>
+        </div>
+        <div class="em-note">illustrative rates ≈ Budget $2 · Standard $10 · Premium $40 per 1M tokens · all-in ≈ 40 tokens/line</div>
       </div>
       <p class="est-say" id="e_say">Put in your numbers above — I'll do the math live.</p>
       <p class="est-note">Rough and illustrative — a way to reason about <i>your</i> situation, not a promise or a
@@ -601,15 +619,16 @@ try{
 (function(){
   var R=document.getElementById('e_reuses'), H=document.getElementById('e_hours'),
       P=document.getElementById('e_rate'), L=document.getElementById('e_lines'),
-      hrsEl=document.getElementById('e_hrs'), usdEl=document.getElementById('e_usd'),
-      tokEl=document.getElementById('e_tokens'), say=document.getElementById('e_say'),
-      tileH=document.getElementById('e_tile_h'), tileD=document.getElementById('e_tile_d'), tileT=document.getElementById('e_tile_t');
+      hrsEl=document.getElementById('e_hrs'), tokEl=document.getElementById('e_tokens'), say=document.getElementById('e_say'),
+      tileH=document.getElementById('e_tile_h'), tileT=document.getElementById('e_tile_t'),
+      mbEl=document.getElementById('e_mb'), msEl=document.getElementById('e_ms'), mpEl=document.getElementById('e_mp'),
+      emB=document.getElementById('e_em_b'), emS=document.getElementById('e_em_s'), emP=document.getElementById('e_em_p');
   if(!R) return;
   function n(el){ var v=parseFloat(el.value); return (isFinite(v)&&v>0)?v:0; }
-  var TOK_PER_LINE=13, USD_PER_MTOK=5;   // ~50 chars/line ÷ ~4 chars/token ; ~$5 / 1M tokens
+  var TOK_PER_LINE=40, RATE={b:2,s:10,p:40};   // all-in tokens/line (code+context+retries) ; $/1M by tier
   var fmtH=function(v){ return (v>=100?Math.round(v):Math.round(v*10)/10).toLocaleString(); };
-  var fmtD=function(v){ return '$'+Math.round(v).toLocaleString(); };
   var fmtT=function(v){ return Math.round(v).toLocaleString(); };
+  var fmtD=function(v){ return '$'+(v>=100?Math.round(v).toLocaleString():(Math.round(v*100)/100).toFixed(2)); };
   var raf={};
   function tween(el,key,target,fmt){                 // count-up so numbers feel alive
     if(!el) return; if(raf[key]) cancelAnimationFrame(raf[key]);
@@ -622,14 +641,15 @@ try{
   function pulse(t){ if(!t)return; t.classList.add('pulse'); setTimeout(function(){t.classList.remove('pulse');},430); }
   function calc(){
     var reuses=n(R), hours=n(H), rate=n(P), lines=n(L);
-    var hrs=reuses*hours, usd=hrs*rate, tokens=reuses*lines*TOK_PER_LINE, tcost=tokens/1e6*USD_PER_MTOK;
-    tween(hrsEl,'h',hrs,fmtH); tween(tokEl,'t',tokens,fmtT); pulse(tileH); pulse(tileT);
-    if(rate>0){ tween(usdEl,'d',usd,fmtD); pulse(tileD); } else { usdEl.textContent='—'; usdEl.setAttribute('data-v',0); }
-    if(reuses>0&&hours>0){
-      var s='Reusing <b>'+reuses+'</b> thing'+(reuses===1?'':'s')+' a month instead of rebuilding them saves you about <b>'+fmtH(hrs)+' hours</b>';
-      if(rate>0) s+=' (~<b>$'+Math.round(usd).toLocaleString()+'</b>)';
-      s+=' — and <b>'+fmtT(tokens)+' AI tokens</b> you’d otherwise burn'+(tokens>0?' (~$'+tcost.toFixed(2)+' of compute)':'')+'.';
-      s+=' <span style="color:var(--muted)">Your estimate, from your numbers.</span>';
+    var hrs=reuses*hours, tokM=reuses*lines*TOK_PER_LINE, tokY=tokM*12;
+    tween(hrsEl,'h',hrs,fmtH); tween(tokEl,'t',tokM,fmtT); pulse(tileH); pulse(tileT);
+    tween(mbEl,'mb',tokY/1e6*RATE.b,fmtD); tween(msEl,'ms',tokY/1e6*RATE.s,fmtD); tween(mpEl,'mp',tokY/1e6*RATE.p,fmtD);
+    pulse(emB); pulse(emS); pulse(emP);
+    if(reuses>0&&lines>0){
+      var s='Reusing <b>'+reuses+'</b> thing'+(reuses===1?'':'s')+' a month instead of regenerating them saves ~<b>'+fmtT(tokM)+' AI tokens/month</b>';
+      s+=' — on a premium model that’s ~<b>'+fmtD(tokY/1e6*RATE.p)+'/year</b> of compute you never burn';
+      if(rate>0&&hours>0) s+=', plus ~<b>'+fmtH(hrs)+' hours/month</b> (~$'+Math.round(hrs*rate).toLocaleString()+') of your own time';
+      s+='. <span style="color:var(--muted)">Your estimate, from your numbers.</span>';
       say.innerHTML=s;
     } else { say.textContent='Put in your numbers above — I’ll do the math live.'; }
   }
