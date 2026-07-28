@@ -115,6 +115,17 @@
   .chip2{background:#0b1424;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:11.5px;color:var(--muted)}
   .savings{margin-top:13px;border-top:1px dashed var(--line);padding-top:10px;color:#d4ff7a;font-size:12.5px;line-height:1.5}
   .savings b{color:var(--lime)}
+  .est{max-width:680px;margin:24px auto 0;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px 28px}
+  .est-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .est-row:last-of-type{border-bottom:none}
+  .est-row label{font-size:14px;color:var(--text);flex:1}
+  .est-row .hint{display:block;font-size:12px;color:var(--muted);font-weight:400;margin-top:2px}
+  .est-row input{width:120px;background:#0b1220;border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text);font-size:15px;text-align:right;font-family:ui-monospace,monospace}
+  .est-out{margin-top:20px;padding-top:18px;border-top:1px dashed var(--line);text-align:center}
+  .est-out .num{font-size:clamp(28px,5vw,40px);font-weight:800;color:var(--lime);line-height:1.1;font-family:ui-monospace,monospace}
+  .est-out .cap{font-size:13px;color:var(--muted);margin-top:6px}
+  .est-formula{margin-top:14px;font-size:12px;color:var(--muted);text-align:center;font-family:ui-monospace,monospace}
+  .est-note{margin-top:12px;font-size:12px;color:var(--muted);text-align:center;line-height:1.55}
   .fullstore{max-width:900px;margin:28px auto 0}
   .fullstore summary{color:var(--cyan);cursor:pointer;text-align:center;font-size:13.5px;list-style:none}
   .fullstore img{width:100%;border:1px solid var(--line);border-radius:14px;margin-top:12px;box-shadow:0 20px 50px rgba(0,0,0,.4)}
@@ -235,6 +246,38 @@ python3 repohunter.py <span class="p">serve</span>
       <div class="feat"><div class="ic">🧬</div><h3>Breaks the monoculture</h3><p>AI reaches for the same ten popular libraries every time. RepoHunter surfaces the long tail — so we stop all building the same thing.</p></div>
     </div>
     <p class="subline" style="text-align:center;margin-top:18px">It's not about an exact number — it's that <b>reusing proven code</b> means you don't spend the time, cost, or energy of rebuilding it.</p>
+  </section>
+
+  <section id="estimate">
+    <div class="h2">What reuse is worth — to you</div>
+    <div class="h2b">Your inputs. Your math. We don't put a number on it — you do.</div>
+    <p class="diff">We won't invent a savings figure and paste it on a billboard. Put in <i>your own</i> reality
+      and watch the estimate move. Every assumption stays on screen — nothing hidden, nothing asserted by us.</p>
+    <div class="est">
+      <div class="est-row">
+        <label>Times a month you reach for something that likely already exists
+          <span class="hint">every reuse is a build you skip</span></label>
+        <input id="e_reuses" type="number" min="0" step="1" value="4" inputmode="numeric">
+      </div>
+      <div class="est-row">
+        <label>Hours it'd take you to build &amp; maintain one yourself
+          <span class="hint">writing is the cheap part; owning it forever isn't</span></label>
+        <input id="e_hours" type="number" min="0" step="0.5" value="8" inputmode="decimal">
+      </div>
+      <div class="est-row">
+        <label>Your time, per hour ($)
+          <span class="hint">your rate — or leave blank to see hours only</span></label>
+        <input id="e_rate" type="number" min="0" step="5" value="0" inputmode="numeric" placeholder="0">
+      </div>
+      <div class="est-out">
+        <div class="num" id="e_out">— hrs / month</div>
+        <div class="cap" id="e_cap">time you don't spend rebuilding — <b style="color:var(--text)">your estimate, from your numbers</b></div>
+      </div>
+      <div class="est-formula" id="e_formula">reuses × hours = time saved</div>
+      <p class="est-note">Rough and illustrative — a way to reason about <i>your</i> situation, not a promise or a
+        claim about typical results. RepoHunter helps you find and vet what to reuse; the value depends entirely on
+        what you'd have built instead.</p>
+    </div>
   </section>
 
   <section>
@@ -382,6 +425,34 @@ try{
   go.onclick=submit; inp.addEventListener('keydown',function(e){ if(e.key==='Enter') submit(); });
   Array.prototype.forEach.call(document.querySelectorAll('.try-ex button'),function(b){ b.onclick=function(){ evalRepo(b.getAttribute('data-r'),true); }; });
   ['ollama/ollama','simonw/llm','yt-dlp/yt-dlp'].forEach(function(s){ evalRepo(s,false); });
+})();
+</script>
+
+<script>
+/* Reuse estimator — visitor-driven. We assert nothing; the math runs on THEIR inputs, in the open. */
+(function(){
+  var R=document.getElementById('e_reuses'), H=document.getElementById('e_hours'),
+      P=document.getElementById('e_rate'), out=document.getElementById('e_out'),
+      cap=document.getElementById('e_cap'), fx=document.getElementById('e_formula');
+  if(!R) return;
+  function n(el){ var v=parseFloat(el.value); return (isFinite(v)&&v>0)?v:0; }
+  function fmtHrs(h){ return (h>=100?Math.round(h):Math.round(h*10)/10); }
+  function calc(){
+    var reuses=n(R), hours=n(H), rate=n(P);
+    var hrs=reuses*hours;
+    if(rate>0){
+      var dollars=hrs*rate;
+      out.textContent='$'+dollars.toLocaleString(undefined,{maximumFractionDigits:0})+' / month';
+      cap.innerHTML='time-value you don’t spend rebuilding — <b style="color:var(--text)">your estimate, from your numbers</b>';
+      fx.textContent=reuses+' reuses × '+fmtHrs(hours)+' hrs × $'+rate+'/hr = your monthly estimate';
+    } else {
+      out.textContent=fmtHrs(hrs)+' hrs / month';
+      cap.innerHTML='time you don’t spend rebuilding — <b style="color:var(--text)">your estimate, from your numbers</b> (add a rate for $)';
+      fx.textContent=reuses+' reuses × '+fmtHrs(hours)+' hrs = time saved';
+    }
+  }
+  [R,H,P].forEach(function(el){ el.addEventListener('input',calc); });
+  calc();
 })();
 </script>
 
