@@ -332,6 +332,32 @@ python3 repohunter.py <span class="p">serve</span>
     </div>
   </section>
 
+  <section id="badge">
+    <div class="h2">Own a repo? Wear the badge.</div>
+    <div class="h2b">A live RepoHunter score you can embed — and can't fake</div>
+    <p class="diff">One line in your README shows your repo's <b>current</b> RepoHunter verdict, straight from
+      live GitHub data. You embed it — but you <i>can't edit what it says.</i> That's the whole point: a badge
+      nobody can game is a badge worth trusting. Stale repo, honest badge.</p>
+    <div class="est" style="max-width:720px">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center">
+        <input id="bg_repo" value="ollama/ollama" spellcheck="false" autocomplete="off"
+          style="flex:1;min-width:220px;background:#0b1220;border:1px solid var(--line);border-radius:12px;padding:12px 15px;color:var(--text);font-size:15px;font-family:ui-monospace,monospace">
+        <button id="bg_go" class="btn primary">Preview ↵</button>
+      </div>
+      <div style="text-align:center;margin:22px 0 18px"><img id="bg_badge" src="sample-badge.svg" alt="RepoHunter badge preview" style="height:22px"></div>
+      <img id="bg_card" src="sample-card.svg" alt="RepoHunter report card preview" style="width:100%;border:1px solid var(--line);border-radius:14px;display:block">
+      <div style="margin-top:18px">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:7px">Paste into your README:</div>
+        <div style="display:flex;gap:8px;align-items:stretch">
+          <code id="bg_md" style="flex:1;background:#060a13;border:1px solid var(--line);border-radius:10px;padding:11px 13px;font-size:12px;overflow:auto;white-space:nowrap;color:var(--cyan)">[![RepoHunter](https://img.repohunter.dev/badge/ollama/ollama.svg)](https://repohunter.dev)</code>
+          <button id="bg_copy" class="btn ghost" style="white-space:nowrap">Copy</button>
+        </div>
+      </div>
+      <p class="est-note">Transparent score over live GitHub data — <b style="color:var(--text)">not a safety or security
+        rating</b> (that layer ships only after we validate it). Public repos need no login; the badge updates itself.</p>
+    </div>
+  </section>
+
   <section>
     <div class="h2">Why it exists</div>
     <div class="h2b">A love letter to open source, disguised as a tool</div>
@@ -541,6 +567,28 @@ try{
   dfly.addEventListener('mouseenter',function(){ var now=Date.now(); if(now-last<450) return; last=now; wing(0.05); });
   dfly.addEventListener('click',function(){ wing(0.07); chime(); dfly.classList.add('excited');
     setTimeout(function(){ dfly.classList.remove('excited'); }, 800); });
+})();
+</script>
+
+<script>
+/* Badge previewer — type a repo, get a live badge + card + copy-paste README markdown.
+   Points at the img.repohunter.dev worker; the prefilled sample uses local SVGs so it's never empty. */
+(function(){
+  var repo=document.getElementById('bg_repo'), go=document.getElementById('bg_go'),
+      badge=document.getElementById('bg_badge'), card=document.getElementById('bg_card'),
+      md=document.getElementById('bg_md'), copy=document.getElementById('bg_copy');
+  if(!repo) return;
+  var BASE='https://img.repohunter.dev';
+  function slug(){ return (repo.value||'').replace(/.*github\.com\//,'').replace(/\.git$/,'').replace(/^\/+|\/+$/g,'').trim(); }
+  function render(){
+    var s=slug(); if(!/^[\w.\-]+\/[\w.\-]+$/.test(s)) return;
+    badge.src=BASE+'/badge/'+s+'.svg';
+    card.src=BASE+'/card/'+s+'.svg';
+    md.textContent='[![RepoHunter]('+BASE+'/badge/'+s+'.svg)](https://repohunter.dev)';
+  }
+  go.onclick=render; repo.addEventListener('keydown',function(e){ if(e.key==='Enter') render(); });
+  copy.onclick=function(){ navigator.clipboard&&navigator.clipboard.writeText(md.textContent||'').then(function(){
+    copy.textContent='Copied ✓'; setTimeout(function(){ copy.textContent='Copy'; },1500); }); };
 })();
 </script>
 

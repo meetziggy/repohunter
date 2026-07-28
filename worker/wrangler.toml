@@ -1,0 +1,14 @@
+name = "repohunter-badge"
+main = "badge-worker.js"
+compatibility_date = "2026-07-01"
+workers_dev = true
+
+# Custom domain — provisions img.repohunter.dev (DNS + cert) on deploy, since repohunter.dev is on
+# this Cloudflare account. Comment this out to ship on the free *.workers.dev URL only.
+[[routes]]
+pattern = "img.repohunter.dev"
+custom_domain = true
+
+# Optional: raise the GitHub rate limit with a token that stays server-side in the Worker:
+#   wrangler secret put GITHUB_TOKEN
+# Public-repo badges work with no token at all (public data + 30-min edge cache).
