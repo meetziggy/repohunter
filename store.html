@@ -163,7 +163,7 @@ async function load(){
   try{
     const r=await fetch('repostore.json?t='+Date.now());
     STORE=await r.json();
-  }catch(e){ el('empty').textContent='Store data not built yet — run: ziggy-repostore.py refresh'; el('empty').style.display='block'; return; }
+  }catch(e){ el('empty').textContent='Store data not built yet — run: repohunter.py refresh'; el('empty').style.display='block'; return; }
   const m=STORE.machine||{};
   el('machine').innerHTML='runs on: <b>'+esc(m.chip||'—')+'</b> · '+esc(m.cores||'?')+' cores · <b>'+esc((m.ram_gb||'?')+' GB')+'</b> · '+esc(m.disk_free||'')+' free';
   render();
@@ -321,21 +321,21 @@ async function evaluate(){
     toast('Mining the video for repos… (about a minute)');
     try{ await fetch(APP+'/api/repo/ingest-video',{method:'POST',headers:{'Content-Type':'application/json'},
           body:JSON.stringify({url:u})}); }
-    catch(e){ toast('Run: ziggy-repostore.py ingest-video '+u); return; }
+    catch(e){ toast('Run: repohunter.py ingest-video '+u); return; }
     [8000,20000,40000,60000,80000].forEach(ms=>setTimeout(load,ms));
     return;
   }
   toast('RepoHunter is evaluating '+u+' …');
   try{ await fetch(APP+'/api/repo/queue',{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({url:u})}); }
-  catch(e){ toast('Add it with: ziggy-repostore.py evaluate '+u); return; }
+  catch(e){ toast('Add it with: repohunter.py evaluate '+u); return; }
   [4000,20000,45000].forEach(ms=>setTimeout(load,ms));
 }
 async function integrate(id){
   toast('RepoHunter is drafting the integration plan…');
   try{ await fetch(APP+'/api/repo/integrate',{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({id})}); }
-  catch(e){ toast('Run: ziggy-repostore.py plan '+id); return; }
+  catch(e){ toast('Run: repohunter.py plan '+id); return; }
   [4000,12000,24000,40000,60000].forEach(ms=>setTimeout(async()=>{
     await load(); if(el('drawer').classList.contains('on')) openDrawer(id);
   },ms));
@@ -383,7 +383,7 @@ async function evaluateRepo(full,btn){
   toast('Evaluating '+full+' for this machine…');
   try{ await fetch(APP+'/api/repo/queue',{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({url:full})}); }
-  catch(e){ toast('Run: ziggy-repostore.py evaluate '+full); return; }
+  catch(e){ toast('Run: repohunter.py evaluate '+full); return; }
   [8000,20000,40000,60000].forEach(ms=>setTimeout(async()=>{ await load(); openDrawer(full); },ms));
 }
 el('go').onclick=evaluate;

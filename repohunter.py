@@ -45,7 +45,7 @@ def _load_config():
         "github_token_env": "GITHUB_TOKEN",
         "seed": [], "output": "data/repostore.json", "port": 8130,
     }
-    path = os.path.join(HERE, "config.json")
+    path = "config.json" if os.path.exists("config.json") else os.path.join(HERE, "config.json")
     if os.path.exists(path):
         try:
             user = json.load(open(path))
@@ -60,8 +60,10 @@ def _load_config():
 
 
 CFG = _load_config()
-OUT = os.path.join(HERE, CFG["output"])
-CACHE = os.path.join(HERE, ".cache", "repohunter")
+# Data + cache live where the user runs (their project), not in the install dir — so the
+# pip/pipx console-script works instead of trying to write into site-packages.
+OUT = CFG["output"] if os.path.isabs(CFG["output"]) else os.path.join(os.getcwd(), CFG["output"])
+CACHE = os.path.join(os.getcwd(), ".cache", "repohunter")
 STORE_SCHEMA = 1
 PROFILE = CFG["project"]["profile"]
 GHTOK = os.environ.get(CFG.get("github_token_env") or "GITHUB_TOKEN", "")
@@ -221,19 +223,28 @@ def score(meta, why=""):
 
 
 def resource_fit(meta, specs):
+    """Estimate whether this repo runs on THIS machine — actually reads specs (RAM)."""
     text = " ".join([meta.get("desc", ""), " ".join(meta.get("topics", [])),
                      meta.get("language", "")]).lower()
     lang = meta.get("language", "").lower()
+    try:
+        ram = int((specs or {}).get("ram_gb") or 0)
+    except Exception:
+        ram = 0
     if any(k in text for k in ("cuda", "gpu-only", "a100", "h100", "training", "fine-tun",
                                "70b", "kubernetes", "cluster")):
-        return {"verdict": "heavy", "ram_need": "high", "gpu": True,
-                "note": "May want a GPU / lots of RAM — check the dossier."}
+        note = "Wants a GPU / lots of RAM — check the dossier."
+        if ram and ram < 32:
+            note = "Wants a GPU / lots of RAM — your %d GB is likely tight for this." % ram
+        return {"verdict": "heavy", "ram_need": "high", "gpu": True, "note": note}
     if lang in ("c", "rust", "go", "zig", "c++"):
         return {"verdict": "runs easily", "ram_need": "low", "gpu": False,
                 "note": "Compiled, small footprint."}
     if any(k in text for k in ("pytorch", "tensorflow", "model", "inference", "llm", "embedding")):
-        return {"verdict": "runs with headroom", "ram_need": "medium", "gpu": False,
-                "note": "Local ML — fits given enough RAM."}
+        note = "Local ML — fits given enough RAM."
+        if ram and ram < 16:
+            note = "Local ML — %d GB is on the low side; watch memory." % ram
+        return {"verdict": "runs with headroom", "ram_need": "medium", "gpu": False, "note": note}
     return {"verdict": "runs easily", "ram_need": "low", "gpu": False, "note": "Ordinary app resources."}
 
 
@@ -296,8 +307,19 @@ def make_plan(meta, specs):
          "Write the integration plan as JSON." % (
              PROFILE, specs["chip"], specs["ram_gb"], specs["os"], meta["id"],
              meta.get("desc", ""), meta.get("license", ""), meta.get("language", "")))
-    return _json_from(llm(PLAN_SYSTEM, q, timeout=200)) or \
+    plan = _json_from(llm(PLAN_SYSTEM, q, timeout=200)) or \
         {"summary": "No LLM configured — set one in config.json.", "verdict": "HOLD", "steps": []}
+    # Honesty guard: "avoid curl|bash" is a request to the model, not a guarantee. Verify it and
+    # downgrade to HOLD if a piped-shell install slipped through, so we never present it as safe.
+    blob = " ".join(str(plan.get(k, "")) for k in ("install_method", "summary")) + " " \
+        + " ".join(str(s) for s in (plan.get("steps") or []))
+    if re.search(r"(curl|wget)[^\n|]*\|\s*(sudo\s+)?(ba)?sh", blob):
+        plan.setdefault("risks", [])
+        if isinstance(plan["risks"], list):
+            plan["risks"].insert(0, "⚠ This plan contains a piped curl|bash install — do NOT run it "
+                                    "unverified. Pin a release and verify a checksum instead.")
+        plan["verdict"] = "HOLD"
+    return plan
 
 
 # ── Store I/O ─────────────────────────────────────────────────────────────────
@@ -354,6 +376,10 @@ def refresh():
             print("  ✓ %-38s overall=%d %s" % (r["id"], r["scores"]["overall"],
                                                "· dossier" if "dossier" in r else ""))
     _save_store({"repos": repos}, specs)
+    if not repos:
+        print("\n⚠  Your store is EMPTY — config.json 'seed' is missing or still the placeholder.")
+        print("   Add real repos and re-run, e.g.:  \"seed\": [{\"slug\": \"owner/name\"}]")
+        print("   (config.example.json ships a few real ones to start from.)\n")
     print("→ wrote %s (%d repos)" % (OUT, len(repos)))
 
 
@@ -416,20 +442,34 @@ def _strip_vtt(v):
     return " ".join(out)[:6000]
 
 
+def _is_youtube_url(url):
+    """Real hostname check — a bare 'youtu' substring test lets a hostile URL through."""
+    from urllib.parse import urlparse
+    try:
+        p = urlparse((url or "").strip())
+    except Exception:
+        return False
+    host = (p.hostname or "").lower()
+    return p.scheme in ("http", "https") and host in (
+        "youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be", "www.youtu.be")
+
+
 def ingest_video(url):
     import tempfile, glob
+    if not _is_youtube_url(url):
+        print("refusing non-YouTube URL: %r" % (url or "")[:80]); return 1
     ytbin = YT_BIN if os.path.exists(YT_BIN) else "yt-dlp"
     td = tempfile.mkdtemp()
     try:
         info = json.loads(subprocess.check_output(
-            [ytbin, "--skip-download", "--dump-json", "--no-warnings", url], text=True, timeout=120))
+            [ytbin, "--skip-download", "--dump-json", "--no-warnings", "--", url], text=True, timeout=120))
     except Exception as e:
         print("could not fetch video (%s) — is yt-dlp installed?" % str(e)[:60]); return 1
     title = info.get("title", "(video)")
     text = info.get("description", "") or ""
     try:
         subprocess.run([ytbin, "--skip-download", "--write-auto-subs", "--sub-lang", "en.*",
-                        "--sub-format", "vtt", "-o", os.path.join(td, "v"), "--no-warnings", url],
+                        "--sub-format", "vtt", "-o", os.path.join(td, "v"), "--no-warnings", "--", url],
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=120)
         for f in glob.glob(os.path.join(td, "*.vtt")):
             text += "\n" + _strip_vtt(open(f, encoding="utf-8", errors="ignore").read()); break
@@ -479,8 +519,8 @@ def serve():
         def _send(self, code, obj=None, ctype="application/json", raw=None):
             self.send_response(code)
             self.send_header("Content-Type", ctype)
-            self.send_header("Access-Control-Allow-Origin", "*")
-            self.send_header("Access-Control-Allow-Headers", "Content-Type")
+            # No CORS: the UI is served from this same origin, so it needs no cross-origin grant.
+            # A wildcard here would let ANY website drive your local API. Keep it same-origin only.
             body = raw if raw is not None else json.dumps(obj or {}).encode()
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
@@ -521,8 +561,8 @@ def serve():
                 self._spawn("evaluate", m.group(1).replace(".git", ""))
                 return self._send(200, {"queued": True})
             if path == "/api/repo/ingest-video":
-                if "youtu" not in (body.get("url") or ""):
-                    return self._send(400, {"error": "YouTube URL required"})
+                if not _is_youtube_url(body.get("url") or ""):
+                    return self._send(400, {"error": "a valid youtube.com / youtu.be URL is required"})
                 self._spawn("ingest-video", body["url"]); return self._send(200, {"queued": True})
             if path == "/api/repo/integrate":
                 self._spawn("plan", body.get("id", "")); return self._send(200, {"queued": True})
@@ -536,14 +576,35 @@ def serve():
     http.server.HTTPServer(("127.0.0.1", port), H).serve_forever()
 
 
+USAGE = """RepoHunter — reuse, don't reinvent.
+
+  repohunter refresh                     build the store from your config.json seed
+  repohunter evaluate <owner/repo>       deep-evaluate one repo
+  repohunter plan <owner/repo>           draft an integration plan
+  repohunter decide <owner/repo> approve|reject
+  repohunter ingest-video <youtube-url>  mine a video for the repos it recommends
+  repohunter serve                       serve the UI + API on http://127.0.0.1:<port>
+"""
+
+
 def main(argv=None):
     """CLI entry point. Also the console_scripts target so `repohunter <cmd>` works."""
     argv = list(sys.argv[1:] if argv is None else argv)
     cmd = argv[0] if argv else "refresh"
     a = argv[1:]
+    if cmd in ("help", "-h", "--help"):
+        print(USAGE)
+        return 0
+    needs = {"evaluate": 1, "plan": 1, "ingest-video": 1, "decide": 2}
+    if cmd in needs and len(a) < needs[cmd]:
+        sys.stderr.write("error: '%s' needs %d argument(s).\n\n%s" % (cmd, needs[cmd], USAGE))
+        return 2
     fn = {"evaluate": lambda: evaluate(a[0]), "plan": lambda: plan_mode(a[0]),
           "decide": lambda: decide_mode(a[0], a[1]), "ingest-video": lambda: ingest_video(a[0]),
-          "serve": serve, "refresh": refresh}.get(cmd, refresh)
+          "serve": serve, "refresh": refresh}.get(cmd)
+    if fn is None:
+        sys.stderr.write("error: unknown command '%s'.\n\n%s" % (cmd, USAGE))
+        return 2
     return fn() or 0
 
 

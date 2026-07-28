@@ -20,5 +20,6 @@ All notable changes to RepoHunter are documented here. Format follows
 - **Approve-first, two-gate integration planning** — concrete checksum-pinned plan → your approval
   (automated builder stage in progress); never a `curl | bash`
 - **Pluggable LLM backend** — local Ollama by default (no API bill), OpenAI/OpenRouter via `config.json`
-- **Visual store UI** — first-run walkthrough, plus **Grid** and **Map** (relevance × ready-to-use) views
+- **Store UI** — a sortable/filterable browser (best-fit / relevance / stars / maturity), dossier drawers,
+  live GitHub search, and YouTube ingest. _(The guided walkthrough + Map view are tracked under Unreleased.)_
 - Brand identity — dragonfly logo, brand guide, OG link-preview + social assets

@@ -17,9 +17,13 @@
 
   "github_token_env": "GITHUB_TOKEN",
 
+  "_seed_note": "Real starter repos so your first `refresh` shows something. Replace with repos relevant to YOUR project. Add \"featured\": true to any to auto-run the full LLM dossier on it.",
   "seed": [
-    { "slug": "owner/repo", "category": "Example", "featured": true,
-      "why": "Why this repo matters to your project (shown on the card)." }
+    { "slug": "ollama/ollama", "category": "Local LLM", "why": "Run models locally — RepoHunter's default brain." },
+    { "slug": "simonw/llm", "category": "AI tooling", "why": "A clean CLI for talking to LLMs — a model reuse-first project." },
+    { "slug": "modelcontextprotocol/servers", "category": "Agent ecosystem", "why": "Reference MCP servers your agents can adopt." },
+    { "slug": "yt-dlp/yt-dlp", "category": "Utility", "why": "The downloader RepoHunter itself reuses for video ingest." },
+    { "slug": "astral-sh/ruff", "category": "Dev tooling", "why": "A fast Python linter/formatter — a compiled tool that runs anywhere." }
   ],
 
   "output": "data/repostore.json",

@@ -66,9 +66,11 @@ Point RepoHunter at code from anywhere and it lands in one place to evaluate:
 
 ## Adopt, don't just rate
 
-Approve-first, two-gate integration: RepoHunter drafts a concrete, checksum-pinned plan (never a
-`curl | bash`), you approve it, an agent builds it in an isolated worktree and opens a PR, you approve
-that too. It doesn't just grade code — it helps you *safely adopt* it.
+Approve-first integration planning: RepoHunter drafts a concrete, reviewable plan for adopting a repo —
+and if a piped `curl | bash` slips into that plan, it **flags it and downgrades the verdict** instead of
+presenting it as safe. You approve the plan, then you (or your own coding agent) run it. It doesn't just
+grade code — it hands you a runnable, reviewed plan to adopt it.
+_(An automated builder that runs the plan and opens the PR for you is on the roadmap, not yet shipped.)_
 
 ## The philosophy
 
