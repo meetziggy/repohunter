@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RepoHunter report</title>
+<meta name="description" content="A live RepoHunter reuse-decision report for any public GitHub repo — transparent score, resource fit, and a GO / MAYBE / SKIP.">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<meta name="theme-color" content="#070b16">
+<meta property="og:title" content="RepoHunter report">
+<meta property="og:description" content="Should you reuse this repo? A transparent, live RepoHunter verdict.">
+<meta property="og:image" content="https://repohunter.dev/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root{--bg:#070b16;--card:#111a2b;--line:#22304a;--lime:#b8ff3c;--cyan:#38bdf8;--green:#34d399;--amber:#fbbf24;--red:#fb7185;--text:#e6edf7;--muted:#8fa0bd;--grad:linear-gradient(100deg,var(--lime),var(--cyan))}
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1000px 500px at 50% -10%,#141d33 0,var(--bg) 55%);color:var(--text);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  a{color:var(--cyan);text-decoration:none}
+  .wrap{max-width:820px;margin:0 auto;padding:0 20px}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:16px 0}
+  nav .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;color:var(--text)}
+  nav img{width:34px;height:34px}
+  .btn{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:9px 16px;font-weight:700;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--text);cursor:pointer}
+  .btn.primary{background:var(--grad);color:#05210a;border:none}
+  main{padding:14px 0 60px}
+  .load,.err{text-align:center;color:var(--muted);padding:60px 0}
+  .head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:10px}
+  h1{font-size:clamp(26px,5vw,40px);margin:0;letter-spacing:-.02em;word-break:break-word}
+  h1 a{color:var(--text)}
+  .sub{color:var(--muted);font:13.5px ui-monospace,monospace;margin-top:8px}
+  .verd{border-radius:14px;padding:12px 20px;text-align:center;min-width:132px;border:1px solid}
+  .verd .v{font-size:26px;font-weight:800;line-height:1}
+  .verd .s{font:11px ui-monospace,monospace;color:var(--muted);margin-top:3px}
+  .GO{color:var(--green);background:rgba(52,211,153,.14);border-color:rgba(52,211,153,.5)}
+  .MAYBE{color:var(--amber);background:rgba(251,191,36,.14);border-color:rgba(251,191,36,.5)}
+  .SKIP{color:var(--red);background:rgba(251,113,133,.14);border-color:rgba(251,113,133,.5)}
+  .bars{display:grid;grid-template-columns:1fr 1fr;gap:14px 30px;margin:28px 0 8px}
+  @media(max-width:560px){.bars{grid-template-columns:1fr}}
+  .bar .t{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-bottom:5px;font-family:ui-monospace,monospace}
+  .bar .track{height:8px;border-radius:5px;background:#0b1424;overflow:hidden}
+  .bar .fill{height:100%;border-radius:5px;background:var(--grad)}
+  .desc{color:var(--text);margin:20px 0}
+  .card-img{width:100%;border:1px solid var(--line);border-radius:16px;display:block;margin:22px 0}
+  .embed{background:#060a13;border:1px solid var(--line);border-radius:12px;padding:14px;margin:14px 0}
+  .embed .lbl{font-size:12px;color:var(--muted);margin-bottom:8px}
+  .embed .row{display:flex;gap:8px}
+  .embed code{flex:1;overflow:auto;white-space:nowrap;color:var(--cyan);font-size:12px;padding:8px 10px;background:#0b1220;border-radius:8px}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 4px}
+  .lookup{display:flex;gap:8px;margin-top:26px}
+  .lookup input{flex:1;background:#0b1220;border:1px solid var(--line);border-radius:12px;padding:11px 14px;color:var(--text);font:14px ui-monospace,monospace}
+  .note{color:var(--muted);font-size:12px;margin-top:22px;line-height:1.6}
+  .note b{color:var(--text)}
+  footer{border-top:1px solid var(--line);padding:22px 0 40px;text-align:center;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a class="brand" href="/"><img src="/logo.svg" alt="">RepoHunter</a>
+    <a class="btn" href="https://github.com/meetziggy/repohunter" target="_blank" rel="noopener">★ Star on GitHub</a>
+  </nav>
+  <main id="main"><div class="load">Loading the report…</div></main>
+  <footer>Live report · <a href="/">repohunter.dev</a> · reuse, don't reinvent 🪲</footer>
+</div>
+<script>
+var API="https://img.repohunter.dev";
+function slug(){
+  var m=location.pathname.match(/^\/r\/([\w.\-]+)\/([\w.\-]+)/);
+  if(m) return m[1]+"/"+m[2];
+  var q=new URLSearchParams(location.search).get("repo")||"";
+  return q.replace(/.*github\.com\//,"").replace(/\.git$/,"").replace(/^\/+|\/+$/g,"").trim();
+}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function bar(label,v){return '<div class="bar"><div class="t"><span>'+label+'</span><span>'+v+'</span></div><div class="track"><div class="fill" style="width:'+Math.max(0,Math.min(100,v))+'%"></div></div></div>';}
+function lookupBox(){return '<div class="lookup"><input id="lk" placeholder="Evaluate another repo — owner/name" spellcheck="false"><button class="btn primary" onclick="goLk()">Report ↵</button></div>';}
+function goLk(){var v=(document.getElementById("lk").value||"").replace(/.*github\.com\//,"").replace(/^\/+|\/+$/g,"").trim(); if(/^[\w.\-]+\/[\w.\-]+$/.test(v)) location.href="/r/"+v;}
+function render(d){
+  var s=d.scores, v=d.verdict;
+  document.title="RepoHunter: "+v+" "+s.overall+" · "+d.repo;
+  var facts=["★ "+(d.stars||0).toLocaleString(), d.language||"—", d.license||"no license",
+             "pushed "+(d.last_push||"—"), (d.forks||0)+" forks", (d.open_issues||0)+" open issues"].map(esc).join("  ·  ");
+  var md='[![RepoHunter]('+API+'/badge/'+d.repo+'.svg)](https://repohunter.dev/r/'+d.repo+')';
+  document.getElementById("main").innerHTML=
+    '<div class="head"><div><h1><a href="'+esc(d.url)+'" target="_blank" rel="noopener">'+esc(d.repo)+'</a></h1>'
+    +'<div class="sub">'+facts+'</div></div>'
+    +'<div class="verd '+v+'"><div class="v">'+v+'</div><div class="s">score '+s.overall+'/100</div></div></div>'
+    +(d.description?'<p class="desc">'+esc(d.description)+'</p>':'')
+    +'<div class="bars">'+bar("popularity",s.popularity)+bar("health",s.health)+bar("freshness",s.freshness)+bar("maturity",s.maturity)+'</div>'
+    +'<img class="card-img" src="'+API+'/card/'+d.repo+'.svg" alt="RepoHunter report card for '+esc(d.repo)+'">'
+    +'<div class="actions"><a class="btn primary" href="'+esc(d.url)+'" target="_blank" rel="noopener">★ Open on GitHub</a>'
+    +'<a class="btn" href="/#demo">Try the tool →</a></div>'
+    +'<div class="embed"><div class="lbl">Wear the badge — paste into your README:</div><div class="row">'
+    +'<code id="md">'+esc(md)+'</code><button class="btn" onclick="cpMd()">Copy</button></div></div>'
+    +lookupBox()
+    +'<p class="note"><b>What am I looking at?</b> A live RepoHunter reuse-decision report for this repo, straight from the '
+    +'GitHub API. The score is a <b>transparent heuristic — guidance, not a guarantee, and not a safety or security rating.</b> '
+    +'Verify license &amp; security before adopting. '+esc(d.note||"")+'</p>';
+}
+function cpMd(){var t=document.getElementById("md").textContent; navigator.clipboard&&navigator.clipboard.writeText(t);}
+(function(){
+  var s=slug();
+  if(!/^[\w.\-]+\/[\w.\-]+$/.test(s)){
+    document.getElementById("main").innerHTML='<div class="err"><h1>Report any repo</h1><p>Add a repo to the URL, like <b>/r/ollama/ollama</b>.</p>'+lookupBox()+'</div>';
+    return;
+  }
+  fetch(API+"/api/repo/"+s).then(function(r){ if(!r.ok) throw 0; return r.json(); })
+    .then(render)
+    .catch(function(){ document.getElementById("main").innerHTML='<div class="err"><h1>Couldn’t load <code>'+esc(s)+'</code></h1><p>It may be private, renamed, or not exist. Public repos only.</p>'+lookupBox()+'</div>'; });
+})();
+</script>
+</body>
+</html>

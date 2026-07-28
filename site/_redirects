@@ -1,0 +1,2 @@
+# Pretty per-repo report URLs: /r/owner/name → the report page (client reads owner/name from the path)
+/r/*  /r.html  200

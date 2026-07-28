@@ -31,8 +31,19 @@
       <line x1="115" y1="126" x2="125" y2="126"/><line x1="115.5" y1="144" x2="124.5" y2="144"/>
       <line x1="116" y1="162" x2="124" y2="162"/><line x1="116.5" y1="180" x2="123.5" y2="180"/>
     </g>
-    <ellipse cx="120" cy="70" rx="15" ry="11" fill="url(#body)"/>
-    <circle cx="112" cy="66" r="7.5" fill="url(#eye)"/>
-    <circle cx="128" cy="66" r="7.5" fill="url(#eye)"/>
+    <ellipse cx="120" cy="70" rx="15.5" ry="11" fill="url(#body)"/>
+    <!-- eyes with personality: big compound domes, forward gaze, bright catchlights -->
+    <g>
+      <circle cx="112" cy="66" r="8" fill="url(#eye)"/>
+      <circle cx="112.8" cy="67.2" r="3.7" fill="#0a1710"/>
+      <circle cx="110.8" cy="65.1" r="1.8" fill="#f4ffe0"/>
+      <circle cx="113.5" cy="68.5" r=".8" fill="#eafff0" opacity=".6"/>
+    </g>
+    <g>
+      <circle cx="128" cy="66" r="8" fill="url(#eye)"/>
+      <circle cx="127.2" cy="67.2" r="3.7" fill="#0a1710"/>
+      <circle cx="126.4" cy="65.1" r="1.8" fill="#f4ffe0"/>
+      <circle cx="128.9" cy="68.5" r=".8" fill="#eafff0" opacity=".6"/>
+    </g>
   </g>
 </svg>

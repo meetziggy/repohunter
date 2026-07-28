@@ -88,15 +88,17 @@ function cardSVG(m, s) {
 </defs>
 <rect width="560" height="300" rx="18" fill="url(#bg)" stroke="${LINE}"/>
 <g transform="translate(28,22)">
-  <g fill="url(#wg)" fill-opacity=".45" stroke="url(#wg)" stroke-width="1.4">
+  <g fill="url(#wg)" fill-opacity=".42" stroke="url(#wg)" stroke-width="1.3">
     <g transform="rotate(-14 20 15)"><ellipse cx="6" cy="11" rx="15" ry="4.2"/></g>
     <g transform="rotate(14 20 15)"><ellipse cx="6" cy="20" rx="12.5" ry="3.6"/></g>
     <g transform="rotate(14 20 15)"><ellipse cx="34" cy="11" rx="15" ry="4.2"/></g>
     <g transform="rotate(-14 20 15)"><ellipse cx="34" cy="20" rx="12.5" ry="3.6"/></g>
   </g>
-  <rect x="18.7" y="16" width="2.6" height="17" rx="1.3" fill="url(#wg)"/>
-  <ellipse cx="20" cy="14" rx="3.2" ry="5.2" fill="url(#wg)"/>
-  <ellipse cx="20" cy="8.5" rx="4" ry="3" fill="url(#wg)"/>
+  <rect x="18.7" y="17" width="2.6" height="16" rx="1.3" fill="url(#wg)"/>
+  <ellipse cx="20" cy="14" rx="3.4" ry="5" fill="url(#wg)"/>
+  <circle cx="16.9" cy="8.6" r="3" fill="url(#wg)"/><circle cx="23.1" cy="8.6" r="3" fill="url(#wg)"/>
+  <circle cx="17.3" cy="9.3" r="1.35" fill="#0a1710"/><circle cx="22.7" cy="9.3" r="1.35" fill="#0a1710"/>
+  <circle cx="16.4" cy="7.9" r=".55" fill="#f4ffe0"/><circle cx="21.8" cy="7.9" r=".55" fill="#f4ffe0"/>
 </g>
 <text x="72" y="40" fill="${TEXT}" font-size="15" font-weight="bold" font-family="ui-sans-serif,system-ui,sans-serif">RepoHunter</text>
 <text x="72" y="57" fill="${MUTED}" font-size="11.5" font-family="ui-sans-serif,system-ui,sans-serif">reuse-decision report card</text>
@@ -117,37 +119,68 @@ function cardSVG(m, s) {
 </svg>`;
 }
 
+const CC = "public, max-age=1800, s-maxage=1800";   // 30-min cache → dedup + cheap
 const svgResp = (svg) => new Response(svg, {
-  headers: {
-    "content-type": "image/svg+xml; charset=utf-8",
-    "cache-control": "public, max-age=1800, s-maxage=1800",
-    "access-control-allow-origin": "*",
-  },
+  headers: { "content-type": "image/svg+xml; charset=utf-8", "cache-control": CC, "access-control-allow-origin": "*" },
+});
+const jsonResp = (obj, status) => new Response(JSON.stringify(obj, null, 2), {
+  status: status || 200,
+  headers: { "content-type": "application/json; charset=utf-8", "cache-control": CC, "access-control-allow-origin": "*" },
 });
 
-export default {
-  async fetch(request, env) {
-    const url = new URL(request.url);
-    const parts = url.pathname.replace(/\.svg$/, "").split("/").filter(Boolean);
-    if (url.pathname === "/health") return new Response("ok");
-    const kind = parts[0];
-    if ((kind === "badge" || kind === "card") && parts.length >= 3) {
-      const slug = parts[1] + "/" + parts[2];
-      let m = null;
-      try { m = await fetchRepo(slug, env); } catch (e) { m = null; }
-      if (!m || !m.full_name) {
-        return kind === "badge"
-          ? svgResp(badgeSVG("repohunter", "repo not found", MUTED, false))
-          : svgResp(badgeSVG("repohunter", "repo not found", MUTED, false));
-      }
-      const s = score(m);
-      return kind === "badge"
-        ? svgResp(badgeSVG("repohunter", s.verdict + " " + s.overall, vColor(s.verdict), s.verdict === "MAYBE"))
-        : svgResp(cardSVG(m, s));
+// full facts + scores as JSON — the single source the report page and any agent read
+function apiJSON(m, s) {
+  return {
+    repo: m.full_name, url: m.html_url, description: m.description || null, homepage: m.homepage || null,
+    stars: m.stargazers_count || 0, forks: m.forks_count || 0, open_issues: m.open_issues_count || 0,
+    language: m.language || null, license: (m.license && m.license.spdx_id && m.license.spdx_id !== "NOASSERTION") ? m.license.spdx_id : null,
+    topics: m.topics || [], created: (m.created_at || "").slice(0, 10), last_push: (m.pushed_at || "").slice(0, 10),
+    archived: !!m.archived, verdict: s.verdict,
+    scores: { overall: s.overall, popularity: s.pop, freshness: s.fresh, health: s.health, maturity: s.mat },
+    note: "Transparent heuristic over live GitHub data — guidance, not a guarantee, and NOT a safety/security rating.",
+  };
+}
+
+async function route(request, env) {
+  const url = new URL(request.url);
+  if (url.pathname === "/health") return new Response("ok", { headers: { "cache-control": "no-store" } });
+  const parts = url.pathname.replace(/\.svg$/, "").split("/").filter(Boolean);
+  const kind = parts[0];                                    // badge | card | api
+
+  if ((kind === "badge" || kind === "card" || kind === "api") && parts.length >= 3) {
+    // /api/repo/owner/name  → parts = [api, repo, owner, name] ; badge/card → [kind, owner, name]
+    const off = kind === "api" ? 2 : 1;
+    const slug = parts[off] + "/" + parts[off + 1];
+    let m = null;
+    try { m = await fetchRepo(slug, env); } catch (e) { m = null; }
+    if (!m || !m.full_name) {
+      if (kind === "badge") return svgResp(badgeSVG("repohunter", "repo not found", MUTED, false));
+      if (kind === "card") return svgResp(cardSVG({ full_name: slug }, { verdict: "SKIP", overall: 0, pop: 0, fresh: 0, health: 0, mat: 0 }));
+      return jsonResp({ error: "repo not found or private", repo: slug }, 404);
     }
-    return new Response(
-      "RepoHunter badge service. Try /badge/ollama/ollama.svg or /card/ollama/ollama.svg",
-      { status: 404, headers: { "content-type": "text/plain" } }
-    );
+    const s = score(m);
+    if (kind === "badge") return svgResp(badgeSVG("repohunter", s.verdict + " " + s.overall, vColor(s.verdict), s.verdict === "MAYBE"));
+    if (kind === "card") return svgResp(cardSVG(m, s));
+    return jsonResp(apiJSON(m, s));
+  }
+  return new Response(
+    "RepoHunter badge service — /badge/:owner/:name.svg · /card/:owner/:name.svg · /api/repo/:owner/:name",
+    { status: 404, headers: { "content-type": "text/plain" } }
+  );
+}
+
+export default {
+  async fetch(request, env, ctx) {
+    // Edge cache = dedup: identical URLs are served from cache, so repeated asks don't re-hit GitHub.
+    if (request.method !== "GET") return route(request, env);
+    const cache = caches.default;
+    const key = new Request(new URL(request.url).toString(), request);
+    const hit = await cache.match(key);
+    if (hit) return hit;
+    const resp = await route(request, env);
+    if (resp.status === 200 && (resp.headers.get("cache-control") || "").includes("max-age")) {
+      ctx.waitUntil(cache.put(key, resp.clone()));
+    }
+    return resp;
   },
 };

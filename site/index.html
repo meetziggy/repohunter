@@ -63,6 +63,11 @@
   @keyframes fr{0%,100%{transform:rotate(-2.6deg)}50%{transform:rotate(3.4deg)}}
   @keyframes hl{0%,100%{transform:rotate(-2.2deg)}50%{transform:rotate(2.8deg)}}
   @keyframes hr{0%,100%{transform:rotate(2.2deg)}50%{transform:rotate(-2.8deg)}}
+  .dfly .eye{transform-box:view-box}
+  .dfly .eyeL{transform-origin:112px 66px}
+  .dfly .eyeR{transform-origin:128px 66px}
+  @media(prefers-reduced-motion:no-preference){.dfly .eye{animation:blink 4.8s ease-in-out infinite}}
+  @keyframes blink{0%,93%,99%,100%{transform:scaleY(1)}96%{transform:scaleY(.08)}}
   @media(max-width:640px){.dfly{width:150px;height:150px}}
   .hero h1{font-size:clamp(40px,7vw,74px);margin:18px 0 6px;letter-spacing:-.03em;line-height:1}
   .hero h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -219,9 +224,19 @@
           <line x1="115" y1="126" x2="125" y2="126"/><line x1="115.5" y1="144" x2="124.5" y2="144"/>
           <line x1="116" y1="162" x2="124" y2="162"/><line x1="116.5" y1="180" x2="123.5" y2="180"/>
         </g>
-        <ellipse cx="120" cy="70" rx="15" ry="11" fill="url(#body)"/>
-        <circle cx="112" cy="66" r="7.5" fill="url(#eye)"/>
-        <circle cx="128" cy="66" r="7.5" fill="url(#eye)"/>
+        <ellipse cx="120" cy="70" rx="15.5" ry="11" fill="url(#body)"/>
+        <g class="eye eyeL">
+          <circle cx="112" cy="66" r="8" fill="url(#eye)"/>
+          <circle cx="112.8" cy="67.2" r="3.7" fill="#0a1710"/>
+          <circle cx="110.8" cy="65.1" r="1.8" fill="#f4ffe0"/>
+          <circle cx="113.5" cy="68.5" r=".8" fill="#eafff0" opacity=".6"/>
+        </g>
+        <g class="eye eyeR">
+          <circle cx="128" cy="66" r="8" fill="url(#eye)"/>
+          <circle cx="127.2" cy="67.2" r="3.7" fill="#0a1710"/>
+          <circle cx="126.4" cy="65.1" r="1.8" fill="#f4ffe0"/>
+          <circle cx="128.9" cy="68.5" r=".8" fill="#eafff0" opacity=".6"/>
+        </g>
       </g>
     </svg>
     <h1>Reuse,<br><span class="g">don't reinvent.</span></h1>
@@ -353,6 +368,8 @@ python3 repohunter.py <span class="p">serve</span>
           <button id="bg_copy" class="btn ghost" style="white-space:nowrap">Copy</button>
         </div>
       </div>
+      <div style="text-align:center;margin-top:14px;font-size:13px">Or share the full live report →
+        <a id="bg_report" href="/r/ollama/ollama" style="color:var(--cyan);font-family:ui-monospace,monospace">repohunter.dev/r/ollama/ollama</a></div>
       <p class="est-note">Transparent score over live GitHub data — <b style="color:var(--text)">not a safety or security
         rating</b> (that layer ships only after we validate it). Public repos need no login; the badge updates itself.</p>
     </div>
@@ -580,11 +597,13 @@ try{
   if(!repo) return;
   var BASE='https://img.repohunter.dev';
   function slug(){ return (repo.value||'').replace(/.*github\.com\//,'').replace(/\.git$/,'').replace(/^\/+|\/+$/g,'').trim(); }
+  var report=document.getElementById('bg_report');
   function render(){
     var s=slug(); if(!/^[\w.\-]+\/[\w.\-]+$/.test(s)) return;
     badge.src=BASE+'/badge/'+s+'.svg';
     card.src=BASE+'/card/'+s+'.svg';
-    md.textContent='[![RepoHunter]('+BASE+'/badge/'+s+'.svg)](https://repohunter.dev)';
+    md.textContent='[![RepoHunter]('+BASE+'/badge/'+s+'.svg)](https://repohunter.dev/r/'+s+')';
+    if(report){ report.href='/r/'+s; report.textContent='repohunter.dev/r/'+s; }
   }
   go.onclick=render; repo.addEventListener('keydown',function(e){ if(e.key==='Enter') render(); });
   copy.onclick=function(){ navigator.clipboard&&navigator.clipboard.writeText(md.textContent||'').then(function(){
