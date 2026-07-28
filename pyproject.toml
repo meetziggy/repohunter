@@ -9,7 +9,7 @@ description = "Reuse, don't reinvent — the reuse-first scout for open source. 
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.9"
-authors = [{ name = "Chris Gorzelic" }, { name = "Ziggy" }]
+authors = [{ name = "Chris Gorzelic" }, { name = "Brian Gorzelic" }, { name = "Ziggy" }]
 keywords = ["open-source", "developer-tools", "code-reuse", "ai", "mcp", "cli", "github"]
 classifiers = [
   "Development Status :: 3 - Alpha",

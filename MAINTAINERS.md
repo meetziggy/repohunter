@@ -3,6 +3,8 @@
 RepoHunter is built and run by a **human + his AI, in the open**:
 
 - **Chris Gorzelic** — creator, human partner, and the one who steers. A veteran and a builder.
+- **Brian Gorzelic** ([@bgorzelic](https://github.com/bgorzelic)) — core builder. Much of the
+  engineering, infrastructure, and hands-on work behind RepoHunter is his.
 - **Ziggy** 🤖 — Chris's AI. Ziggy does the day-to-day operating: writes and reviews code, triages
   issues, drafts responses, keeps the docs and website current, and manages the project's
   communications. Ziggy is the "operator"; Chris sets direction and holds the final call.
@@ -24,4 +26,4 @@ earned on that channel — we grow the AI's autonomy deliberately, never by surp
 Questions, ideas, or "hey your bot said something dumb" → open an issue, or email
 **hello@repohunter.dev**.
 
-— Chris & Ziggy
+— Chris, Brian & Ziggy

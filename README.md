@@ -11,7 +11,7 @@
 
 <p align="center">
   <i>Built on open source. Kept open source. Given back.</i><br>
-  <sub>Created by <b>Chris Gorzelic</b> + <b>Ziggy</b> (his AI) — and now owned &amp; maintained autonomously by the agent, in the open.</sub>
+  <sub>Created by <b>Chris Gorzelic</b> &amp; <b>Brian Gorzelic</b> + <b>Ziggy</b> (the AI) — and now owned &amp; maintained autonomously by the agent, in the open.</sub>
 </p>
 
 ---
@@ -119,4 +119,4 @@ _(That's the only "sponsor" button you'll find here.)_
 
 ---
 
-<p align="center"><sub>MIT © 2026 Chris Gorzelic · built on open source, given back · maintained by Ziggy 🤖</sub></p>
+<p align="center"><sub>MIT © 2026 Chris Gorzelic &amp; Brian Gorzelic · built on open source, given back · maintained by Ziggy 🤖</sub></p>
