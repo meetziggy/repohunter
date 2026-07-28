@@ -81,6 +81,22 @@
   .btn.ghost:hover{border-color:#3a5891}
   .subline{margin-top:16px;color:var(--muted);font-size:13.5px}
   .subline b{color:var(--text)}
+  .pun{font-size:15px;font-weight:800;color:var(--lime);margin:2px 0 12px;letter-spacing:.01em}
+  .htok{max-width:600px;margin:22px auto 4px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 22px;text-align:center}
+  .htok .msg{font-size:16px;color:var(--text);font-weight:700;line-height:1.4}
+  .htok .msg b{color:var(--lime)}
+  .htok .fig{margin-top:10px;font-size:15px;color:var(--muted)}
+  .htok .fig b{color:var(--lime)}
+  .htok .note{display:block;font-size:11.5px;color:var(--muted);margin-top:4px}
+  .htok details{margin-top:12px}
+  .htok summary{cursor:pointer;color:var(--cyan);font-size:13px;list-style:none}
+  .htok summary::-webkit-details-marker{display:none}
+  .htok table{width:100%;border-collapse:collapse;margin-top:12px;font-size:12px}
+  .htok th{color:var(--muted);font-weight:600;text-align:left;padding:4px 6px;border-bottom:1px solid var(--line)}
+  .htok td{color:var(--muted);padding:5px 6px;border-bottom:1px solid var(--line);text-align:left}
+  .htok td.big{color:var(--lime);font-weight:700;font-family:ui-monospace,monospace}
+  .htok .fine{font-size:11px;color:var(--muted);margin:9px 0 0;line-height:1.5;text-align:left}
+  .htok a.est{display:inline-block;margin-top:12px;font-size:13.5px;color:var(--cyan);font-weight:700}
 
   .code{max-width:560px;margin:34px auto 0;background:#060a13;border:1px solid var(--line);border-radius:14px;
     text-align:left;padding:16px 18px;font:13.5px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;color:#cdd9ef;overflow-x:auto}
@@ -146,6 +162,8 @@
   .est-out .cap{font-size:13px;color:var(--muted);margin-top:6px}
   .est-formula{margin-top:14px;font-size:12px;color:var(--muted);text-align:center;font-family:ui-monospace,monospace}
   .est-note{margin-top:12px;font-size:12px;color:var(--muted);text-align:center;line-height:1.55}
+  .est-tok{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);text-align:center;font-size:13.5px;color:var(--muted)}
+  .est-tok b{color:var(--lime);font-family:ui-monospace,monospace}
   .fullstore{max-width:900px;margin:28px auto 0}
   .fullstore summary{color:var(--cyan);cursor:pointer;text-align:center;font-size:13.5px;list-style:none}
   .fullstore img{width:100%;border:1px solid var(--line);border-radius:14px;margin-top:12px;box-shadow:0 20px 50px rgba(0,0,0,.4)}
@@ -240,10 +258,29 @@
       </g>
     </svg>
     <h1>Reuse,<br><span class="g">don't reinvent.</span></h1>
+    <p class="pun">🌳 Save a token, save a tree.</p>
     <p class="tag">Not a repo health-scorer — a reuse <i>decision</i> engine.</p>
     <p class="lede">Every "is this repo any good?" tool grades maintenance. RepoHunter answers the question you
       actually have: <b style="color:var(--text)">should I adopt this — for my project, on my machine?</b>
       A GO / MAYBE / SKIP call and a plan to do it — and now a <b style="color:var(--text)">skill your AI agent calls</b> before it installs anything.</p>
+    <div class="htok">
+      <div class="msg">🔥 Every token spent regenerating code that <b>already exists</b> is wasted.</div>
+      <div class="fig">Regenerating a ~400-line module ≈ <b>~5,000 tokens</b> ≈ <b>$0.03–$0.15</b>
+        <span class="note">real tokenizer math · ~4 chars/token · current model pricing</span></div>
+      <details>
+        <summary>…now multiply that by everyone, every day ↓</summary>
+        <table>
+          <tr><th>scenario</th><th>AI-assisted devs</th><th>redundant tokens / dev·day</th><th>tokens / day</th></tr>
+          <tr><td>low</td><td>5M</td><td>2,500</td><td class="big">~12B</td></tr>
+          <tr><td>mid</td><td>10M</td><td>4,000</td><td class="big">~40B</td></tr>
+          <tr><td>high</td><td>25M</td><td>8,000</td><td class="big">~200B</td></tr>
+        </table>
+        <p class="fine">A back-of-the-envelope — <b style="color:var(--text)">not a measurement.</b> Every assumption is
+          shown so you can argue with it. At ~$5 / 1M tokens the mid case is ~$200K/day of compute burned re-writing
+          code that already exists. That's the problem RepoHunter exists to kill.</p>
+      </details>
+      <a class="est" href="#estimate">Estimate your own savings →</a>
+    </div>
     <div class="cta">
       <button class="btn primary" onclick="rhTour()">▶ Take the 60-second tour</button>
       <a class="btn ghost" href="https://github.com/meetziggy/repohunter" target="_blank" rel="noopener">★ Star it on GitHub</a>
@@ -336,11 +373,17 @@ python3 repohunter.py <span class="p">serve</span>
           <span class="hint">your rate — or leave blank to see hours only</span></label>
         <input id="e_rate" type="number" min="0" step="5" value="0" inputmode="numeric" placeholder="0">
       </div>
+      <div class="est-row">
+        <label>Avg size of what you'd have rebuilt (lines)
+          <span class="hint">tokens ≈ lines × ~13 (real tokenizer ratio)</span></label>
+        <input id="e_lines" type="number" min="0" step="50" value="400" inputmode="numeric">
+      </div>
       <div class="est-out">
         <div class="num" id="e_out">— hrs / month</div>
         <div class="cap" id="e_cap">time you don't spend rebuilding — <b style="color:var(--text)">your estimate, from your numbers</b></div>
       </div>
       <div class="est-formula" id="e_formula">reuses × hours = time saved</div>
+      <div class="est-tok" id="e_tok">🔥 and ≈ <b>—</b> tokens/month you don't burn regenerating</div>
       <p class="est-note">Rough and illustrative — a way to reason about <i>your</i> situation, not a promise or a
         claim about typical results. RepoHunter helps you find and vet what to reuse; the value depends entirely on
         what you'd have built instead.</p>
@@ -527,13 +570,15 @@ try{
 /* Reuse estimator — visitor-driven. We assert nothing; the math runs on THEIR inputs, in the open. */
 (function(){
   var R=document.getElementById('e_reuses'), H=document.getElementById('e_hours'),
-      P=document.getElementById('e_rate'), out=document.getElementById('e_out'),
-      cap=document.getElementById('e_cap'), fx=document.getElementById('e_formula');
+      P=document.getElementById('e_rate'), L=document.getElementById('e_lines'),
+      out=document.getElementById('e_out'), cap=document.getElementById('e_cap'),
+      fx=document.getElementById('e_formula'), tok=document.getElementById('e_tok');
   if(!R) return;
   function n(el){ var v=parseFloat(el.value); return (isFinite(v)&&v>0)?v:0; }
   function fmtHrs(h){ return (h>=100?Math.round(h):Math.round(h*10)/10); }
+  var TOK_PER_LINE=13, USD_PER_MTOK=5;   // ~50 chars/line ÷ ~4 chars/token ; ~$5 / 1M output tokens
   function calc(){
-    var reuses=n(R), hours=n(H), rate=n(P);
+    var reuses=n(R), hours=n(H), rate=n(P), lines=n(L);
     var hrs=reuses*hours;
     if(rate>0){
       var dollars=hrs*rate;
@@ -545,8 +590,14 @@ try{
       cap.innerHTML='time you don’t spend rebuilding — <b style="color:var(--text)">your estimate, from your numbers</b> (add a rate for $)';
       fx.textContent=reuses+' reuses × '+fmtHrs(hours)+' hrs = time saved';
     }
+    if(tok){
+      var tokens=Math.round(reuses*lines*TOK_PER_LINE);
+      var tcost=tokens/1e6*USD_PER_MTOK;
+      tok.innerHTML='🔥 and ≈ <b>'+tokens.toLocaleString()+'</b> tokens/month you don’t burn regenerating'
+        + (tokens>0 ? ' <span style="color:var(--muted)">(~$'+tcost.toFixed(2)+' at ~$5/1M · your lines × ~13)</span>' : '');
+    }
   }
-  [R,H,P].forEach(function(el){ el.addEventListener('input',calc); });
+  [R,H,P,L].forEach(function(el){ el && el.addEventListener('input',calc); });
   calc();
 })();
 </script>
