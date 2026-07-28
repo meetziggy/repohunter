@@ -66,6 +66,22 @@ npx @smithery/cli install repohunter
 Smithery can also host a **remote** version (their Gateway) if you'd rather not run it locally — that's
 the "run it in the cloud" option, no local install.
 
+## Run it in a container (optional)
+
+RepoHunter is zero-dependency stdlib Python, so `uvx` is simpler — but if you prefer container
+isolation (or found it via the Docker MCP Catalog):
+```
+docker build -t repohunter-mcp .
+```
+Then point your client at `docker run -i --rm repohunter-mcp` instead of `uvx repohunter-mcp`. MCP
+speaks over stdio, so there are no ports to expose.
+
+## Give your agent the *reflex*, not just the tools
+
+The server above is the toolset. To make your agent reach for RepoHunter **on its own** — before it
+installs a dependency or clones a repo — install the **Skill** too: see [`skills/README.md`](skills/README.md).
+One server + one skill = the reuse-first reflex in Claude Code, Codex, Gemini, or any agent.
+
 ## Verify it works
 ```
 printf '%s\n' \
