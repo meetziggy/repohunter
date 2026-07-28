@@ -28,6 +28,7 @@ Changelog = "https://github.com/meetziggy/repohunter/blob/main/CHANGELOG.md"
 
 [project.scripts]
 repohunter = "repohunter:main"
+repohunter-mcp = "repohunter_mcp:main"
 
 [tool.setuptools]
-py-modules = ["repohunter"]
+py-modules = ["repohunter", "repohunter_mcp"]
