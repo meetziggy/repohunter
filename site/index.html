@@ -199,8 +199,8 @@ python3 repohunter.py <span class="p">serve</span>
       <img src="/store-screenshot.png" alt="RepoHunter store: repos ranked with GO / MAYBE / SKIP verdicts, resource-fit, and scores" loading="lazy">
     </details>
     <div class="ticker" aria-hidden="true"><div>
-      <span><b>96%</b> of codebases run on open source</span><span>reuse, don't <b>re-burn</b></span><span>the greenest code is the code you never regenerate</span><span>a mid-size library ≈ <b>weeks</b> to rebuild</span><span>every regenerated token burns real energy + money</span><span>AI reaches for the same 10 libraries — the long tail goes dark</span>
-      <span><b>96%</b> of codebases run on open source</span><span>reuse, don't <b>re-burn</b></span><span>the greenest code is the code you never regenerate</span><span>a mid-size library ≈ <b>weeks</b> to rebuild</span><span>every regenerated token burns real energy + money</span><span>AI reaches for the same 10 libraries — the long tail goes dark</span>
+      <span>the vast majority of software runs on open source</span><span>reuse, don't <b>re-burn</b></span><span>the greenest code is the code you never regenerate</span><span>reinventing what already exists is <b>wasted effort</b></span><span>generating code that already exists burns energy + money for nothing</span><span>AI reaches for the same popular libraries — the long tail goes dark</span>
+      <span>the vast majority of software runs on open source</span><span>reuse, don't <b>re-burn</b></span><span>the greenest code is the code you never regenerate</span><span>reinventing what already exists is <b>wasted effort</b></span><span>generating code that already exists burns energy + money for nothing</span><span>AI reaches for the same popular libraries — the long tail goes dark</span>
     </div></div>
     <p class="subline" style="text-align:center;margin-top:20px"><b>Where this is headed:</b> as AI agents write more of the code,
       your agent calls RepoHunter automatically — an MCP server that checks <i>before</i> it installs. Same verdict, zero clicks.</p>
@@ -233,7 +233,7 @@ python3 repohunter.py <span class="p">serve</span>
       <div class="feat"><div class="ic">🌱</div><h3>Less compute, less carbon</h3><p>AI inference runs on real power and cooling. Reuse simply avoids it. Think of it as recycling, for software.</p></div>
       <div class="feat"><div class="ic">🧬</div><h3>Breaks the monoculture</h3><p>AI reaches for the same ten popular libraries every time. RepoHunter surfaces the long tail — so we stop all building the same thing.</p></div>
     </div>
-    <p class="subline" style="text-align:center;margin-top:18px"><b>Coming soon:</b> every adoption shows an estimated <b>tokens saved ≈ energy ≈ CO₂ avoided</b> vs. building it yourself — transparent, conservative math.</p>
+    <p class="subline" style="text-align:center;margin-top:18px">It's not about an exact number — it's that <b>reusing proven code</b> means you don't spend the time, cost, or energy of rebuilding it.</p>
   </section>
 
   <section>
@@ -285,7 +285,8 @@ python3 repohunter.py <span class="p">serve</span>
 <footer>
   <div class="wrap">
     MIT © 2026 Chris Gorzelic · built on open source, given back · maintained by Ziggy 🤖<br>
-    <a href="https://github.com/meetziggy/repohunter" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://github.com/meetziggy/repohunter" target="_blank" rel="noopener">GitHub</a> ·
+    <a href="/terms">Terms, Privacy &amp; Disclaimer</a>
   </div>
 </footer>
 <div class="obscrim" id="obscrim"></div>
@@ -353,26 +354,17 @@ try{
     var verdict = d.archived?'SKIP': overall>=70?'GO': overall>=48?'MAYBE':'SKIP';
     return {pop:pop,fresh:fresh,health:health,overall:overall,verdict:verdict,fit:fit(d)};
   }
-  function savings(d){          // rough, illustrative — "build your own equivalent" vs reuse. Conservative + capped.
-    var kb=d.size||0, wk, cap=false;
-    if(kb<400) wk=0.5; else if(kb<3000) wk=2; else if(kb<20000) wk=6; else { wk=12; cap=true; } // size-bucket dev-weeks
-    var tokens=wk*200000;                                          // ~200k AI tokens / dev-week of assisted work
-    var tk = tokens>=1e6? (tokens/1e6).toFixed(1)+'M' : Math.round(tokens/1e3)+'k';
-    var dollars=Math.round(wk*35*70 + tokens/1e6*3);              // dev @ ~$70/hr, 35 hr/wk + tokens @ ~$3/M
-    return {wk:(cap?'12+':(wk<1?wk.toFixed(1):String(wk))), tk:tk, dollars:dollars.toLocaleString()};
-  }
   function esc(s){return (s||'').replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
   function num(n){return n>=1000?(n/1000).toFixed(1).replace(/\.0$/,'')+'k':String(n);}
   function tile(d){
-    var s=score(d), v=s.verdict, sv=savings(d);
+    var s=score(d), v=s.verdict;
     var el=document.createElement('div'); el.className='tile'+(v==='GO'?' go':'');
     el.innerHTML='<div class="th"><div><h4>'+esc(d.name)+'</h4><div class="own">'+esc((d.owner||{}).login||'')+'</div></div>'
       +'<span class="tv tv-'+v+'">'+v+'</span></div>'
       +'<div class="desc">'+(esc((d.description||'').slice(0,120))||'—')+'</div>'
       +'<div class="meta"><span>★ '+num(d.stargazers_count||0)+'</span><span>'+esc(d.language||'—')+'</span><span>'+esc(((d.license||{}).spdx_id)||'—')+'</span></div>'
       +'<div class="tfoot"><div class="ring" style="--p:'+s.overall+'"><b>'+s.overall+'</b></div>'
-      +'<div class="chips"><span class="chip2">'+s.fit+'</span><span class="chip2">pop '+s.pop+'</span><span class="chip2">fresh '+s.fresh+'</span><span class="chip2">health '+s.health+'</span></div></div>'
-      +'<div class="savings">♻ Reuse instead of rebuild ≈ <b>~'+sv.wk+' wk</b> of dev + <b>~'+sv.tk+'</b> AI tokens ≈ <b>~$'+sv.dollars+'</b> avoided <span style="color:var(--muted)">· rough estimate</span></div>';
+      +'<div class="chips"><span class="chip2">'+s.fit+'</span><span class="chip2">pop '+s.pop+'</span><span class="chip2">fresh '+s.fresh+'</span><span class="chip2">health '+s.health+'</span></div></div>';
     return el;
   }
   function err(slug,msg){ var el=document.createElement('div'); el.className='tile';
