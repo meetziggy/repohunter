@@ -1,2 +1,4 @@
-# Pretty per-repo report URLs: /r/owner/name → the report page (client reads owner/name from the path)
-/r/*  /r.html  200
+# Pretty per-repo report URLs: /r/owner/name serves the report page WITHOUT changing the URL
+# (200 = rewrite, not a redirect), so r.html can read owner/name from the path. Target the clean
+# URL /r (not /r.html) — Pages clean-URLs would 308 /r.html → /r and drop the splat.
+/r/*  /r  200
