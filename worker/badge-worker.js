@@ -89,10 +89,10 @@ function cardSVG(m, s) {
 <rect width="560" height="300" rx="18" fill="url(#bg)" stroke="${LINE}"/>
 <g transform="translate(28,22)">
   <g fill="url(#wg)" fill-opacity=".42" stroke="url(#wg)" stroke-width="1.3">
-    <g transform="rotate(-14 20 15)"><ellipse cx="6" cy="11" rx="15" ry="4.2"/></g>
-    <g transform="rotate(14 20 15)"><ellipse cx="6" cy="20" rx="12.5" ry="3.6"/></g>
-    <g transform="rotate(14 20 15)"><ellipse cx="34" cy="11" rx="15" ry="4.2"/></g>
-    <g transform="rotate(-14 20 15)"><ellipse cx="34" cy="20" rx="12.5" ry="3.6"/></g>
+    <g transform="rotate(15 20 15)"><ellipse cx="6" cy="19" rx="14" ry="4.8"/></g>
+    <g transform="rotate(-15 20 15)"><ellipse cx="34" cy="19" rx="14" ry="4.8"/></g>
+    <g transform="rotate(-13 20 15)"><ellipse cx="6" cy="11" rx="14.5" ry="3.4"/></g>
+    <g transform="rotate(13 20 15)"><ellipse cx="34" cy="11" rx="14.5" ry="3.4"/></g>
   </g>
   <rect x="18.7" y="17" width="2.6" height="16" rx="1.3" fill="url(#wg)"/>
   <ellipse cx="20" cy="14" rx="3.4" ry="5" fill="url(#wg)"/>
