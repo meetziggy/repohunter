@@ -49,6 +49,21 @@
   .hero img{width:200px;height:200px;filter:drop-shadow(0 16px 66px rgba(184,255,60,.45));animation:floaty 5.5s ease-in-out infinite}
   @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
   @media(max-width:640px){.hero img{width:150px;height:150px}}
+  /* animated hero dragonfly (web only; logo.svg stays static for print/favicon) */
+  .dfly{width:200px;height:200px;display:inline-block;cursor:pointer;filter:drop-shadow(0 16px 66px rgba(184,255,60,.45));animation:floaty 5.5s ease-in-out infinite}
+  .dfly .wg{transform-box:view-box}
+  @media(prefers-reduced-motion:no-preference){
+    .dfly .fl{transform-origin:116px 90px;animation:fl .62s ease-in-out infinite}
+    .dfly .fr{transform-origin:124px 90px;animation:fr .62s ease-in-out infinite}
+    .dfly .hl{transform-origin:116px 112px;animation:hl .62s ease-in-out infinite}
+    .dfly .hr{transform-origin:124px 112px;animation:hr .62s ease-in-out infinite}
+    .dfly.excited .fl,.dfly.excited .fr,.dfly.excited .hl,.dfly.excited .hr{animation-duration:.24s}
+  }
+  @keyframes fl{0%,100%{transform:rotate(2.6deg)}50%{transform:rotate(-3.4deg)}}
+  @keyframes fr{0%,100%{transform:rotate(-2.6deg)}50%{transform:rotate(3.4deg)}}
+  @keyframes hl{0%,100%{transform:rotate(-2.2deg)}50%{transform:rotate(2.8deg)}}
+  @keyframes hr{0%,100%{transform:rotate(2.2deg)}50%{transform:rotate(-2.8deg)}}
+  @media(max-width:640px){.dfly{width:150px;height:150px}}
   .hero h1{font-size:clamp(40px,7vw,74px);margin:18px 0 6px;letter-spacing:-.03em;line-height:1}
   .hero h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
   .tag{font-size:clamp(18px,2.6vw,24px);font-weight:700;color:var(--text);margin:0 0 14px}
@@ -171,7 +186,44 @@
   </nav>
 
   <header class="hero">
-    <img src="logo.svg" alt="RepoHunter">
+    <svg id="dfly" class="dfly" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="RepoHunter — hover to hear the wings">
+      <defs>
+        <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#d4ff7a"/><stop offset=".5" stop-color="#b8ff3c"/><stop offset="1" stop-color="#38bdf8"/>
+        </linearGradient>
+        <linearGradient id="wing" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#b8ff3c"/><stop offset="1" stop-color="#38bdf8"/>
+        </linearGradient>
+        <radialGradient id="eye" cx=".4" cy=".35" r=".8">
+          <stop offset="0" stop-color="#f0ffd6"/><stop offset=".5" stop-color="#b8ff3c"/><stop offset="1" stop-color="#2f9e5a"/>
+        </radialGradient>
+        <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="3.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <rect x="20" y="20" width="200" height="200" rx="46" fill="#0b1220" stroke="#22304a" stroke-width="2"/>
+      <g filter="url(#glow)">
+        <g fill="url(#wing)" fill-opacity=".42" stroke="url(#wing)" stroke-width="2">
+          <g class="wg fl"><g transform="rotate(-15 120 96)"><ellipse cx="74" cy="88" rx="48" ry="14"/>
+            <line x1="30" y1="88" x2="118" y2="88" stroke="#dbeafe" stroke-width="1" opacity=".4"/></g></g>
+          <g class="wg hl"><g transform="rotate(15 120 96)"><ellipse cx="74" cy="118" rx="42" ry="12"/>
+            <line x1="34" y1="118" x2="116" y2="118" stroke="#dbeafe" stroke-width="1" opacity=".4"/></g></g>
+          <g class="wg fr"><g transform="rotate(15 120 96)"><ellipse cx="166" cy="88" rx="48" ry="14"/>
+            <line x1="122" y1="88" x2="210" y2="88" stroke="#dbeafe" stroke-width="1" opacity=".4"/></g></g>
+          <g class="wg hr"><g transform="rotate(-15 120 96)"><ellipse cx="166" cy="118" rx="42" ry="12"/>
+            <line x1="124" y1="118" x2="206" y2="118" stroke="#dbeafe" stroke-width="1" opacity=".4"/></g></g>
+        </g>
+        <ellipse cx="120" cy="96" rx="11" ry="17" fill="url(#body)"/>
+        <path d="M111 104 Q120 100 129 104 L124 196 Q120 205 116 196 Z" fill="url(#body)"/>
+        <g stroke="#0b1220" stroke-width="1.6" opacity=".45">
+          <line x1="115" y1="126" x2="125" y2="126"/><line x1="115.5" y1="144" x2="124.5" y2="144"/>
+          <line x1="116" y1="162" x2="124" y2="162"/><line x1="116.5" y1="180" x2="123.5" y2="180"/>
+        </g>
+        <ellipse cx="120" cy="70" rx="15" ry="11" fill="url(#body)"/>
+        <circle cx="112" cy="66" r="7.5" fill="url(#eye)"/>
+        <circle cx="128" cy="66" r="7.5" fill="url(#eye)"/>
+      </g>
+    </svg>
     <h1>Reuse,<br><span class="g">don't reinvent.</span></h1>
     <p class="tag">Not a repo health-scorer — a reuse <i>decision</i> engine.</p>
     <p class="lede">Every "is this repo any good?" tool grades maintenance. RepoHunter answers the question you
@@ -453,6 +505,42 @@ try{
   }
   [R,H,P].forEach(function(el){ el.addEventListener('input',calc); });
   calc();
+})();
+</script>
+
+<script>
+/* Dragonfly wings — subtle flutter sound on hover, a soft chime on click. Web Audio only, low volume,
+   created on first gesture (browsers block autoplay). Fully optional delight; nothing depends on it. */
+(function(){
+  var dfly=document.getElementById('dfly'); if(!dfly) return;
+  var ac=null, last=0;
+  function ctx(){ if(!ac){ try{ ac=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; } }
+    if(ac.state==='suspended'){ ac.resume(); } return ac; }
+  function wing(vol){                    // filtered noise + tremolo ≈ a wing flutter
+    var c=ctx(); if(!c) return; var t=c.currentTime, dur=0.2;
+    var buf=c.createBuffer(1, Math.floor(c.sampleRate*dur), c.sampleRate), d=buf.getChannelData(0);
+    for(var i=0;i<d.length;i++){ d[i]=Math.random()*2-1; }
+    var src=c.createBufferSource(); src.buffer=buf;
+    var bp=c.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=2300; bp.Q.value=7;
+    var g=c.createGain(); g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    var lfo=c.createOscillator(); lfo.frequency.value=44; var lg=c.createGain(); lg.gain.value=vol*0.6;
+    lfo.connect(lg); lg.connect(g.gain);   // tremolo shimmer
+    src.connect(bp); bp.connect(g); g.connect(c.destination);
+    lfo.start(t); src.start(t); src.stop(t+dur); lfo.stop(t+dur);
+  }
+  function chime(){                       // gentle lime→cyan two-note lift on click
+    var c=ctx(); if(!c) return; var t=c.currentTime;
+    [[659,0],[988,0.1]].forEach(function(n){
+      var o=c.createOscillator(), g=c.createGain(); o.type='triangle'; o.frequency.value=n[0];
+      g.gain.setValueAtTime(0,t+n[1]); g.gain.linearRampToValueAtTime(0.045,t+n[1]+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+n[1]+0.4);
+      o.connect(g); g.connect(c.destination); o.start(t+n[1]); o.stop(t+n[1]+0.42);
+    });
+  }
+  dfly.addEventListener('mouseenter',function(){ var now=Date.now(); if(now-last<450) return; last=now; wing(0.05); });
+  dfly.addEventListener('click',function(){ wing(0.07); chime(); dfly.classList.add('excited');
+    setTimeout(function(){ dfly.classList.remove('excited'); }, 800); });
 })();
 </script>
 
