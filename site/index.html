@@ -164,6 +164,26 @@
   .est-note{margin-top:12px;font-size:12px;color:var(--muted);text-align:center;line-height:1.55}
   .est-tok{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);text-align:center;font-size:13.5px;color:var(--muted)}
   .est-tok b{color:var(--lime);font-family:ui-monospace,monospace}
+  /* self-explaining, animated calculator */
+  .est-help{display:inline-flex;align-items:center;gap:7px;background:#0b1424;border:1px solid var(--line);color:var(--cyan);border-radius:999px;padding:6px 15px;font-size:13px;font-weight:700;cursor:pointer;transition:.15s;font-family:inherit}
+  .est-help:hover{border-color:var(--cyan);transform:translateY(-1px)}
+  .est-pop{position:relative;max-width:580px;margin:0 auto 22px;background:linear-gradient(180deg,#0e1729,#0b1322);border:1px solid var(--line);border-radius:16px;padding:22px 24px;text-align:left;display:none}
+  .est-pop.open{display:block;animation:cardin .3s ease}
+  .est-pop h4{margin:0 0 6px;font-size:15px;color:var(--lime);display:flex;align-items:center;gap:8px}
+  .est-pop p{margin:0 0 13px;font-size:13.5px;color:var(--muted);line-height:1.65}
+  .est-pop p:last-child{margin-bottom:0}
+  .est-pop p b{color:var(--text)}
+  .est-pop .x{position:absolute;top:14px;right:16px;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;border:0;background:none}
+  .est-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:6px 0}
+  @media(max-width:560px){.est-tiles{grid-template-columns:1fr}}
+  .est-tile{background:#0b1424;border:1px solid var(--line);border-radius:14px;padding:16px 12px;text-align:center;transition:box-shadow .35s,border-color .35s}
+  .est-tile.pulse{border-color:rgba(184,255,60,.55);box-shadow:0 0 26px rgba(184,255,60,.16)}
+  .est-tile .et-ic{font-size:19px;opacity:.9}
+  .est-tile .et-num{font-size:clamp(21px,4vw,29px);font-weight:800;color:var(--lime);font-family:ui-monospace,monospace;line-height:1.1;margin-top:5px}
+  .est-tile .et-lbl{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.35}
+  .est-say{margin-top:18px;text-align:center;font-size:15.5px;color:var(--text);line-height:1.6}
+  .est-say b{color:var(--lime)}
+  .tokchip{display:inline-block;border-bottom:1px dashed var(--cyan);color:var(--cyan);cursor:help}
   .fullstore{max-width:900px;margin:28px auto 0}
   .fullstore summary{color:var(--cyan);cursor:pointer;text-align:center;font-size:13.5px;list-style:none}
   .fullstore img{width:100%;border:1px solid var(--line);border-radius:14px;margin-top:12px;box-shadow:0 20px 50px rgba(0,0,0,.4)}
@@ -357,6 +377,16 @@ python3 repohunter.py <span class="p">serve</span>
     <div class="h2b">Your inputs. Your math. We don't put a number on it — you do.</div>
     <p class="diff">We won't invent a savings figure and paste it on a billboard. Put in <i>your own</i> reality
       and watch the estimate move. Every assumption stays on screen — nothing hidden, nothing asserted by us.</p>
+    <div style="text-align:center;margin:0 0 6px"><button class="est-help" id="e_helpbtn" type="button">❓ New here? What is this?</button></div>
+    <div class="est-pop" id="e_pop">
+      <button class="x" id="e_popx" type="button" aria-label="close">✕</button>
+      <h4>🧮 What this calculator does</h4>
+      <p>It estimates what you save by <b>reusing existing code</b> instead of rebuilding it from scratch — in three things you actually care about: your <b>time</b>, your <b>money</b>, and <b>AI tokens</b>.</p>
+      <h4>🔥 Wait — what's a "token"?</h4>
+      <p>AI models read and write in <b>tokens</b> — tiny chunks of text, about 4 characters each. It's the unit they're <b>billed by</b>. Every time an AI regenerates code that already exists somewhere, it <b>burns tokens you pay for</b> — for zero new value. Reuse the code and you skip the burn entirely.</p>
+      <h4>👇 How to use it</h4>
+      <p>Type in <b>your own</b> numbers below. The estimate updates live. We never assert a figure — the math is yours, and every assumption is shown. <i>Save a token, save a tree.</i> 🌳</p>
+    </div>
     <div class="est">
       <div class="est-row">
         <label>Times a month you reach for something that likely already exists
@@ -378,12 +408,12 @@ python3 repohunter.py <span class="p">serve</span>
           <span class="hint">tokens ≈ lines × ~13 (real tokenizer ratio)</span></label>
         <input id="e_lines" type="number" min="0" step="50" value="400" inputmode="numeric">
       </div>
-      <div class="est-out">
-        <div class="num" id="e_out">— hrs / month</div>
-        <div class="cap" id="e_cap">time you don't spend rebuilding — <b style="color:var(--text)">your estimate, from your numbers</b></div>
+      <div class="est-tiles">
+        <div class="est-tile" id="e_tile_h"><div class="et-ic">⏱️</div><div class="et-num" id="e_hrs">—</div><div class="et-lbl">hours / month<br>you don't rebuild</div></div>
+        <div class="est-tile" id="e_tile_d"><div class="et-ic">💵</div><div class="et-num" id="e_usd">—</div><div class="et-lbl">value / month<br>(add your rate)</div></div>
+        <div class="est-tile" id="e_tile_t"><div class="et-ic">🔥</div><div class="et-num" id="e_tokens">—</div><div class="et-lbl">tokens / month<br>you don't burn</div></div>
       </div>
-      <div class="est-formula" id="e_formula">reuses × hours = time saved</div>
-      <div class="est-tok" id="e_tok">🔥 and ≈ <b>—</b> tokens/month you don't burn regenerating</div>
+      <p class="est-say" id="e_say">Put in your numbers above — I'll do the math live.</p>
       <p class="est-note">Rough and illustrative — a way to reason about <i>your</i> situation, not a promise or a
         claim about typical results. RepoHunter helps you find and vet what to reuse; the value depends entirely on
         what you'd have built instead.</p>
@@ -571,34 +601,43 @@ try{
 (function(){
   var R=document.getElementById('e_reuses'), H=document.getElementById('e_hours'),
       P=document.getElementById('e_rate'), L=document.getElementById('e_lines'),
-      out=document.getElementById('e_out'), cap=document.getElementById('e_cap'),
-      fx=document.getElementById('e_formula'), tok=document.getElementById('e_tok');
+      hrsEl=document.getElementById('e_hrs'), usdEl=document.getElementById('e_usd'),
+      tokEl=document.getElementById('e_tokens'), say=document.getElementById('e_say'),
+      tileH=document.getElementById('e_tile_h'), tileD=document.getElementById('e_tile_d'), tileT=document.getElementById('e_tile_t');
   if(!R) return;
   function n(el){ var v=parseFloat(el.value); return (isFinite(v)&&v>0)?v:0; }
-  function fmtHrs(h){ return (h>=100?Math.round(h):Math.round(h*10)/10); }
-  var TOK_PER_LINE=13, USD_PER_MTOK=5;   // ~50 chars/line ÷ ~4 chars/token ; ~$5 / 1M output tokens
+  var TOK_PER_LINE=13, USD_PER_MTOK=5;   // ~50 chars/line ÷ ~4 chars/token ; ~$5 / 1M tokens
+  var fmtH=function(v){ return (v>=100?Math.round(v):Math.round(v*10)/10).toLocaleString(); };
+  var fmtD=function(v){ return '$'+Math.round(v).toLocaleString(); };
+  var fmtT=function(v){ return Math.round(v).toLocaleString(); };
+  var raf={};
+  function tween(el,key,target,fmt){                 // count-up so numbers feel alive
+    if(!el) return; if(raf[key]) cancelAnimationFrame(raf[key]);
+    var start=parseFloat(el.getAttribute('data-v'))||0, t0=null;
+    function step(ts){ if(!t0)t0=ts; var p=Math.min(1,(ts-t0)/500), e=1-Math.pow(1-p,3);
+      el.textContent=fmt(start+(target-start)*e);
+      if(p<1) raf[key]=requestAnimationFrame(step); else { el.setAttribute('data-v',target); el.textContent=fmt(target); } }
+    raf[key]=requestAnimationFrame(step);
+  }
+  function pulse(t){ if(!t)return; t.classList.add('pulse'); setTimeout(function(){t.classList.remove('pulse');},430); }
   function calc(){
     var reuses=n(R), hours=n(H), rate=n(P), lines=n(L);
-    var hrs=reuses*hours;
-    if(rate>0){
-      var dollars=hrs*rate;
-      out.textContent='$'+dollars.toLocaleString(undefined,{maximumFractionDigits:0})+' / month';
-      cap.innerHTML='time-value you don’t spend rebuilding — <b style="color:var(--text)">your estimate, from your numbers</b>';
-      fx.textContent=reuses+' reuses × '+fmtHrs(hours)+' hrs × $'+rate+'/hr = your monthly estimate';
-    } else {
-      out.textContent=fmtHrs(hrs)+' hrs / month';
-      cap.innerHTML='time you don’t spend rebuilding — <b style="color:var(--text)">your estimate, from your numbers</b> (add a rate for $)';
-      fx.textContent=reuses+' reuses × '+fmtHrs(hours)+' hrs = time saved';
-    }
-    if(tok){
-      var tokens=Math.round(reuses*lines*TOK_PER_LINE);
-      var tcost=tokens/1e6*USD_PER_MTOK;
-      tok.innerHTML='🔥 and ≈ <b>'+tokens.toLocaleString()+'</b> tokens/month you don’t burn regenerating'
-        + (tokens>0 ? ' <span style="color:var(--muted)">(~$'+tcost.toFixed(2)+' at ~$5/1M · your lines × ~13)</span>' : '');
-    }
+    var hrs=reuses*hours, usd=hrs*rate, tokens=reuses*lines*TOK_PER_LINE, tcost=tokens/1e6*USD_PER_MTOK;
+    tween(hrsEl,'h',hrs,fmtH); tween(tokEl,'t',tokens,fmtT); pulse(tileH); pulse(tileT);
+    if(rate>0){ tween(usdEl,'d',usd,fmtD); pulse(tileD); } else { usdEl.textContent='—'; usdEl.setAttribute('data-v',0); }
+    if(reuses>0&&hours>0){
+      var s='Reusing <b>'+reuses+'</b> thing'+(reuses===1?'':'s')+' a month instead of rebuilding them saves you about <b>'+fmtH(hrs)+' hours</b>';
+      if(rate>0) s+=' (~<b>$'+Math.round(usd).toLocaleString()+'</b>)';
+      s+=' — and <b>'+fmtT(tokens)+' AI tokens</b> you’d otherwise burn'+(tokens>0?' (~$'+tcost.toFixed(2)+' of compute)':'')+'.';
+      s+=' <span style="color:var(--muted)">Your estimate, from your numbers.</span>';
+      say.innerHTML=s;
+    } else { say.textContent='Put in your numbers above — I’ll do the math live.'; }
   }
   [R,H,P,L].forEach(function(el){ el && el.addEventListener('input',calc); });
   calc();
+  var pop=document.getElementById('e_pop'), hb=document.getElementById('e_helpbtn'), px=document.getElementById('e_popx');
+  if(hb&&pop) hb.addEventListener('click',function(){ pop.classList.toggle('open'); if(pop.classList.contains('open')) pop.scrollIntoView({behavior:'smooth',block:'nearest'}); });
+  if(px&&pop) px.addEventListener('click',function(){ pop.classList.remove('open'); });
 })();
 </script>
 
