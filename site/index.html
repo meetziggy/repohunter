@@ -194,6 +194,13 @@
   .em .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
   .em .dot.g{background:var(--green)}.em .dot.y{background:var(--amber)}.em .dot.r{background:#fb7185}
   .em-note{font-size:10.5px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.5}
+  .est-validate{max-width:600px;margin:22px auto 0;background:linear-gradient(180deg,#0e1729,#0b1322);border:1px solid var(--line);border-radius:16px;padding:20px 22px}
+  .ev-h{font-size:15px;font-weight:800;color:var(--lime);text-align:center}
+  .ev-p{font-size:13px;color:var(--muted);text-align:center;margin:8px 0 14px;line-height:1.6}
+  .ev-code{background:#060a13;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font:11.5px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;color:#cdd9ef;overflow-x:auto;margin:0 0 14px;white-space:pre}
+  .ev-code .c{color:var(--muted)}
+  .ev-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .ev-btns .btn{font-size:13.5px;padding:10px 16px;text-decoration:none;display:inline-flex;align-items:center}
   .fullstore{max-width:900px;margin:28px auto 0}
   .fullstore summary{color:var(--cyan);cursor:pointer;text-align:center;font-size:13.5px;list-style:none}
   .fullstore img{width:100%;border:1px solid var(--line);border-radius:14px;margin-top:12px;box-shadow:0 20px 50px rgba(0,0,0,.4)}
@@ -300,14 +307,14 @@
       <details>
         <summary>…now multiply that by everyone, every day ↓</summary>
         <table>
-          <tr><th>scenario</th><th>AI-assisted devs</th><th>redundant tokens / dev·day</th><th>tokens / day</th></tr>
-          <tr><td>low</td><td>5M</td><td>2,500</td><td class="big">~12B</td></tr>
-          <tr><td>mid</td><td>10M</td><td>4,000</td><td class="big">~40B</td></tr>
-          <tr><td>high</td><td>25M</td><td>8,000</td><td class="big">~200B</td></tr>
+          <tr><th>scenario</th><th>AI-assisted devs</th><th>redundant lines / dev·day</th><th>× 40 = tokens / day</th></tr>
+          <tr><td>low</td><td>5M</td><td>60</td><td class="big">~12B</td></tr>
+          <tr><td>mid</td><td>10M</td><td>100</td><td class="big">~40B</td></tr>
+          <tr><td>high</td><td>25M</td><td>200</td><td class="big">~200B</td></tr>
         </table>
         <p class="fine">A back-of-the-envelope — <b style="color:var(--text)">not a measurement.</b> Every assumption is
-          shown so you can argue with it. At ~$5 / 1M tokens the mid case is ~$200K/day of compute burned re-writing
-          code that already exists. That's the problem RepoHunter exists to kill.</p>
+          shown so you can argue with it. Across the model tiers, the mid case is <b style="color:var(--text)">~$80K–$1.6M/day</b>
+          (≈ $29M–$584M/year) of compute burned re-writing code that already exists. That's the problem RepoHunter exists to kill.</p>
       </details>
       <a class="est" href="#estimate">Estimate your own savings →</a>
     </div>
@@ -435,6 +442,20 @@ python3 repohunter.py <span class="p">serve</span>
       <p class="est-note">Rough and illustrative — a way to reason about <i>your</i> situation, not a promise or a
         claim about typical results. RepoHunter helps you find and vet what to reuse; the value depends entirely on
         what you'd have built instead.</p>
+    </div>
+    <div class="est-validate">
+      <div class="ev-h">🔍 Don't trust us — validate it</div>
+      <p class="ev-p">Every number here comes from one short, transparent algorithm. Read it, download and run it,
+        change the assumptions — or paste it into any AI and ask it to poke holes. No trust required.</p>
+      <pre class="ev-code"><span class="c"># all-in tokens = the code PLUS the context &amp; retries it takes to generate it</span>
+tokens/month  = reuses × lines × 40        <span class="c"># 40 ≈ 13 output tokens/line × ~3 overhead</span>
+$/year (tier) = tokens/month × 12 ÷ 1e6 × rate
+                <span class="c"># rate = $2 Budget · $10 Standard · $40 Premium per 1M tokens</span>
+ecosystem/day = AI-devs × redundant-lines/day × 40</pre>
+      <div class="ev-btns">
+        <a class="btn primary" href="/token-math.py" download>⬇ Download the algorithm (Python)</a>
+        <button class="btn ghost" id="ev_copy" type="button">📋 Copy an AI-validation prompt</button>
+      </div>
     </div>
   </section>
 
@@ -658,6 +679,23 @@ try{
   var pop=document.getElementById('e_pop'), hb=document.getElementById('e_helpbtn'), px=document.getElementById('e_popx');
   if(hb&&pop) hb.addEventListener('click',function(){ pop.classList.toggle('open'); if(pop.classList.contains('open')) pop.scrollIntoView({behavior:'smooth',block:'nearest'}); });
   if(px&&pop) px.addEventListener('click',function(){ pop.classList.remove('open'); });
+  var evc=document.getElementById('ev_copy');
+  if(evc) evc.addEventListener('click',function(){
+    var p=[
+      'You are a skeptical, numerate reviewer. Independently check RepoHunter’s "tokens saved by reusing code" math and tell me if it’s fair or overstated. Show your own numbers.','',
+      'Algorithm:',
+      '- all-in tokens per line of code = 40  (derived as ~13 output tokens/line [~50 chars/line / ~4 chars/token] x ~3 for the context sent + 2-4 iterations to generate it)',
+      '- per developer: tokens_saved_per_month = reuses_per_month x lines_per_reuse x 40',
+      '- $/year per model tier = tokens_per_month x 12 / 1,000,000 x price_per_million  (Budget $2, Standard $10, Premium $40 per 1M tokens)',
+      '- ecosystem/day = AI_assisted_developers x redundant_lines_per_dev_per_day x 40','',
+      'Questions:',
+      '1. Is 40 all-in tokens/line reasonable, too high, or too low? Give your own estimate.',
+      '2. Are those model prices in the right ballpark for current models?',
+      '3. Do the per-user and ecosystem numbers follow correctly from the inputs?',
+      '4. Where is this misleading, and where would you push back? Be blunt.'
+    ].join('\n');
+    if(navigator.clipboard) navigator.clipboard.writeText(p).then(function(){ evc.textContent='Copied ✓ — paste into any AI'; setTimeout(function(){ evc.textContent='📋 Copy an AI-validation prompt'; },2400); });
+  });
 })();
 </script>
 
