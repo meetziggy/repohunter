@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stop paying for software that's already free — RepoHunter</title>
+<meta name="description" content="Open-source that goes toe-to-toe with the SaaS you're billed for — every alternative vetted live by RepoHunter. Reuse, don't reinvent.">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<meta name="theme-color" content="#070b16">
+<meta property="og:title" content="Stop paying for software that's already free">
+<meta property="og:description" content="Open-source alternatives to the SaaS you're billed for — every one a live RepoHunter GO.">
+<meta property="og:image" content="https://repohunter.dev/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root{--bg:#070b16;--card:#0c1528;--line:#22304a;--lime:#b8ff3c;--cyan:#38bdf8;--green:#34d399;--red:#fb7185;--amber:#fbbf24;--text:#e6edf7;--muted:#8fa0bd;--grad:linear-gradient(100deg,var(--lime),var(--cyan))}
+  *{box-sizing:border-box}
+  html,body{overflow-x:hidden;max-width:100%}
+  body{margin:0;background:radial-gradient(1100px 560px at 50% -8%,#141d33 0,var(--bg) 52%);color:var(--text);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  a{color:var(--cyan);text-decoration:none}
+  .wrap{max-width:960px;margin:0 auto;padding:0 20px}
+  nav{display:flex;align-items:center;gap:11px;padding:18px 0}
+  nav img{width:34px;height:34px}.nav-name{font-weight:800;font-size:18px}.sp{flex:1}
+  .btn{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:9px 16px;font-weight:700;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--text)}
+  .btn.primary{background:var(--grad);color:#05210a;border:none}
+  header.hero{text-align:center;padding:26px 0 8px}
+  .kick{font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--lime);font-weight:800}
+  h1{font-size:clamp(30px,6vw,56px);margin:12px 0 8px;letter-spacing:-.02em;line-height:1.05}
+  h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{max-width:620px;margin:0 auto;color:var(--muted);font-size:17px}
+  .lede b{color:var(--text)}
+  .tally{display:flex;justify-content:center;gap:26px;flex-wrap:wrap;margin:22px 0 6px}
+  .tally .n{font:800 26px ui-monospace,monospace;color:var(--lime)}
+  .tally .l{font-size:12px;color:var(--muted)}
+  .disc{max-width:640px;margin:16px auto 0;text-align:center;font-size:12.5px;color:var(--muted)}
+  .disc b{color:var(--text)}
+  .cat{margin:34px 0 12px;display:flex;align-items:center;gap:10px}
+  .cat h2{font-size:19px;margin:0}.cat .line{flex:1;height:1px;background:var(--line)}
+  .row{display:grid;grid-template-columns:1fr 30px 1.25fr;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 16px;margin-bottom:10px}
+  .paid .name{font-weight:700;font-size:15.5px;color:var(--text)}
+  .paid .price{font-size:12px;color:var(--red);font-family:ui-monospace,monospace;margin-top:2px}
+  .arrow{text-align:center;color:var(--muted);font-size:18px}
+  .oss{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .oss .of{min-width:0}
+  .oss .name{font-weight:800;font-size:15.5px;color:var(--lime)}
+  .oss .slug{font-size:11.5px;color:var(--muted);font-family:ui-monospace,monospace}
+  .oss img.badge{height:20px;flex:none}
+  @media(max-width:560px){
+    .row{grid-template-columns:1fr;gap:6px;text-align:left}
+    .arrow{text-align:left;transform:rotate(90deg);width:20px}
+    .oss{gap:8px}
+  }
+  .cta{text-align:center;margin:40px 0 10px}
+  .cta .big{font-size:clamp(22px,4vw,30px);font-weight:800;letter-spacing:-.01em}
+  .cta p{color:var(--muted);max-width:560px;margin:10px auto 18px}
+  footer{border-top:1px solid var(--line);margin-top:40px;padding:26px 0 50px;text-align:center;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a href="/" style="display:flex;align-items:center;gap:11px"><img src="/logo.svg" alt=""><span class="nav-name">RepoHunter</span></a>
+    <span class="sp"></span>
+    <a class="btn primary" href="/">Reuse, don't reinvent →</a>
+  </nav>
+
+  <header class="hero">
+    <div class="kick">🪲 The reuse-first receipts</div>
+    <h1>Stop paying for software<br>that's <span class="g">already free.</span></h1>
+    <p class="lede">For nearly every SaaS you're billed for, there's open-source that goes toe-to-toe with it —
+      <b>and every alternative below is a live RepoHunter <span style="color:var(--green)">GO</span></b>. Reuse, don't reinvent. 🌳</p>
+    <div class="tally">
+      <div><div class="n" id="t-tools">—</div><div class="l">paid tools replaced</div></div>
+      <div><div class="n" id="t-go">100%</div><div class="l">score a RepoHunter GO</div></div>
+      <div><div class="n">$0</div><div class="l">to run them yourself</div></div>
+    </div>
+    <p class="disc">Honest framing: these are <b>strong open-source alternatives</b>, not always 100% feature-identical —
+      but close enough to cancel the subscription. Prices are approximate retail and change; the badges are live.</p>
+  </header>
+
+  <main id="grid"></main>
+
+  <div class="cta">
+    <div class="big">Found one worth adopting?</div>
+    <p>Run it through RepoHunter first — get the full dossier: does it fit your project, your machine, and what will it cost to integrate.</p>
+    <a class="btn primary" href="/">Open RepoHunter →</a>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">Every alternative here is real, open-source, and a live RepoHunter GO · <a href="/">repohunter.dev</a> · reuse, don't reinvent 🪲<br>
+  <span style="font-size:11.5px">Not affiliated with any product named. Trademarks belong to their owners. Comparisons are our honest opinion.</span></div>
+</footer>
+
+<script>
+var DATA=[
+ {cat:'🤖 AI tools', rows:[
+   {paid:'ChatGPT Plus', price:'~$20/mo', oss:'Open WebUI + Ollama', slug:'open-webui/open-webui'},
+   {paid:'GitHub Copilot', price:'~$10/mo', oss:'Continue', slug:'continuedev/continue'},
+   {paid:'Midjourney', price:'~$10/mo', oss:'ComfyUI', slug:'comfyanonymous/ComfyUI'},
+   {paid:'Perplexity Pro', price:'~$20/mo', oss:'Perplexica', slug:'ItzCrazyKns/Perplexica'},
+   {paid:'Zapier (AI/agents)', price:'~$20+/mo', oss:'Dify', slug:'langgenius/dify'},
+ ]},
+ {cat:'🛠️ Developer & infrastructure', rows:[
+   {paid:'Vercel / Heroku', price:'~$20+/mo', oss:'Coolify', slug:'coollabsio/coolify'},
+   {paid:'Firebase', price:'usage', oss:'Supabase', slug:'supabase/supabase'},
+   {paid:'Auth0 / Okta', price:'$$$', oss:'Keycloak', slug:'keycloak/keycloak'},
+   {paid:'Algolia', price:'$$$', oss:'Meilisearch', slug:'meilisearch/meilisearch'},
+   {paid:'Postman', price:'~$14/mo', oss:'Hoppscotch', slug:'hoppscotch/hoppscotch'},
+   {paid:'Datadog', price:'$$$', oss:'Grafana', slug:'grafana/grafana'},
+ ]},
+ {cat:'📊 Productivity', rows:[
+   {paid:'Notion', price:'~$10/user/mo', oss:'AppFlowy', slug:'AppFlowy-IO/AppFlowy'},
+   {paid:'Airtable', price:'~$20/user/mo', oss:'NocoDB', slug:'nocodb/nocodb'},
+   {paid:'Jira', price:'~$8/user/mo', oss:'Plane', slug:'makeplane/plane'},
+   {paid:'Confluence', price:'~$6/user/mo', oss:'Outline', slug:'outline/outline'},
+   {paid:'Miro', price:'~$8/user/mo', oss:'Excalidraw', slug:'excalidraw/excalidraw'},
+   {paid:'Calendly', price:'~$10/mo', oss:'Cal.com', slug:'calcom/cal.com'},
+ ]},
+ {cat:'💼 Business & communication', rows:[
+   {paid:'Slack', price:'~$8/user/mo', oss:'Mattermost', slug:'mattermost/mattermost'},
+   {paid:'Zoom', price:'~$15/mo', oss:'Jitsi Meet', slug:'jitsi/jitsi-meet'},
+   {paid:'Salesforce / HubSpot', price:'$$$', oss:'Twenty', slug:'twentyhq/twenty'},
+   {paid:'Intercom / Zendesk', price:'~$40+/mo', oss:'Chatwoot', slug:'chatwoot/chatwoot'},
+   {paid:'Mailchimp', price:'~$13+/mo', oss:'Listmonk', slug:'knadh/listmonk'},
+   {paid:'Google Analytics', price:'privacy cost', oss:'Plausible', slug:'plausible/analytics'},
+   {paid:'1Password / LastPass', price:'~$3/mo', oss:'Bitwarden', slug:'bitwarden/server'},
+   {paid:'Loom', price:'~$12/mo', oss:'Cap', slug:'CapSoftware/Cap'},
+   {paid:'Dropbox / Drive', price:'~$12/mo', oss:'Nextcloud', slug:'nextcloud/server'},
+ ]},
+];
+var BASE='https://img.repohunter.dev';
+var grid=document.getElementById('grid'), total=0;
+DATA.forEach(function(g){
+  var s='<div class="cat"><h2>'+g.cat+'</h2><span class="line"></span></div>';
+  g.rows.forEach(function(r){ total++;
+    s+='<div class="row">'
+     +'<div class="paid"><div class="name">'+r.paid+'</div><div class="price">'+r.price+'</div></div>'
+     +'<div class="arrow">→</div>'
+     +'<div class="oss"><a class="of" href="/r/'+r.slug+'"><div class="name">'+r.oss+'</div><div class="slug">'+r.slug+'</div></a>'
+     +'<a href="/r/'+r.slug+'"><img class="badge" loading="lazy" src="'+BASE+'/badge/'+r.slug+'.svg" alt="RepoHunter score for '+r.oss+'"></a></div>'
+     +'</div>';
+  });
+  grid.insertAdjacentHTML('beforeend', s);
+});
+document.getElementById('t-tools').textContent=total;
+</script>
+</body>
+</html>
