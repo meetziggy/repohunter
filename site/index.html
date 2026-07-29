@@ -31,6 +31,7 @@
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
+  html,body{overflow-x:hidden;max-width:100%}
   body{margin:0;background:radial-gradient(1200px 600px at 50% -10%,#141d33 0,var(--bg) 55%);
     color:var(--text);font:16px/1.6 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif}
   a{color:var(--cyan);text-decoration:none}
@@ -201,6 +202,64 @@
   .ev-code .c{color:var(--muted)}
   .ev-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
   .ev-btns .btn{font-size:13.5px;padding:10px 16px;text-decoration:none;display:inline-flex;align-items:center}
+  /* ── futuristic AI-console calculator ───────────────────────────── */
+  @property --calcang{syntax:'<angle>';initial-value:0deg;inherits:false}
+  .est{--calcang:0deg;position:relative;overflow:hidden;
+    background:radial-gradient(130% 100% at 50% -10%,rgba(56,189,248,.07),transparent 58%),linear-gradient(180deg,#0c1528,#0a0f1e);
+    border:1px solid rgba(56,189,248,.16);border-radius:22px;padding:24px 26px;
+    box-shadow:0 34px 90px -34px rgba(0,0,0,.85),0 0 60px -30px rgba(56,189,248,.25),inset 0 1px 0 rgba(255,255,255,.04)}
+  .est::before{content:'';position:absolute;inset:0;border-radius:inherit;padding:1.4px;
+    background:conic-gradient(from var(--calcang),transparent 0 52%,var(--lime) 70%,var(--cyan) 85%,transparent 93%);
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+    mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;
+    animation:calcspin 5.5s linear infinite;pointer-events:none}
+  @keyframes calcspin{to{--calcang:360deg}}
+  .est::after{content:'';position:absolute;inset:0;pointer-events:none;opacity:.45;
+    background:linear-gradient(rgba(184,255,60,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.045) 1px,transparent 1px);
+    background-size:32px 32px;-webkit-mask:radial-gradient(120% 85% at 50% 0,#000,transparent 72%);mask:radial-gradient(120% 85% at 50% 0,#000,transparent 72%)}
+  .est > *{position:relative;z-index:1}
+  .calc-hud{display:flex;align-items:center;justify-content:center;gap:9px;font:700 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+    letter-spacing:.24em;color:var(--cyan);text-transform:uppercase;margin:2px 0 18px;opacity:.9}
+  .calc-hud .dotlive{width:7px;height:7px;border-radius:50%;background:var(--lime);box-shadow:0 0 10px var(--lime);animation:blip 1.6s ease-in-out infinite}
+  @keyframes blip{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.65)}}
+  .er{padding:13px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+  .er:last-of-type{border-bottom:none;padding-bottom:4px}
+  .er-top{display:flex;align-items:center;justify-content:space-between;gap:14px}
+  .er-label{font-size:14px;color:var(--text)}
+  .er-val{width:82px;background:#0a1120;border:1px solid rgba(56,189,248,.28);border-radius:9px;padding:8px 10px;color:var(--lime);
+    font:700 15px ui-monospace,monospace;text-align:right;transition:.15s}
+  .er-val:focus{outline:none;border-color:var(--lime);box-shadow:0 0 0 3px rgba(184,255,60,.14)}
+  .er-hint{display:block;font-size:11.5px;color:var(--muted);margin-top:3px}
+  .er-slider{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:5px;margin:12px 0 2px;
+    background:linear-gradient(90deg,var(--lime),var(--cyan)) no-repeat,#10192e;background-size:var(--fill,50%) 100%,100% 100%;cursor:pointer}
+  .er-slider::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;background:#0a0f1e;
+    border:2px solid var(--lime);box-shadow:0 0 11px rgba(184,255,60,.7);transition:box-shadow .12s,transform .12s}
+  .er-slider::-webkit-slider-thumb:hover{box-shadow:0 0 18px rgba(184,255,60,.95);transform:scale(1.14)}
+  .er-slider::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:#0a0f1e;border:2px solid var(--lime);box-shadow:0 0 11px rgba(184,255,60,.7)}
+  .est .est-tile{background:linear-gradient(180deg,rgba(56,189,248,.05),rgba(10,15,30,.35));border-color:rgba(56,189,248,.14)}
+  .est .et-num{text-shadow:0 0 20px rgba(184,255,60,.45)}
+  .est .est-models{background:linear-gradient(180deg,rgba(56,189,248,.04),rgba(10,15,30,.3));border-color:rgba(56,189,248,.14)}
+  .est .em{background:#0a1424}
+  .est .em b{text-shadow:0 0 15px rgba(184,255,60,.4)}
+  .est-tiles,.em-row{max-width:100%}
+  .est-tile,.em{min-width:0}          /* let grid items shrink instead of overflowing on mobile */
+  .em b{overflow-wrap:anywhere}
+  @media(prefers-reduced-motion:reduce){.est::before{animation:none}.calc-hud .dotlive{animation:none}}
+  @media(max-width:560px){
+    .est{padding:20px 15px}
+    .calc-hud{letter-spacing:.1em;font-size:9.5px;gap:7px}
+    .er-label{font-size:12.5px;line-height:1.35}
+    .er-val{width:66px;font-size:14px;padding:7px 8px}
+    .er-slider{margin-top:14px;height:6px}
+    .er-slider::-webkit-slider-thumb{width:20px;height:20px}
+    .em-row{gap:7px}
+    .em{padding:10px 4px;font-size:10.5px}
+    .em b{font-size:16px}
+    .ev-code{font-size:10px}
+    .est-pop{padding:20px 18px}
+    .est-pop h4{font-size:14px}
+    .est-help{font-size:12.5px}
+  }
   .fullstore{max-width:900px;margin:28px auto 0}
   .fullstore summary{color:var(--cyan);cursor:pointer;text-align:center;font-size:13.5px;list-style:none}
   .fullstore img{width:100%;border:1px solid var(--line);border-radius:14px;margin-top:12px;box-shadow:0 20px 50px rgba(0,0,0,.4)}
@@ -405,25 +464,30 @@ python3 repohunter.py <span class="p">serve</span>
       <p>Type in <b>your own</b> numbers below. The estimate updates live. We never assert a figure — the math is yours, and every assumption is shown. <i>Save a token, save a tree.</i> 🌳</p>
     </div>
     <div class="est">
-      <div class="est-row">
-        <label>Times a month you reach for something that likely already exists
-          <span class="hint">every reuse is a build you skip</span></label>
-        <input id="e_reuses" type="number" min="0" step="1" value="8" inputmode="numeric">
+      <div class="calc-hud"><span class="dotlive"></span> Reuse ROI · live estimate</div>
+      <div class="er">
+        <div class="er-top"><span class="er-label">Times a month you reuse instead of rebuild</span>
+          <input class="er-val" id="e_reuses" type="number" min="0" max="40" step="1" value="8" inputmode="numeric"></div>
+        <input class="er-slider" id="e_reuses_s" type="range" min="0" max="40" step="1" value="8" aria-label="reuses per month">
+        <span class="er-hint">every reuse is a build you skip</span>
       </div>
-      <div class="est-row">
-        <label>Hours it'd take you to build &amp; maintain one yourself
-          <span class="hint">writing is the cheap part; owning it forever isn't</span></label>
-        <input id="e_hours" type="number" min="0" step="0.5" value="6" inputmode="decimal">
+      <div class="er">
+        <div class="er-top"><span class="er-label">Hours to build &amp; maintain one yourself</span>
+          <input class="er-val" id="e_hours" type="number" min="0" max="40" step="0.5" value="6" inputmode="decimal"></div>
+        <input class="er-slider" id="e_hours_s" type="range" min="0" max="40" step="0.5" value="6" aria-label="hours to build">
+        <span class="er-hint">writing is the cheap part; owning it forever isn't</span>
       </div>
-      <div class="est-row">
-        <label>Your time, per hour ($)
-          <span class="hint">your rate — or leave blank to see hours only</span></label>
-        <input id="e_rate" type="number" min="0" step="5" value="0" inputmode="numeric" placeholder="0">
+      <div class="er">
+        <div class="er-top"><span class="er-label">Your time, per hour ($)</span>
+          <input class="er-val" id="e_rate" type="number" min="0" max="400" step="5" value="0" inputmode="numeric"></div>
+        <input class="er-slider" id="e_rate_s" type="range" min="0" max="400" step="5" value="0" aria-label="hourly rate">
+        <span class="er-hint">optional — adds the time-value in dollars</span>
       </div>
-      <div class="est-row">
-        <label>Avg size of what you'd have rebuilt (lines)
-          <span class="hint">all-in ≈ lines × ~40 tokens (code + context + retries)</span></label>
-        <input id="e_lines" type="number" min="0" step="50" value="500" inputmode="numeric">
+      <div class="er">
+        <div class="er-top"><span class="er-label">Avg size of what you'd have rebuilt (lines)</span>
+          <input class="er-val" id="e_lines" type="number" min="0" max="2000" step="50" value="500" inputmode="numeric"></div>
+        <input class="er-slider" id="e_lines_s" type="range" min="0" max="2000" step="50" value="500" aria-label="lines of code">
+        <span class="er-hint">all-in ≈ lines × ~40 tokens (code + context + retries)</span>
       </div>
       <div class="est-tiles">
         <div class="est-tile" id="e_tile_h"><div class="et-ic">⏱️</div><div class="et-num" id="e_hrs">—</div><div class="et-lbl">hours / month<br>you don't rebuild</div></div>
@@ -674,7 +738,13 @@ try{
       say.innerHTML=s;
     } else { say.textContent='Put in your numbers above — I’ll do the math live.'; }
   }
-  [R,H,P,L].forEach(function(el){ el && el.addEventListener('input',calc); });
+  function setFill(sl){ var mn=+sl.min||0, mx=+sl.max||100, v=+sl.value; sl.style.setProperty('--fill', Math.max(0,Math.min(100,(v-mn)/(mx-mn)*100))+'%'); }
+  ['e_reuses','e_hours','e_rate','e_lines'].forEach(function(id){
+    var num=document.getElementById(id), sl=document.getElementById(id+'_s');
+    if(!num||!sl) return; setFill(sl);
+    num.addEventListener('input',function(){ sl.value=num.value; setFill(sl); calc(); });
+    sl.addEventListener('input',function(){ num.value=sl.value; setFill(sl); calc(); });
+  });
   calc();
   var pop=document.getElementById('e_pop'), hb=document.getElementById('e_helpbtn'), px=document.getElementById('e_popx');
   if(hb&&pop) hb.addEventListener('click',function(){ pop.classList.toggle('open'); if(pop.classList.contains('open')) pop.scrollIntoView({behavior:'smooth',block:'nearest'}); });
