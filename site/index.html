@@ -402,9 +402,11 @@ python3 repohunter.py <span class="p">serve</span>
       <button class="btn primary" id="tryGo">Evaluate ↵</button>
     </div>
     <div class="try-ex">Or try:
-      <button data-r="ollama/ollama">ollama/ollama</button>
-      <button data-r="yt-dlp/yt-dlp">yt-dlp/yt-dlp</button>
-      <button data-r="astral-sh/ruff">astral-sh/ruff</button></div>
+      <button data-r="Significant-Gravitas/AutoGPT">AutoGPT</button>
+      <button data-r="langchain-ai/langchain">langchain</button>
+      <button data-r="OpenHands/OpenHands">OpenHands</button>
+      <button data-r="crewAIInc/crewAI">crewAI</button>
+      <button data-r="torvalds/linux">linux</button></div>
     <div class="tiles" id="tiles"></div>
     <details class="fullstore">
       <summary>See the full store (what it looks like running locally)</summary>
@@ -695,7 +697,7 @@ try{
   function submit(){ var v=inp.value; if(v.trim()){ evalRepo(v,true); inp.value=''; } }
   go.onclick=submit; inp.addEventListener('keydown',function(e){ if(e.key==='Enter') submit(); });
   Array.prototype.forEach.call(document.querySelectorAll('.try-ex button'),function(b){ b.onclick=function(){ evalRepo(b.getAttribute('data-r'),true); }; });
-  ['ollama/ollama','simonw/llm','yt-dlp/yt-dlp'].forEach(function(s){ evalRepo(s,false); });
+  ['Significant-Gravitas/AutoGPT','langchain-ai/langchain','OpenHands/OpenHands','crewAIInc/crewAI','ollama/ollama','torvalds/linux'].forEach(function(s){ evalRepo(s,false); });
 })();
 </script>
 
