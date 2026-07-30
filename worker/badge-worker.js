@@ -120,12 +120,16 @@ function cardSVG(m, s) {
 }
 
 const CC = "public, max-age=1800, s-maxage=1800";   // 30-min cache → dedup + cheap
+const SEC = { "x-content-type-options": "nosniff", "access-control-allow-origin": "*" };
+const SLUG_RE = /^[\w.-]{1,39}\/[\w.-]{1,100}$/;     // reject junk before any GitHub call
 const svgResp = (svg) => new Response(svg, {
-  headers: { "content-type": "image/svg+xml; charset=utf-8", "cache-control": CC, "access-control-allow-origin": "*" },
+  headers: { "content-type": "image/svg+xml; charset=utf-8", "cache-control": CC,
+    "content-security-policy": "default-src 'none'; style-src 'unsafe-inline'", ...SEC },
 });
 const jsonResp = (obj, status) => new Response(JSON.stringify(obj, null, 2), {
   status: status || 200,
-  headers: { "content-type": "application/json; charset=utf-8", "cache-control": CC, "access-control-allow-origin": "*" },
+  headers: { "content-type": "application/json; charset=utf-8", "cache-control": CC,
+    "content-security-policy": "default-src 'none'", ...SEC },
 });
 
 // full facts + scores as JSON — the single source the report page and any agent read
@@ -141,23 +145,27 @@ function apiJSON(m, s) {
   };
 }
 
+function notFound(kind, slug) {
+  if (kind === "badge") return svgResp(badgeSVG("repohunter", "repo not found", MUTED, false));
+  if (kind === "card") return svgResp(cardSVG({ full_name: slug || "?/?" }, { verdict: "SKIP", overall: 0, pop: 0, fresh: 0, health: 0, mat: 0 }));
+  return jsonResp({ error: "repo not found, private, or invalid", repo: slug || null }, 404);
+}
+
 async function route(request, env) {
   const url = new URL(request.url);
   if (url.pathname === "/health") return new Response("ok", { headers: { "cache-control": "no-store" } });
   const parts = url.pathname.replace(/\.svg$/, "").split("/").filter(Boolean);
   const kind = parts[0];                                    // badge | card | api
 
-  if ((kind === "badge" || kind === "card" || kind === "api") && parts.length >= 3) {
-    // /api/repo/owner/name  → parts = [api, repo, owner, name] ; badge/card → [kind, owner, name]
+  if (kind === "badge" || kind === "card" || kind === "api") {
+    // /api/repo/owner/name → [api, repo, owner, name] ; badge/card → [kind, owner, name]
     const off = kind === "api" ? 2 : 1;
+    if (parts.length < off + 2 || (kind === "api" && parts[1] !== "repo")) return notFound(kind, "");
     const slug = parts[off] + "/" + parts[off + 1];
+    if (!SLUG_RE.test(slug)) return notFound(kind, slug);   // cheap reject — no GitHub call for junk
     let m = null;
     try { m = await fetchRepo(slug, env); } catch (e) { m = null; }
-    if (!m || !m.full_name) {
-      if (kind === "badge") return svgResp(badgeSVG("repohunter", "repo not found", MUTED, false));
-      if (kind === "card") return svgResp(cardSVG({ full_name: slug }, { verdict: "SKIP", overall: 0, pop: 0, fresh: 0, health: 0, mat: 0 }));
-      return jsonResp({ error: "repo not found or private", repo: slug }, 404);
-    }
+    if (!m || !m.full_name) return notFound(kind, slug);
     const s = score(m);
     if (kind === "badge") return svgResp(badgeSVG("repohunter", s.verdict + " " + s.overall, vColor(s.verdict), s.verdict === "MAYBE"));
     if (kind === "card") return svgResp(cardSVG(m, s));
@@ -165,22 +173,22 @@ async function route(request, env) {
   }
   return new Response(
     "RepoHunter badge service — /badge/:owner/:name.svg · /card/:owner/:name.svg · /api/repo/:owner/:name",
-    { status: 404, headers: { "content-type": "text/plain" } }
+    { status: 404, headers: { "content-type": "text/plain", ...SEC } }
   );
 }
 
 export default {
   async fetch(request, env, ctx) {
+    if (request.method !== "GET" && request.method !== "HEAD")
+      return new Response("method not allowed", { status: 405, headers: { "allow": "GET, HEAD", ...SEC } });
     // Edge cache = dedup: identical URLs are served from cache, so repeated asks don't re-hit GitHub.
-    if (request.method !== "GET") return route(request, env);
     const cache = caches.default;
     const key = new Request(new URL(request.url).toString(), request);
     const hit = await cache.match(key);
     if (hit) return hit;
     const resp = await route(request, env);
-    if (resp.status === 200 && (resp.headers.get("cache-control") || "").includes("max-age")) {
-      ctx.waitUntil(cache.put(key, resp.clone()));
-    }
+    // cache both positive AND negative results (they carry max-age) so junk floods can't re-hit GitHub
+    if ((resp.headers.get("cache-control") || "").includes("max-age")) ctx.waitUntil(cache.put(key, resp.clone()));
     return resp;
   },
 };
