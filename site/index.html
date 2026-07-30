@@ -150,6 +150,11 @@
   .ring b{position:relative;z-index:1;font-weight:800;font-size:13px}
   .chips{display:flex;gap:6px;flex-wrap:wrap}
   .chip2{background:#0b1424;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:11.5px;color:var(--muted)}
+  .tile.loading{border-color:rgba(56,189,248,.4)}
+  .tile.loading .desc{color:var(--cyan)}
+  .spin{width:22px;height:22px;border-radius:50%;border:2.5px solid #1b2740;border-top-color:var(--lime);animation:spin1 .8s linear infinite;flex:none}
+  @keyframes spin1{to{transform:rotate(360deg)}}
+  .tv-wait{background:rgba(56,189,248,.16);color:var(--cyan)}
   .savings{margin-top:13px;border-top:1px dashed var(--line);padding-top:10px;color:#d4ff7a;font-size:12.5px;line-height:1.5}
   .savings b{color:var(--lime)}
   .est{max-width:680px;margin:24px auto 0;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px 28px}
@@ -686,13 +691,23 @@ try{
   }
   function err(slug,msg){ var el=document.createElement('div'); el.className='tile';
     el.innerHTML='<div class="th"><h4>'+esc(slug)+'</h4><span class="tv tv-SKIP">—</span></div><div class="desc">'+esc(msg)+'</div>'; return el; }
-  function evalRepo(slug, prepend){
-    slug=(slug||'').trim().replace(/^https?:\/\/github\.com\//i,'').replace(/\.git$/,'').replace(/\/+$/,'');
-    var m=slug.match(/^([\w.\-]+\/[\w.\-]+)/); if(!m) return; slug=m[1];
+  function loadingTile(label){ var el=document.createElement('div'); el.className='tile loading';
+    el.innerHTML='<div class="th"><div><h4>'+esc(label)+'</h4><div class="own">reading live GitHub data…</div></div><span class="tv tv-wait">⏳</span></div>'
+      +'<div class="desc">Evaluating — scoring popularity, freshness, health &amp; maturity…</div>'
+      +'<div class="tfoot"><div class="spin"></div><div class="chips"><span class="chip2">working…</span></div></div>'; return el; }
+  function evalRepo(input, prepend){
+    var raw=(input||'').trim();
+    var slug=raw.replace(/^git@github\.com:/i,'').replace(/^https?:\/\/(www\.)?github\.com\//i,'').replace(/^github\.com\//i,'')
+      .replace(/[?#].*$/,'').replace(/\.git$/,'').replace(/\/+$/,'').trim();
+    var m=slug.match(/^([\w.\-]+\/[\w.\-]+)/);
+    var lt=loadingTile(m?m[1]:(raw||'…'));                      // ALWAYS show feedback immediately
+    if(prepend&&tiles.firstChild) tiles.insertBefore(lt,tiles.firstChild); else tiles.appendChild(lt);
+    if(!m){ lt.replaceWith(err(raw||'—','Couldn’t read that — paste owner/name or a github.com URL')); return; }
+    slug=m[1];
     fetch('https://api.github.com/repos/'+slug,{headers:{'Accept':'application/vnd.github+json'}})
-      .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
-      .then(function(d){ var t=tile(d); if(prepend&&tiles.firstChild) tiles.insertBefore(t,tiles.firstChild); else tiles.appendChild(t); })
-      .catch(function(e){ tiles.insertBefore(err(slug, (''+e).indexOf('404')>=0?'repo not found':'GitHub rate-limited — try again shortly'), tiles.firstChild); });
+      .then(function(r){ if(r.status===403||r.status===429) throw new Error('rate'); if(!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function(d){ lt.replaceWith(tile(d)); })
+      .catch(function(e){ var s=''+e, msg=s.indexOf('rate')>=0?'GitHub rate-limited — wait a minute and retry':(s.indexOf('404')>=0?'Repo not found — check owner/name':'Couldn’t reach GitHub — try again'); lt.replaceWith(err(slug,msg)); });
   }
   function submit(){ var v=inp.value; if(v.trim()){ evalRepo(v,true); inp.value=''; } }
   go.onclick=submit; inp.addEventListener('keydown',function(e){ if(e.key==='Enter') submit(); });
