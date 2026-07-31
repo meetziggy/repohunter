@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Software family tree — RepoHunter</title>
+<meta name="description" content="Where did this repo come from, and what grew from it? RepoHunter traces a repo's real fork lineage — ancestors and descendants — straight from GitHub.">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<meta name="theme-color" content="#070b16">
+<style>
+  :root{--bg:#070b16;--card:#0c1528;--line:#22304a;--lime:#b8ff3c;--cyan:#38bdf8;--green:#34d399;--amber:#fbbf24;--red:#fb7185;--text:#e6edf7;--muted:#8fa0bd;--grad:linear-gradient(100deg,var(--lime),var(--cyan))}
+  *{box-sizing:border-box}
+  html,body{overflow-x:hidden;max-width:100%}
+  body{margin:0;background:radial-gradient(1000px 520px at 50% -8%,#141d33 0,var(--bg) 55%);color:var(--text);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  a{color:var(--cyan);text-decoration:none}
+  .wrap{max-width:900px;margin:0 auto;padding:0 20px}
+  nav{display:flex;align-items:center;gap:11px;padding:18px 0}
+  nav img{width:34px;height:34px}.nav-name{font-weight:800;font-size:18px}.sp{flex:1}
+  .btn{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:9px 16px;font-weight:700;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--text);cursor:pointer;font-family:inherit}
+  .btn.primary{background:var(--grad);color:#05210a;border:none}
+  header.hero{text-align:center;padding:20px 0 6px}
+  .kick{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--lime);font-weight:800}
+  h1{font-size:clamp(28px,5vw,44px);margin:10px 0 6px;letter-spacing:-.02em;line-height:1.05}
+  h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{max-width:560px;margin:0 auto;color:var(--muted);font-size:16px}
+  .search{display:flex;gap:8px;max-width:520px;margin:22px auto 0}
+  .search input{flex:1;background:#0b1220;border:1px solid var(--line);border-radius:12px;padding:12px 15px;color:var(--text);font:14px ui-monospace,monospace}
+  .search input:focus{outline:none;border-color:var(--lime)}
+  .ex{text-align:center;color:var(--muted);font-size:12.5px;margin-top:12px}
+  .ex button{background:#0b1424;border:1px solid var(--line);color:var(--cyan);border-radius:999px;padding:4px 12px;margin:3px;font-size:12px;cursor:pointer;font-family:ui-monospace,monospace}
+  .tree{margin:34px auto 20px;max-width:760px}
+  .lvl{text-align:center}
+  .lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+  .node{display:inline-block;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px;min-width:230px;max-width:340px;cursor:pointer;transition:.15s;position:relative}
+  .node:hover{border-color:#3a5891;transform:translateY(-1px)}
+  .node.focus{border-color:var(--lime);box-shadow:0 0 28px rgba(184,255,60,.18)}
+  .node .repo{font-weight:800;font-size:15px;word-break:break-word}
+  .node .repo .own{color:var(--muted);font-weight:600}
+  .node .meta{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:12px;color:var(--muted);font-family:ui-monospace,monospace}
+  .verd{font-weight:800;font-size:11px;padding:2px 8px;border-radius:999px}
+  .GO{color:var(--green);background:rgba(52,211,153,.15)}.MAYBE{color:var(--amber);background:rgba(251,191,36,.15)}.SKIP{color:var(--red);background:rgba(251,113,133,.15)}
+  .crown{position:absolute;top:-12px;left:14px;font-size:16px}
+  .conn{width:2px;height:26px;background:linear-gradient(var(--lime),var(--cyan));margin:0 auto;opacity:.6}
+  .conn.dash{background:repeating-linear-gradient(var(--muted) 0 4px,transparent 4px 9px);opacity:.5}
+  .forks{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:8px}
+  .forks .node{min-width:200px;max-width:260px}
+  .fanbar{width:70%;max-width:420px;height:2px;background:linear-gradient(90deg,transparent,var(--line) 20%,var(--line) 80%,transparent);margin:0 auto 14px}
+  .status{text-align:center;color:var(--muted);padding:40px 0}
+  .note{max-width:640px;margin:24px auto 0;text-align:center;font-size:12.5px;color:var(--muted);line-height:1.6}
+  .note b{color:var(--text)}
+  footer{border-top:1px solid var(--line);margin-top:44px;padding:24px 0 50px;text-align:center;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a href="/" style="display:flex;align-items:center;gap:11px"><img src="/logo.svg" alt=""><span class="nav-name">RepoHunter</span></a>
+    <span class="sp"></span>
+    <a class="btn" href="/">← Home</a>
+  </nav>
+
+  <header class="hero">
+    <div class="kick">🌳 prototype · software genealogy</div>
+    <h1>The <span class="g">family tree</span> of software</h1>
+    <p class="lede">Where did this repo come from — and what grew from it? RepoHunter traces a repo's <b style="color:var(--text)">real fork lineage</b>, straight from GitHub. No made-up edges.</p>
+    <div class="search">
+      <input id="q" placeholder="owner/name or a github.com URL" spellcheck="false" autocomplete="off">
+      <button class="btn primary" id="go">Trace ↵</button>
+    </div>
+    <div class="ex">Try:
+      <button data-r="valkey-io/valkey">valkey (the Redis fork)</button>
+      <button data-r="ollama/ollama">ollama</button>
+      <button data-r="AUTOMATIC1111/stable-diffusion-webui">stable-diffusion-webui</button>
+    </div>
+  </header>
+
+  <div id="tree" class="tree"></div>
+
+  <p class="note"><b>What am I looking at?</b> A repo's <b>fork lineage</b> — the genealogy GitHub actually records. Above the highlighted repo are its <b>ancestors</b> (what it was forked from, up to the origin 👑); below are its <b>most-starred forks</b> (what grew from it). Every edge here is a <b>real, recorded fork relationship</b> — nothing inferred. Each node carries its own RepoHunter verdict. Click any node to walk the tree.</p>
+
+  <footer>Prototype · fork lineage from live GitHub data · <a href="/">repohunter.dev</a> · reuse, don't reinvent 🪲</footer>
+</div>
+
+<script>
+var tree=document.getElementById('tree'), q=document.getElementById('q'), go=document.getElementById('go');
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function days(iso){var t=Date.parse(iso||'');return isFinite(t)?Math.max(0,Math.floor((Date.now()-t)/864e5)):9999;}
+function score(m){
+  var stars=m.stargazers_count||0, pop=Math.min(100,Math.round(Math.log10(stars+1)*22));
+  var fd=days(m.pushed_at), fresh=fd<30?100:fd<90?80:fd<365?55:25;
+  var spdx=(m.license&&m.license.spdx_id)||'';
+  var health=Math.max(0,Math.min(100,70+((spdx&&spdx!=='NOASSERTION')?15:0)+(stars>1000?10:0)-(m.archived?40:0)));
+  var age=days(m.created_at), mat=Math.min(100,(age>365?20:5)+Math.min(50,Math.round(Math.log10(stars+1)*12)));
+  var overall=Math.round(pop*0.3+fresh*0.25+health*0.25+mat*0.2);
+  return {overall:overall, verdict:m.archived?'SKIP':overall>=68?'GO':overall>=45?'MAYBE':'SKIP'};
+}
+function num(n){return (n||0).toLocaleString();}
+function node(m, opts){
+  opts=opts||{}; var s=score(m), full=m.full_name||'', own=full.split('/')[0], nm=full.split('/').slice(1).join('/');
+  return '<div class="node'+(opts.focus?' focus':'')+'" data-r="'+esc(full)+'">'
+    +(opts.crown?'<span class="crown" title="origin">👑</span>':'')
+    +'<div class="repo"><span class="own">'+esc(own)+'/</span>'+esc(nm)+'</div>'
+    +'<div class="meta"><span>★ '+num(m.stargazers_count)+'</span><span class="verd '+s.verdict+'">'+s.verdict+' '+s.overall+'</span>'
+    +(m.archived?'<span>· archived</span>':'')+'</div></div>';
+}
+function gh(path){ return fetch('https://api.github.com'+path,{headers:{'Accept':'application/vnd.github+json'}})
+  .then(function(r){ if(r.status===403||r.status===429) throw new Error('rate'); if(!r.ok) throw new Error(r.status); return r.json(); }); }
+
+function slugify(v){ return (v||'').trim().replace(/^git@github\.com:/i,'').replace(/^https?:\/\/(www\.)?github\.com\//i,'')
+  .replace(/^github\.com\//i,'').replace(/[?#].*$/,'').replace(/\.git$/,'').replace(/\/+$/,'').trim(); }
+
+function trace(input){
+  var slug=slugify(input); var m=slug.match(/^([\w.\-]+\/[\w.\-]+)/);
+  if(!m){ tree.innerHTML='<div class="status">Paste a repo like <b>owner/name</b> or a github.com URL.</div>'; return; }
+  slug=m[1];
+  try{ history.replaceState(null,'','?repo='+slug); }catch(e){}
+  q.value=slug;
+  tree.innerHTML='<div class="status">🌱 Tracing the lineage of <b>'+esc(slug)+'</b>…</div>';
+  gh('/repos/'+slug).then(function(d){
+    var ancestors=[];
+    if(d.fork){
+      if(d.source&&d.source.full_name&&d.source.full_name!==d.full_name) ancestors.push({m:d.source,crown:true});
+      if(d.parent&&d.parent.full_name&&d.parent.full_name!==d.full_name&&(!d.source||d.parent.full_name!==d.source.full_name))
+        ancestors.push({m:d.parent});
+    }
+    return gh('/repos/'+slug+'/forks?sort=stargazers&per_page=12').then(function(forks){
+      forks=(forks||[]).filter(function(f){return (f.stargazers_count||0)>0;});
+      render(d, ancestors, forks);
+    }, function(){ render(d, ancestors, []); });
+  }).catch(function(e){
+    var msg=(''+e).indexOf('rate')>=0?'GitHub rate-limited — wait a minute and retry':((''+e).indexOf('404')>=0?'Repo not found — check owner/name':'Couldn’t reach GitHub — try again');
+    tree.innerHTML='<div class="status">'+msg+'</div>';
+  });
+}
+function render(d, ancestors, forks){
+  var html='';
+  // ancestors: origin (source) at top, then parent, chained down
+  ancestors.forEach(function(a){ html+='<div class="lvl">'+node(a.m,{crown:a.crown})+'</div><div class="conn"></div>'; });
+  if(ancestors.length){ html='<div class="lvl"><div class="lbl">↑ ancestors — where it came from</div></div>'+html; }
+  else { html='<div class="lvl"><div class="lbl">🌱 this repo is an origin — not a fork</div></div>'; }
+  // focus
+  html+='<div class="lvl">'+node(d,{focus:true})+'</div>';
+  // descendants
+  if(forks.length){
+    html+='<div class="conn"></div><div class="fanbar"></div>';
+    html+='<div class="lvl"><div class="lbl">↓ top forks — what grew from it</div></div>';
+    html+='<div class="forks">'+forks.slice(0,8).map(function(f){return node(f,{});}).join('')+'</div>';
+    if((d.forks_count||0)>forks.length) html+='<div class="lvl" style="margin-top:12px"><span style="color:var(--muted);font-size:12.5px">+ '+num((d.forks_count||0))+' forks total on GitHub</span></div>';
+  } else {
+    html+='<div class="lvl" style="margin-top:14px"><span style="color:var(--muted);font-size:13px">No notable forks yet — nothing has grown from this one.</span></div>';
+  }
+  tree.innerHTML=html;
+  Array.prototype.forEach.call(tree.querySelectorAll('.node'),function(n){ n.onclick=function(){ trace(n.getAttribute('data-r')); window.scrollTo({top:0,behavior:'smooth'}); }; });
+}
+go.onclick=function(){ trace(q.value); };
+q.addEventListener('keydown',function(e){ if(e.key==='Enter') trace(q.value); });
+Array.prototype.forEach.call(document.querySelectorAll('.ex button'),function(b){ b.onclick=function(){ trace(b.getAttribute('data-r')); }; });
+(function(){ var r=new URLSearchParams(location.search).get('repo'); trace(r||'valkey-io/valkey'); })();
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"03db8d874ff44447832e44f5533aedbd"}'></script>
+</body>
+</html>
