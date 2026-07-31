@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reuse it right: open-source licenses & credit, in plain English | RepoHunter</title>
+<meta name="description" content="Can you actually use this code? Do you have to credit the author? MIT vs GPL vs Apache decoded in plain English — plus how to reuse open source with integrity (and not get burned).">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<meta name="theme-color" content="#070b16">
+<meta property="og:title" content="Reuse it right: licenses & credit, in plain English">
+<meta property="og:description" content="Can you use this code? Credit it? MIT vs GPL vs Apache, decoded — and how to reuse with integrity.">
+<meta property="og:image" content="https://repohunter.dev/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root{--bg:#070b16;--card:#0c1528;--line:#22304a;--lime:#b8ff3c;--cyan:#38bdf8;--green:#34d399;--amber:#fbbf24;--red:#fb7185;--text:#e6edf7;--muted:#8fa0bd;--grad:linear-gradient(100deg,var(--lime),var(--cyan))}
+  *{box-sizing:border-box}
+  html,body{overflow-x:hidden;max-width:100%}html{scroll-behavior:smooth}
+  body{margin:0;background:radial-gradient(1000px 520px at 50% -8%,#141d33 0,var(--bg) 55%);color:var(--text);font:16px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 22px}
+  nav{display:flex;align-items:center;gap:11px;padding:18px 0}
+  nav img{width:34px;height:34px}.nav-name{font-weight:800;font-size:18px}.sp{flex:1}
+  .btn{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:9px 16px;font-weight:700;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--text);cursor:pointer;font-family:inherit}
+  .btn.primary{background:var(--grad);color:#05210a;border:none}
+  header.hero{padding:22px 0 6px}
+  .kick{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--lime);font-weight:800}
+  h1{font-size:clamp(28px,5vw,42px);margin:10px 0 10px;letter-spacing:-.02em;line-height:1.1}
+  h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:var(--muted);font-size:18px}.lede b{color:var(--text)}
+  .meta{color:var(--muted);font-size:13px;margin-top:14px;border-bottom:1px solid var(--line);padding-bottom:20px}
+  h2{font-size:25px;letter-spacing:-.01em;margin:42px 0 6px}h2 .em{color:var(--lime)}
+  h3{font-size:18px;margin:24px 0 4px}
+  p{color:#d3ddef}
+  code{background:#0b1220;border:1px solid var(--line);border-radius:6px;padding:1px 6px;font:13.5px ui-monospace,Menlo,monospace;color:#cdd9ef}
+  .eli5{background:linear-gradient(180deg,#0e1729,#0b1322);border:1px solid var(--line);border-left:3px solid var(--cyan);border-radius:10px;padding:14px 18px;margin:18px 0}
+  .eli5 b{color:var(--cyan)}
+  .callout{background:#0b1424;border:1px solid var(--line);border-left:3px solid var(--lime);border-radius:10px;padding:14px 18px;margin:18px 0}
+  .callout.warn{border-left-color:var(--amber)}.callout.bad{border-left-color:var(--red)}
+  .callout b{color:var(--text)}
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;display:block;overflow-x:auto}
+  th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+  td b{color:var(--lime)}
+  .chk{list-style:none;padding:0}.chk li{padding:7px 0 7px 30px;position:relative;color:#d3ddef}
+  .chk li:before{content:"✓";position:absolute;left:0;color:var(--lime);font-weight:800}
+  .promptbox{background:#060a13;border:1px solid var(--line);border-radius:12px;padding:16px}
+  .promptbox pre{margin:0;white-space:pre-wrap;font:13px/1.6 ui-monospace,Menlo,monospace;color:#cdd9ef}
+  .cta{background:linear-gradient(180deg,#0e1729,#0b1322);border:1px solid var(--line);border-radius:16px;padding:24px;text-align:center;margin:40px 0 10px}
+  .cta .big{font-size:22px;font-weight:800}
+  footer{border-top:1px solid var(--line);margin-top:44px;padding:24px 0 50px;text-align:center;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a href="/" style="display:flex;align-items:center;gap:11px"><img src="/logo.svg" alt=""><span class="nav-name">RepoHunter</span></a>
+    <span class="sp"></span>
+    <a class="btn" href="/learn">← The Path</a>
+  </nav>
+
+  <header class="hero">
+    <div class="kick">⚖️ Guide · reuse-first · tier 1</div>
+    <h1>Reuse it <span class="g">right</span></h1>
+    <p class="lede">Open source is free to use — but "free" comes with rules, and getting them wrong can bite you. Here's how to reuse someone's code <b>with integrity</b>: check the license, credit the author, and never get burned. In plain English.</p>
+    <div class="meta">A RepoHunter guide · ~7 min read · <b>plain-English starting point, not legal advice</b></div>
+  </header>
+
+  <div class="eli5">🧒 <b>In one sentence:</b> almost all open source is free to use <i>if</i> you keep the license file, credit the author, and — for "copyleft" licenses — keep your own changes open. "No license" means you actually <i>can't</i> use it at all.</div>
+
+  <h2>The right way to reuse — <span class="em">the checklist</span></h2>
+  <ul class="chk">
+    <li><b>Check the license first</b>, before you build on it — not after you're committed.</li>
+    <li><b>Keep the LICENSE file</b> and any copyright notices. Removing them is the #1 mistake — and a real violation.</li>
+    <li><b>Credit the author</b> — a line in your README/NOTICE, and a ⭐ on their repo. It costs nothing and it's the whole point.</li>
+    <li><b>Obey the license's terms</b> (some require you to share your changes — see below).</li>
+    <li><b>Contribute back</b> when you can: report bugs, send fixes. Reuse, with gratitude — not strip-mining.</li>
+    <li><b>Don't relicense or claim authorship</b> of code that isn't yours.</li>
+  </ul>
+
+  <h2>Licenses in <span class="em">plain English</span></h2>
+  <p>There are dozens, but they fall into a few buckets. Here are the ones you'll actually meet:</p>
+  <table>
+    <tr><th>License</th><th>Type</th><th>What it means for you</th></tr>
+    <tr><td><b>MIT</b></td><td>Permissive</td><td>Do almost anything — just keep the copyright/license notice. The most common, most beginner-friendly.</td></tr>
+    <tr><td><b>Apache-2.0</b></td><td>Permissive</td><td>Like MIT, plus an explicit <b>patent grant</b> (extra protection). Keep notices; note any changes.</td></tr>
+    <tr><td><b>BSD (2/3-clause)</b></td><td>Permissive</td><td>Basically MIT. 3-clause adds "don't use our name to endorse your thing."</td></tr>
+    <tr><td><b>GPL (v2/v3)</b></td><td>Copyleft</td><td>Use it freely, but if you distribute something built on it, <b>your code must also be open</b> under the GPL. "Share-alike."</td></tr>
+    <tr><td><b>AGPL</b></td><td>Strong copyleft</td><td>Like GPL, but the "share your source" trigger also fires if users just <b>use it over a network</b> (a web app). Watch this one for SaaS.</td></tr>
+    <tr><td><b>LGPL / MPL</b></td><td>Weak copyleft</td><td>The <b>library</b> stays open, but <b>your app can stay closed</b>. A middle ground.</td></tr>
+    <tr><td><b>Unlicense / CC0</b></td><td>Public domain</td><td>"Do whatever, no attribution needed." Rare, maximally free.</td></tr>
+    <tr><td><b>No license</b></td><td>⚠️ All rights reserved</td><td><b>You cannot legally reuse it</b>, even though it's public on GitHub. Ask the author to add one, or move on.</td></tr>
+  </table>
+
+  <div class="callout warn">⚠️ <b>The #1 misconception:</b> "it's public on GitHub, so it's free to use." <b>False.</b> Public ≠ open-source. With <b>no license</b>, default copyright applies and all rights are reserved. Look for a LICENSE file <i>every time</i>.</div>
+
+  <h2>How to <span class="em">actually credit</span> someone</h2>
+  <p>Attribution isn't vague — it's concrete:</p>
+  <ul class="chk">
+    <li>Keep their <b>LICENSE</b> file (and <b>NOTICE</b> file, if there is one) in your project.</li>
+    <li>Keep copyright headers at the top of any files you copied.</li>
+    <li>Add a short credit line in your README: <code>Uses [project] by [author], licensed under MIT.</code></li>
+    <li>Star the repo and, if you can, link back to it. Send traffic home.</li>
+  </ul>
+
+  <h2>The <span class="em">AI-era wrinkle</span></h2>
+  <p>When an AI hands you a block of code, it usually comes with <b>no provenance</b> — you don't know where it came from or what license governed it. That's a real risk: you could be pasting GPL'd or copyrighted code into a closed project without knowing. Treat AI-generated code you didn't write like any other borrowed code: <b>if it's a meaningful chunk, find out where it came from and what license it's under.</b> When in doubt, prefer code you found through a proper source with a clear license — which is exactly what a reuse-first workflow gives you.</p>
+
+  <h2>Let an <span class="em">AI agent</span> sort the license out</h2>
+  <div class="promptbox"><pre id="agp">I want to reuse the open-source project [owner/name] in my project, which is licensed under [your license, e.g. MIT / proprietary / not sure].
+
+Please:
+1. Tell me what license [owner/name] uses and explain in plain English what it requires of me.
+2. Tell me whether it's compatible with my project's license — and flag any conflict (especially GPL/AGPL "copyleft" if my project is closed-source).
+3. Show me exactly how to credit the author correctly (what files to keep, what to put in my README/NOTICE).
+4. Warn me about anything I must NOT do.
+
+This is for my understanding, not legal advice — flag if I should consult a lawyer.</pre>
+    <button class="btn primary" id="cp" type="button" style="margin-top:12px">📋 Copy this prompt</button>
+  </div>
+
+  <div class="cta">
+    <div class="big">Know the license before you adopt.</div>
+    <p style="color:var(--muted);max-width:520px;margin:10px auto 16px">RepoHunter surfaces every repo's license on its report — and links right back here so "MIT" actually <i>means</i> something to you.</p>
+    <a class="btn primary" href="/">Open RepoHunter →</a>
+  </div>
+
+  <footer>A RepoHunter guide · <a href="/learn">back to the Path</a> · <a href="/is-this-repo-good">← is this repo any good?</a><br>
+  <span style="font-size:11.5px">Plain-English starting point, <b>not legal advice</b>. Go deeper at <a href="https://choosealicense.com" target="_blank" rel="noopener">choosealicense.com</a>, <a href="https://spdx.org/licenses/" target="_blank" rel="noopener">SPDX</a>, and <a href="https://tldrlegal.com" target="_blank" rel="noopener">tldrlegal.com</a>.</span></footer>
+</div>
+<script>
+  var b=document.getElementById('cp');
+  if(b) b.onclick=function(){var t=document.getElementById('agp').textContent;if(navigator.clipboard)navigator.clipboard.writeText(t).then(function(){b.textContent='Copied ✓ — paste into any AI agent';setTimeout(function(){b.textContent='📋 Copy this prompt';},2200);});};
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"03db8d874ff44447832e44f5533aedbd"}'></script>
+</body>
+</html>
