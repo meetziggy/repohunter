@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Git for beginners — version control, explained plainly | RepoHunter</title>
+<meta name="description" content="A comprehensive, plain-English beginner's guide to Git and version control — the everyday workflow, where to host your code, the alternatives, and a prompt any AI agent can walk you through.">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<meta name="theme-color" content="#070b16">
+<meta property="og:title" content="Git for beginners — version control, explained plainly">
+<meta property="og:description" content="The plain-English guide to Git: the workflow, hosting, alternatives, and an AI-agent prompt to walk you through it step by step.">
+<meta property="og:image" content="https://repohunter.dev/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root{--bg:#070b16;--card:#0c1528;--line:#22304a;--lime:#b8ff3c;--cyan:#38bdf8;--green:#34d399;--amber:#fbbf24;--text:#e6edf7;--muted:#8fa0bd;--grad:linear-gradient(100deg,var(--lime),var(--cyan))}
+  *{box-sizing:border-box}
+  html,body{overflow-x:hidden;max-width:100%} html{scroll-behavior:smooth}
+  body{margin:0;background:radial-gradient(1000px 520px at 50% -8%,#141d33 0,var(--bg) 55%);color:var(--text);font:16px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  a{color:var(--cyan);text-decoration:none} a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 22px}
+  nav{display:flex;align-items:center;gap:11px;padding:18px 0}
+  nav img{width:34px;height:34px}.nav-name{font-weight:800;font-size:18px}.sp{flex:1}
+  .btn{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:9px 16px;font-weight:700;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--text);cursor:pointer;font-family:inherit}
+  .btn.primary{background:var(--grad);color:#05210a;border:none}
+  header.hero{padding:22px 0 6px}
+  .kick{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--lime);font-weight:800}
+  h1{font-size:clamp(30px,5.5vw,46px);margin:10px 0 10px;letter-spacing:-.02em;line-height:1.08}
+  h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:var(--muted);font-size:18px;max-width:640px}
+  .lede b{color:var(--text)}
+  .meta{color:var(--muted);font-size:13px;margin-top:14px;border-bottom:1px solid var(--line);padding-bottom:20px}
+  h2{font-size:26px;letter-spacing:-.01em;margin:44px 0 6px;scroll-margin-top:20px}
+  h2 .em{color:var(--lime)}
+  h3{font-size:18px;margin:26px 0 6px}
+  p{color:#d3ddef}
+  .toc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 20px;margin:26px 0}
+  .toc b{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .toc ol{margin:10px 0 0;padding-left:20px;columns:2;column-gap:26px}
+  .toc a{color:var(--text)}
+  code{background:#0b1220;border:1px solid var(--line);border-radius:6px;padding:1px 6px;font:13.5px ui-monospace,SFMono-Regular,Menlo,monospace;color:#cdd9ef}
+  pre{background:#060a13;border:1px solid var(--line);border-radius:12px;padding:15px 17px;overflow-x:auto;margin:14px 0}
+  pre code{background:none;border:0;padding:0;color:#cdd9ef;font-size:13.5px;line-height:1.7}
+  pre .c{color:var(--muted)} pre .k{color:var(--lime)}
+  .callout{background:linear-gradient(180deg,#0e1729,#0b1322);border:1px solid var(--line);border-left:3px solid var(--lime);border-radius:10px;padding:14px 18px;margin:18px 0}
+  .callout.warn{border-left-color:var(--amber)}
+  .callout b{color:var(--text)}
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14.5px;display:block;overflow-x:auto}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-size:12.5px;text-transform:uppercase;letter-spacing:.05em}
+  td b{color:var(--lime)}
+  .step{display:flex;gap:14px;margin:18px 0}
+  .step .n{flex:none;width:30px;height:30px;border-radius:50%;background:var(--grad);color:#05210a;font-weight:800;display:grid;place-items:center;font-size:15px}
+  .step .b{flex:1}.step .b h3{margin:2px 0 4px}
+  .promptbox{background:#060a13;border:1px solid var(--line);border-radius:12px;padding:16px;position:relative}
+  .promptbox pre{background:none;border:0;margin:0;white-space:pre-wrap}
+  .cta{background:linear-gradient(180deg,#0e1729,#0b1322);border:1px solid var(--line);border-radius:16px;padding:24px;text-align:center;margin:40px 0 10px}
+  .cta .big{font-size:22px;font-weight:800}
+  footer{border-top:1px solid var(--line);margin-top:44px;padding:24px 0 50px;text-align:center;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a href="/" style="display:flex;align-items:center;gap:11px"><img src="/logo.svg" alt=""><span class="nav-name">RepoHunter</span></a>
+    <span class="sp"></span>
+    <a class="btn" href="/">← Home</a>
+  </nav>
+
+  <header class="hero">
+    <div class="kick">🌱 Guide · for beginners</div>
+    <h1>Git, <span class="g">explained plainly</span></h1>
+    <p class="lede">Most guides assume you already know half of it. This one doesn't. If you've never used <b>version control</b> — the thing that saves and tracks every version of your code — start here. In plain English, one step at a time.</p>
+    <div class="meta">A RepoHunter guide · written by a first-time developer, for first-time developers · ~12 min read</div>
+  </header>
+
+  <div class="toc"><b>What's inside</b>
+    <ol>
+      <li><a href="#why">Why version control</a></li>
+      <li><a href="#what">What Git actually is</a></li>
+      <li><a href="#model">The 4 ideas to grok</a></li>
+      <li><a href="#first">Your first repository</a></li>
+      <li><a href="#remote">Push it to the cloud</a></li>
+      <li><a href="#loop">The everyday loop</a></li>
+      <li><a href="#branch">Branches &amp; pull requests</a></li>
+      <li><a href="#reuse">Cloning &amp; reusing code</a></li>
+      <li><a href="#hosting">Where to host it</a></li>
+      <li><a href="#alts">Alternatives to Git</a></li>
+      <li><a href="#cheat">The cheat sheet</a></li>
+      <li><a href="#prompt">Let an AI walk you through it</a></li>
+    </ol>
+  </div>
+
+  <h2 id="why">Why <span class="em">version control</span> exists</h2>
+  <p>Ever had a folder like <code>project_final</code>, <code>project_final_v2</code>, <code>project_final_REALLY_final</code>? That's version control done by hand — badly. It loses history, breaks collaboration, and there's no "undo" when something goes wrong.</p>
+  <p><b>Version control</b> fixes this. It records every meaningful change to your files as a snapshot you can name, revisit, undo, and share. You get a full timeline of your project, the ability to jump back to any point, and a safe way for multiple people (or you + an AI agent) to work on the same code without clobbering each other.</p>
+
+  <h2 id="what">What <span class="em">Git</span> actually is</h2>
+  <p><b>Git</b> is the tool that does version control — by far the most popular one. It runs on your computer and quietly tracks your project's history. <b>GitHub</b> (and GitLab, Codeberg, and others) are <i>websites that host</i> your Git projects online so you can back them up, share them, and collaborate. Git ≠ GitHub: Git is the engine; GitHub is one place to park it.</p>
+
+  <h2 id="model">The <span class="em">4 ideas</span> to grok</h2>
+  <table>
+    <tr><th>Term</th><th>Plain English</th></tr>
+    <tr><td><b>Repository</b> (repo)</td><td>Your project folder, but with a memory. Once it's a repo, Git tracks everything in it.</td></tr>
+    <tr><td><b>Commit</b></td><td>A saved snapshot with a message ("added login page"). Like a checkpoint in a video game — you can always return to it.</td></tr>
+    <tr><td><b>Branch</b></td><td>A parallel copy where you try things without touching the main version. Break stuff safely, then merge it back when it works.</td></tr>
+    <tr><td><b>Remote</b></td><td>The online copy (e.g., on GitHub). You <b>push</b> your commits up to it and <b>pull</b> others' changes down.</td></tr>
+  </table>
+
+  <h2 id="first">Your first <span class="em">repository</span></h2>
+  <div class="step"><div class="n">1</div><div class="b"><h3>Install &amp; introduce yourself</h3>
+    <p>Get Git from <a href="https://git-scm.com" target="_blank" rel="noopener">git-scm.com</a> (macOS/Linux often have it already; type <code>git --version</code> to check). Then tell it who you are — this stamps your commits:</p>
+    <pre><code>git config --global user.name <span class="k">"Your Name"</span>
+git config --global user.email <span class="k">"you@example.com"</span></code></pre></div></div>
+  <div class="step"><div class="n">2</div><div class="b"><h3>Turn a folder into a repo</h3>
+    <pre><code><span class="c"># from inside your project folder</span>
+git init</code></pre>
+    <p>That's it — Git is now watching this folder.</p></div></div>
+  <div class="step"><div class="n">3</div><div class="b"><h3>Make your first commit</h3>
+    <pre><code>git add .            <span class="c"># stage everything (mark it to be saved)</span>
+git commit -m <span class="k">"First commit"</span>   <span class="c"># save the snapshot with a message</span></code></pre>
+    <p>You just created your first checkpoint. <code>git status</code> shows what's changed; <code>git log</code> shows your history.</p></div></div>
+  <div class="callout warn">⚠️ <b>Never commit secrets.</b> API keys, passwords, <code>.env</code> files — once committed and pushed, they live in history forever, even if you delete them later. Add a <code>.gitignore</code> file listing things to skip (like <code>.env</code>, <code>node_modules/</code>). When in doubt, don't commit it.</div>
+
+  <h2 id="remote">Push it to <span class="em">the cloud</span></h2>
+  <p>Now back it up and share it. Create an empty repo on your host (see <a href="#hosting">Where to host it</a>), then connect and push:</p>
+  <pre><code>git remote add origin https://github.com/you/your-repo.git
+git branch -M main
+git push -u origin main</code></pre>
+  <p>Your code is now safely online. Refresh the page and you'll see it.</p>
+
+  <h2 id="loop">The <span class="em">everyday loop</span></h2>
+  <p>99% of Git is these few commands, over and over:</p>
+  <pre><code>git pull            <span class="c"># get the latest (if collaborating)</span>
+<span class="c"># ...do your work, edit files...</span>
+git add .           <span class="c"># stage your changes</span>
+git commit -m <span class="k">"what you changed"</span>
+git push            <span class="c"># send it up</span></code></pre>
+  <div class="callout">💡 <b>Commit often, in small chunks, with clear messages.</b> "Fixed login bug" beats "stuff." Future-you (and anyone reading) will thank you.</div>
+
+  <h2 id="branch">Branches &amp; <span class="em">pull requests</span></h2>
+  <p>When you want to try something risky — or work with others — make a branch:</p>
+  <pre><code>git checkout -b my-feature   <span class="c"># create + switch to a new branch</span>
+<span class="c"># ...work, commit...</span>
+git push -u origin my-feature</code></pre>
+  <p>Then on GitHub you open a <b>Pull Request (PR)</b> — a proposal to merge your branch into <code>main</code>. Others (or you) review it, then merge. This is how nearly all collaboration and AI-assisted work happens: changes land as reviewable PRs, not surprise edits to <code>main</code>.</p>
+
+  <h2 id="reuse">Cloning &amp; <span class="em">reusing</span> code</h2>
+  <p>To grab a copy of someone's public project:</p>
+  <pre><code>git clone https://github.com/owner/repo.git</code></pre>
+  <p>Now you have the whole thing locally. But before you build on it — <b>check the license and credit the author</b> (that's the whole reuse-first ethos, and there's a right way to do it). And before you adopt <i>anything</i>, it's worth asking: is this repo actually worth reusing, for <i>my</i> project? That's literally what <a href="/">RepoHunter</a> is for.</p>
+
+  <h2 id="hosting">Where to <span class="em">host</span> it</h2>
+  <p>Git is the engine; here's where to park your repos. All have a free tier.</p>
+  <table>
+    <tr><th>Host</th><th>Best for</th><th>Note</th></tr>
+    <tr><td><b>GitHub</b></td><td>Everyone / the default</td><td>Biggest community, best integrations, where most open source lives.</td></tr>
+    <tr><td><b>GitLab</b></td><td>Built-in CI/CD, teams</td><td>Powerful DevOps features; self-hostable.</td></tr>
+    <tr><td><b>Codeberg</b></td><td>Privacy, non-profit ethos</td><td>Community-run, runs on open-source Forgejo.</td></tr>
+    <tr><td><b>Bitbucket</b></td><td>Atlassian/Jira shops</td><td>Ties into Jira/Trello.</td></tr>
+    <tr><td><b>Self-hosted (Gitea / Forgejo)</b></td><td>Full control, your server</td><td>Lightweight GitHub-alike you run yourself — the reuse-first choice.</td></tr>
+  </table>
+
+  <h2 id="alts">Alternatives to <span class="em">Git</span></h2>
+  <p>Git won, but it's not the only option:</p>
+  <table>
+    <tr><th>Tool</th><th>Why you'd look at it</th></tr>
+    <tr><td><b>Jujutsu (jj)</b></td><td>A newer, friendlier front-end that works <i>with</i> Git repos — many find it easier to reason about.</td></tr>
+    <tr><td><b>Mercurial (hg)</b></td><td>A cleaner, simpler design than Git; used by a few big projects.</td></tr>
+    <tr><td><b>Fossil</b></td><td>All-in-one (version control + bug tracker + wiki) in a single file. Great for solo/small.</td></tr>
+    <tr><td><b>Subversion (SVN)</b></td><td>The older centralized model; still around in some enterprises.</td></tr>
+  </table>
+  <p>For 99% of people starting today: <b>learn Git.</b> It's what the world uses, and everything else can wait.</p>
+
+  <h2 id="cheat">The <span class="em">cheat sheet</span></h2>
+  <pre><code>git init                    <span class="c"># start tracking this folder</span>
+git status                  <span class="c"># what's changed?</span>
+git add .                   <span class="c"># stage all changes</span>
+git commit -m "message"     <span class="c"># save a snapshot</span>
+git log --oneline           <span class="c"># see history</span>
+git clone URL               <span class="c"># copy a repo</span>
+git pull                    <span class="c"># get latest from remote</span>
+git push                    <span class="c"># send your commits up</span>
+git checkout -b name        <span class="c"># new branch</span>
+git checkout main           <span class="c"># switch back to main</span>
+git merge name              <span class="c"># merge a branch in</span>
+git diff                    <span class="c"># see exact changes</span>
+git restore file            <span class="c"># undo unstaged changes to a file</span></code></pre>
+
+  <h2 id="prompt">Let an <span class="em">AI agent</span> walk you through it</h2>
+  <p>Stuck? Paste this into <b>any</b> AI coding agent (Claude, Cursor, Copilot, ChatGPT) — fill in the brackets and it'll guide you step by step, safely, at your pace:</p>
+  <div class="promptbox">
+    <pre id="agp">I'm new to Git and version control. Walk me through it step by step, one command at a time, and wait for me to confirm each step worked before giving me the next.
+
+My situation:
+- Operating system: [Windows / macOS / Linux]
+- What I'm trying to version: [describe your project or folder]
+- Do I have a GitHub account yet? [yes / no]
+
+Please:
+1. Help me install and configure Git.
+2. Turn my project folder into a Git repository and make my first commit.
+3. Create a remote (GitHub or an alternative) and push my code up.
+4. Show me the everyday save-your-work loop.
+5. Explain branches and pull requests once I'm comfortable.
+
+Explain each command in plain English BEFORE I run it, tell me what to expect, and warn me about anything I should NOT do — especially committing secrets, API keys, or passwords.</pre>
+    <button class="btn primary" id="cp" type="button" style="margin-top:12px">📋 Copy this prompt</button>
+  </div>
+
+  <div class="cta">
+    <div class="big">Now go reuse, don't reinvent.</div>
+    <p style="color:var(--muted);max-width:520px;margin:10px auto 16px">You know Git. The next skill is knowing what's worth cloning in the first place — RepoHunter tells you honestly, before you adopt it.</p>
+    <a class="btn primary" href="/">Open RepoHunter →</a>
+  </div>
+
+  <footer>A RepoHunter guide · plain-English, given freely · <a href="/">repohunter.dev</a> · reuse, don't reinvent 🪲<br>
+  <span style="font-size:11.5px">Starting point, not gospel — the official docs at <a href="https://git-scm.com/doc" target="_blank" rel="noopener">git-scm.com/doc</a> go deeper.</span></footer>
+</div>
+<script>
+  var b=document.getElementById('cp');
+  if(b) b.onclick=function(){ var t=document.getElementById('agp').textContent;
+    if(navigator.clipboard) navigator.clipboard.writeText(t).then(function(){ b.textContent='Copied ✓ — paste into any AI agent'; setTimeout(function(){ b.textContent='📋 Copy this prompt'; },2200); }); };
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"03db8d874ff44447832e44f5533aedbd"}'></script>
+</body>
+</html>
