@@ -3,6 +3,9 @@
 yt-venv/
 __pycache__/
 *.pyc
+# build artifacts
+dist/
+*.egg-info/
 # generated data + local config with secrets
 data/
 repostore.json
@@ -22,3 +25,7 @@ GUIDE.md
 brand-assets/
 MCP-SPEC.md
 LAUNCH_STRATEGY.md
+MONETIZATION_STRATEGY.md
+PRESALE_PAGE.md
+DOSSIER_TEMPLATE.md
+_killtests/

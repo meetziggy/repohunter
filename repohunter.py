@@ -248,6 +248,150 @@ def resource_fit(meta, specs):
     return {"verdict": "runs easily", "ram_need": "low", "gpu": False, "note": "Ordinary app resources."}
 
 
+# ── Safety scan (heuristic, offline — no LLM required) ───────────────────────
+# Scans a repo's README, docs and install scripts for prompt-injection attempts aimed
+# at coding agents, hidden/obfuscated text, piped-shell installs and leaked secrets.
+# Output is a RISK ASSESSMENT, not a certification: a clean scan means "these
+# heuristics found nothing", never "this repo is safe".
+ZERO_WIDTH = ("\u200b", "\u200c", "\u200d", "\u2060", "\ufeff")
+BIDI_CTRL = tuple(chr(c) for c in list(range(0x202a, 0x202f)) + list(range(0x2066, 0x206a)))
+# Requires a URL in the fetch so prose that merely *mentions* `curl | bash` doesn't flag.
+PIPE_SH = r"(curl|wget)[^\n|]*https?://[^\n|]*\|\s*(sudo\s+)?(ba|z)?sh"
+INJECT_PATTERNS = (  # (regex, severity, label)
+    (r"ignore (all |any )?(previous|prior|above|earlier) (instructions|prompts|rules|context)",
+     "high", "prompt-injection phrase"),
+    (r"disregard (your|all|the|any) (instructions|rules|guidelines|system prompt)",
+     "high", "prompt-injection phrase"),
+    (r"if you are an? (ai|llm|agent|assistant|language model)", "high", "agent-directed instruction"),
+    (r"you are (now|actually) [^.\n]{0,60}(assistant|agent|mode)", "medium", "role-override attempt"),
+    (r"do not (tell|inform|mention|reveal|alert)[^.\n]{0,40}(user|human|owner|developer)",
+     "high", "concealment instruction"),
+    (r"(send|post|upload|forward|exfiltrate)[^.\n]{0,60}(api.?key|token|credential|secret|\.env|password)",
+     "high", "exfiltration instruction"),
+    (r"(?:^|[^`\w])(?:<system>|\[system\]|system prompt\s*:)", "medium", "system-prompt marker"),
+)
+SECRET_PATTERNS = (
+    (r"AKIA[0-9A-Z]{16}", "AWS access key"),
+    (r"ghp_[A-Za-z0-9]{36}", "GitHub token"),
+    (r"github_pat_[A-Za-z0-9_]{22,}", "GitHub fine-grained token"),
+    (r"xox[baprs]-[A-Za-z0-9\-]{10,}", "Slack token"),
+    (r"-----BEGIN (RSA |EC |OPENSSH |PGP )?PRIVATE KEY", "private key"),
+)
+
+
+def _excerpt(text, start, end):
+    snip = text[max(0, start - 30):min(len(text), end + 30)]
+    for c in ZERO_WIDTH + BIDI_CTRL:
+        snip = snip.replace(c, "·")
+    return " ".join(snip.split())[:120]
+
+
+def scan_text(name, text):
+    """Heuristic findings for one file's text. Pure function — unit-testable."""
+    findings, seen = [], set()
+
+    def add(sev, kind, ex):
+        key = (kind, sev)
+        if key in seen:  # one finding per kind per file; repeats add noise, not signal
+            return
+        seen.add(key)
+        findings.append({"file": name, "severity": sev, "kind": kind, "excerpt": ex})
+
+    # Injection language — anywhere is bad; inside an HTML comment (invisible on GitHub) is worse.
+    hidden = [(m.start(1), m.group(1)) for m in re.finditer(r"<!--(.*?)-->", text, re.S)]
+    for rx, sev, label in INJECT_PATTERNS:
+        for m in re.finditer(rx, text, re.I):
+            in_comment = any(off <= m.start() < off + len(body) for off, body in hidden)
+            add("high" if in_comment else sev,
+                ("hidden " if in_comment else "") + label, _excerpt(text, m.start(), m.end()))
+    # ZWJ/ZWNJ are legitimate inside emoji sequences and joining scripts — only count them
+    # when sandwiched between plain-ASCII text, where they can only be hiding something.
+    zw = 0
+    for m in re.finditer("[\u200b\u200c\u200d\u2060\ufeff]", text):
+        c, i = m.group(0), m.start()
+        if c in ("\u200c", "\u200d"):
+            prev_c = text[i - 1] if i else " "
+            next_c = text[i + 1] if i + 1 < len(text) else " "
+            if ord(prev_c) > 127 or ord(next_c) > 127:
+                continue
+        zw += 1
+    if zw:
+        add("medium", "zero-width characters (%d) — possible hidden text" % zw, "")
+    bd = sum(text.count(c) for c in BIDI_CTRL)
+    if bd:
+        add("medium", "bidi control characters (%d) — possible trojan-source text" % bd, "")
+    for m in re.finditer(PIPE_SH, text):
+        add("medium", "piped shell install (curl|bash)", _excerpt(text, m.start(), m.end()))
+    if re.search(r"base64\s+(-d|--decode)[^\n]*\|\s*(ba|z)?sh", text):
+        add("high", "base64-decoded shell execution", "")
+    for rx, label in SECRET_PATTERNS:
+        m = re.search(rx, text)
+        if m:
+            add("high", "leaked secret: " + label, m.group(0)[:12] + "…")
+    return findings
+
+
+def _fetch_text_files(slug, cap=8):
+    """README + top-level docs/scripts/manifests, size-capped. Best-effort."""
+    import base64
+    files = []
+    try:
+        rd = gh("/repos/%s/readme" % slug)
+        files.append((rd.get("name", "README"),
+                      base64.b64decode(rd.get("content") or b"").decode("utf-8", "ignore")[:200000]))
+    except Exception:
+        pass
+    try:
+        names = {n.lower() for n, _ in files}
+        for it in gh("/repos/%s/contents/" % slug):
+            n = it.get("name", "")
+            if len(files) >= cap:
+                break
+            interesting = n.lower().endswith((".md", ".sh", ".bash", ".txt")) or n.lower() in (
+                "makefile", "dockerfile", "server.json", ".mcp.json", "manifest.json", "setup.py")
+            if it.get("type") != "file" or not interesting or n.lower() in names \
+                    or (it.get("size") or 0) > 300000 or not it.get("download_url"):
+                continue
+            try:
+                req = urllib.request.Request(it["download_url"], headers={"User-Agent": UA})
+                with urllib.request.urlopen(req, timeout=20) as r:
+                    files.append((n, r.read().decode("utf-8", "ignore")[:200000]))
+            except Exception:
+                pass
+    except Exception:
+        pass
+    return files
+
+
+def safety_scan(slug):
+    files = _fetch_text_files(slug)
+    findings = []
+    for name, text in files:
+        findings.extend(scan_text(name, text))
+    sevs = [f["severity"] for f in findings]
+    level = "high" if "high" in sevs else "medium" if "medium" in sevs else \
+        "low" if findings else "clean"
+    risk = min(100, sum({"high": 40, "medium": 15, "low": 5}[s] for s in sevs))
+    return {"level": level, "risk": risk, "findings": findings[:40], "files_scanned": len(files),
+            "note": "Heuristic risk assessment, not a certification — a clean scan means these "
+                    "checks found nothing, not that the repo is safe."}
+
+
+def apply_safety(meta):
+    """Fuse the safety level into the dossier verdict — findings downgrade, never upgrade."""
+    d, s = meta.get("dossier"), meta.get("safety")
+    if not d or not s:
+        return
+    if s["level"] == "high" and d.get("verdict") != "SKIP":
+        d["verdict"] = "SKIP"
+        d["recommendation"] = ("⚠ SAFETY: high-risk findings (see safety scan) — verdict "
+                               "downgraded to SKIP. ") + str(d.get("recommendation", ""))
+    elif s["level"] == "medium" and d.get("verdict") == "GO":
+        d["verdict"] = "MAYBE"
+        d["recommendation"] = ("⚠ SAFETY: medium-risk findings (see safety scan) — verdict "
+                               "capped at MAYBE. ") + str(d.get("recommendation", ""))
+
+
 # ── Dossier + plan (LLM) ──────────────────────────────────────────────────────
 DOSSIER_SYSTEM = (
     "You are a software integration analyst. Given a GitHub repo and THIS project's "
@@ -353,7 +497,9 @@ def build_one(entry, specs, deep=False):
     meta["resource_fit"] = resource_fit(meta, specs)
     meta["status"] = "candidate"
     if deep or (isinstance(entry, dict) and entry.get("featured")):
+        meta["safety"] = safety_scan(slug)
         meta["dossier"] = make_dossier(meta, specs)
+        apply_safety(meta)
         meta["status"] = "evaluated"
     return meta
 
@@ -408,6 +554,21 @@ def plan_mode(slug):
     repo["integration"] = {"status": "planned", "plan": make_plan(repo, specs), "updated": NOW}
     _save_store(store)
     print("planned %s" % rid); return 0
+
+
+def scan_mode(slug, as_json=False):
+    slug = re.sub(r".*github\.com/", "", slug).replace(".git", "").strip("/")
+    s = safety_scan(slug)
+    if as_json:
+        print(json.dumps({"repo": slug, **s}, indent=2)); return 0
+    icon = {"clean": "✓", "low": "·", "medium": "⚠", "high": "✗"}[s["level"]]
+    print("%s %s — %s risk (%d/100), %d file(s) scanned" % (
+        icon, slug, s["level"].upper(), s["risk"], s["files_scanned"]))
+    for f in s["findings"]:
+        print("  [%s] %s — %s%s" % (f["severity"], f["file"], f["kind"],
+                                    ("  ›› " + f["excerpt"]) if f["excerpt"] else ""))
+    print("  (%s)" % s["note"])
+    return 0
 
 
 def decide_mode(slug, decision):
@@ -583,6 +744,8 @@ USAGE = """RepoHunter — reuse, don't reinvent.
   repohunter plan <owner/repo>           draft an integration plan
   repohunter decide <owner/repo> approve|reject
   repohunter ingest-video <youtube-url>  mine a video for the repos it recommends
+  repohunter scan <owner/repo> [--json]  safety scan only: prompt-injection, hidden
+                                         text, piped installs, leaked secrets
   repohunter serve                       serve the UI + API on http://127.0.0.1:<port>
 """
 
@@ -595,12 +758,13 @@ def main(argv=None):
     if cmd in ("help", "-h", "--help"):
         print(USAGE)
         return 0
-    needs = {"evaluate": 1, "plan": 1, "ingest-video": 1, "decide": 2}
+    needs = {"evaluate": 1, "plan": 1, "ingest-video": 1, "decide": 2, "scan": 1}
     if cmd in needs and len(a) < needs[cmd]:
         sys.stderr.write("error: '%s' needs %d argument(s).\n\n%s" % (cmd, needs[cmd], USAGE))
         return 2
     fn = {"evaluate": lambda: evaluate(a[0]), "plan": lambda: plan_mode(a[0]),
           "decide": lambda: decide_mode(a[0], a[1]), "ingest-video": lambda: ingest_video(a[0]),
+          "scan": lambda: scan_mode(a[0], as_json="--json" in a),
           "serve": serve, "refresh": refresh}.get(cmd)
     if fn is None:
         sys.stderr.write("error: unknown command '%s'.\n\n%s" % (cmd, USAGE))
