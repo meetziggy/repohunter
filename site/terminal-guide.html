@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The terminal isn't scary | RepoHunter</title>
+<meta name="description" content="The command line looks like a hacker movie, but it's just a way to tell your computer what to do with typed words. Here are the ~10 commands that unlock Git and everything else — in plain English.">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<meta name="theme-color" content="#070b16">
+<meta property="og:title" content="The terminal isn't scary">
+<meta property="og:description" content="Just ~10 typed commands unlock Git and the whole developer world. A gentle, beginner-first tour of the command line.">
+<meta property="og:image" content="https://repohunter.dev/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root{--bg:#070b16;--card:#0c1528;--line:#22304a;--lime:#b8ff3c;--cyan:#38bdf8;--green:#34d399;--amber:#fbbf24;--red:#fb7185;--text:#e6edf7;--muted:#8fa0bd;--grad:linear-gradient(100deg,var(--lime),var(--cyan))}
+  *{box-sizing:border-box}
+  html,body{overflow-x:hidden;max-width:100%}html{scroll-behavior:smooth}
+  body{margin:0;background:radial-gradient(1000px 520px at 50% -8%,#141d33 0,var(--bg) 55%);color:var(--text);font:16px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 22px}
+  nav{display:flex;align-items:center;gap:11px;padding:18px 0}
+  nav img{width:34px;height:34px}.nav-name{font-weight:800;font-size:18px}.sp{flex:1}
+  .btn{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:9px 16px;font-weight:700;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--text);cursor:pointer;font-family:inherit}
+  .btn.primary{background:var(--grad);color:#05210a;border:none}
+  header.hero{padding:22px 0 6px}
+  .kick{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--lime);font-weight:800}
+  h1{font-size:clamp(28px,5vw,42px);margin:10px 0 10px;letter-spacing:-.02em;line-height:1.1}
+  h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:var(--muted);font-size:18px}.lede b{color:var(--text)}
+  .meta{color:var(--muted);font-size:13px;margin-top:14px;border-bottom:1px solid var(--line);padding-bottom:20px}
+  h2{font-size:25px;letter-spacing:-.01em;margin:42px 0 6px}h2 .em{color:var(--lime)}
+  h3{font-size:18px;margin:24px 0 4px}
+  p{color:#d3ddef}
+  code{background:#0b1220;border:1px solid var(--line);border-radius:6px;padding:1px 6px;font:13.5px ui-monospace,Menlo,monospace;color:#cdd9ef}
+  .eli5{background:linear-gradient(180deg,#0e1729,#0b1322);border:1px solid var(--line);border-left:3px solid var(--cyan);border-radius:10px;padding:14px 18px;margin:18px 0}
+  .eli5 b{color:var(--cyan)}
+  .callout{background:#0b1424;border:1px solid var(--line);border-left:3px solid var(--lime);border-radius:10px;padding:14px 18px;margin:18px 0}
+  .callout.warn{border-left-color:var(--amber)}.callout.bad{border-left-color:var(--red)}
+  .callout b{color:var(--text)}
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14.5px;display:block;overflow-x:auto}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-size:12.5px;text-transform:uppercase;letter-spacing:.05em}
+  td b{color:var(--lime)}
+  .step{display:flex;gap:14px;margin:16px 0}
+  .step .n{flex:none;width:30px;height:30px;border-radius:50%;background:var(--grad);color:#05210a;font-weight:800;display:grid;place-items:center;font-size:15px}
+  .step .b{flex:1}.step .b h3{margin:2px 0 4px}
+  .promptbox{background:#060a13;border:1px solid var(--line);border-radius:12px;padding:16px}
+  .promptbox pre{margin:0;white-space:pre-wrap;font:13px/1.6 ui-monospace,Menlo,monospace;color:#cdd9ef}
+  .cta{background:linear-gradient(180deg,#0e1729,#0b1322);border:1px solid var(--line);border-radius:16px;padding:24px;text-align:center;margin:40px 0 10px}
+  .cta .big{font-size:22px;font-weight:800}
+  footer{border-top:1px solid var(--line);margin-top:44px;padding:24px 0 50px;text-align:center;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a href="/" style="display:flex;align-items:center;gap:11px"><img src="/logo.svg" alt=""><span class="nav-name">RepoHunter</span></a>
+    <span class="sp"></span>
+    <a class="btn" href="/learn">← The Path</a>
+  </nav>
+
+  <header class="hero">
+    <div class="kick">terminal · tier 0</div>
+    <h1>The terminal <span class="g">isn't scary</span></h1>
+    <p class="lede">It looks like a hacker movie — a black window, a blinking cursor, no buttons. But it's just <b>a way to tell your computer what to do by typing words instead of clicking</b>. Learn about ten of those words and you've unlocked Git, package installs, and most of the developer world.</p>
+    <div class="meta">A RepoHunter guide · ~7 min read</div>
+  </header>
+
+  <div class="eli5">🧒 <b>In one sentence:</b> the terminal is a text box where you type short commands and your computer does exactly what you asked — nothing more — so <i>looking around</i> is safe, and a handful of commands is all you need to start.</div>
+
+  <h2>What the terminal <span class="em">actually is</span></h2>
+  <p>When you use a computer normally, you point and click: you double-click a folder to open it, drag a file to move it, click a program to run it. The <b>terminal</b> (also called the <b>command line</b> or <b>shell</b>) does all the same things — you just <i>type</i> them instead of clicking.</p>
+  <p>You type a command, press <b>Enter</b>, and the computer runs it and prints the result right below. Then it waits for your next command. That's the whole loop. The blinking cursor sitting after a symbol like <code>$</code> or <code>%</code> is called the <b>prompt</b> — it just means "I'm ready, type something."</p>
+  <p>Why bother, when clicking works fine? Because a lot of powerful tools have <i>no</i> clickable window — they only speak command line. The biggest one is <b>Git</b> (the tool that tracks changes to your code and talks to GitHub). Installing libraries, running programs you've written, using AI coding agents — a huge amount of it happens here. Learn the terminal and those doors open. That's why this is "tier 0" — the ground floor everything else stands on.</p>
+
+  <h2>Where to <span class="em">find it</span></h2>
+  <table>
+    <tr><th>Your computer</th><th>What to open</th><th>How</th></tr>
+    <tr><td><b>Mac</b></td><td>Terminal</td><td>Press <code>⌘ + Space</code>, type "Terminal", hit Enter</td></tr>
+    <tr><td><b>Linux</b></td><td>Terminal</td><td>Usually <code>Ctrl + Alt + T</code>, or search your apps for "Terminal"</td></tr>
+    <tr><td><b>Windows</b></td><td>PowerShell or Windows Terminal</td><td>Click Start, type "PowerShell" or "Terminal", hit Enter</td></tr>
+  </table>
+  <p>Mac and Linux share almost all the same commands (they're both built on a family called Unix). Windows PowerShell is a little different under the hood but understands most of the everyday ones below — where it doesn't, we'll note it.</p>
+
+  <h2>The <span class="em">~10 commands</span> that get you moving</h2>
+  <p>Think of your files as folders inside folders inside folders — a tree. Most of what you do is: figure out where you are, move around, and make or run things. Here's the starter set.</p>
+  <table>
+    <tr><th>Command</th><th>What it does</th><th>Example</th></tr>
+    <tr><td><b>pwd</b></td><td>"Print working directory" — shows which folder you're currently in</td><td><code>pwd</code></td></tr>
+    <tr><td><b>ls</b></td><td>Lists the files and folders where you are</td><td><code>ls</code></td></tr>
+    <tr><td><b>cd</b></td><td>"Change directory" — move into a folder</td><td><code>cd projects</code></td></tr>
+    <tr><td><b>mkdir</b></td><td>"Make directory" — create a new folder</td><td><code>mkdir my-app</code></td></tr>
+    <tr><td><b>touch</b></td><td>Create a new empty file</td><td><code>touch notes.txt</code></td></tr>
+    <tr><td><b>cp</b></td><td>Copy a file (original stays put)</td><td><code>cp notes.txt backup.txt</code></td></tr>
+    <tr><td><b>mv</b></td><td>Move or rename a file</td><td><code>mv notes.txt ideas.txt</code></td></tr>
+    <tr><td><b>rm</b></td><td>Remove (delete) a file — <b>no trash, no undo</b></td><td><code>rm oldfile.txt</code></td></tr>
+    <tr><td><b>cat</b></td><td>Print a file's contents to the screen so you can read it</td><td><code>cat notes.txt</code></td></tr>
+    <tr><td><b>run a program</b></td><td>Type a program's name (and any input it needs) to start it</td><td><code>python hello.py</code></td></tr>
+  </table>
+  <div class="callout"><b>Windows note:</b> <code>pwd</code>, <code>ls</code>, <code>cd</code>, <code>mkdir</code>, and <code>cp</code>/<code>mv</code> all work in PowerShell. Its native versions of a few are spelled differently (e.g. <code>Get-ChildItem</code> for <code>ls</code>, <code>Remove-Item</code> for <code>rm</code>), but the short Unix-style names are wired up as friendly aliases — so the table above is a fine starting point on Windows too. To make a blank file, PowerShell prefers <code>New-Item notes.txt</code> over <code>touch</code>.</div>
+
+  <h2>A real <span class="em">walk-through</span></h2>
+  <p>Here's a tiny session that makes a folder, goes into it, creates a file, checks your work, and reads it back. Type one line, press Enter, then the next.</p>
+  <div class="step"><div class="n">1</div><div class="b"><h3>See where you are</h3><p><code>pwd</code> — it prints something like <code>/Users/you</code>. That's your current spot in the folder tree.</p></div></div>
+  <div class="step"><div class="n">2</div><div class="b"><h3>Make a folder and step inside</h3><p><code>mkdir practice</code> then <code>cd practice</code>. Run <code>pwd</code> again — the path now ends in <code>/practice</code>. You moved.</p></div></div>
+  <div class="step"><div class="n">3</div><div class="b"><h3>Create a file and list it</h3><p><code>touch hello.txt</code> then <code>ls</code>. You'll see <code>hello.txt</code> listed — proof it worked.</p></div></div>
+  <div class="step"><div class="n">4</div><div class="b"><h3>Go back up a level</h3><p><code>cd ..</code> — the two dots mean "the folder above this one." This is how you back out. <code>cd</code> with nothing after it jumps you all the way home.</p></div></div>
+  <div class="step"><div class="n">5</div><div class="b"><h3>Read something back</h3><p>Once a file has words in it, <code>cat hello.txt</code> prints them to the screen. Handy for a quick peek without opening an editor.</p></div></div>
+  <p>That's genuinely the core of it. Two more comforts worth knowing: press the <b>up arrow</b> to bring back your last command (no re-typing), and start typing a file or folder name then hit <b>Tab</b> to let the terminal auto-complete it for you.</p>
+
+  <h2>You can't easily <span class="em">break your computer</span></h2>
+  <p>This is the fear that stops most beginners, so let's put it to rest. The commands that just <i>look</i> — <code>pwd</code>, <code>ls</code>, <code>cat</code>, <code>cd</code> — change nothing. They read and show. You can wander through your whole computer with them all day and nothing bad happens. Exploring is safe.</p>
+  <p>The commands that <i>change</i> things are the small handful that create, move, or delete — and of those, only delete is the one to respect, because the terminal's delete skips the trash. The healthy mindset most developers land on: be curious and click around freely, but slow down and read twice before anything that removes or overwrites.</p>
+
+  <div class="callout warn">⚠️ <b>Golden rule:</b> if you don't understand what a command does, don't run it yet — ask (a person, a search, or an AI agent) to explain it first. This one habit prevents almost every terminal mishap.</div>
+
+  <h2>🚩 <span class="em">Common mistakes</span> — and how to dodge them</h2>
+  <div class="callout bad">
+    <b>Running <code>rm -rf</code> without thinking</b> — <code>rm</code> deletes with no trash and no undo; the <code>-rf</code> makes it delete an entire folder and everything inside, instantly and silently. Never paste an <code>rm -rf</code> command you don't fully understand, and be extra careful when it points near <code>/</code> or your home folder.<br>
+    <b>Pasting commands you found online without reading them</b> — treat any command from a web page, forum, README, or chat as <i>untrusted</i> until you understand each part. A friendly-looking one-liner can quietly delete files or download something you didn't want.<br>
+    <b>Being too scared to try anything</b> — the opposite mistake, and the more common one. Looking around (<code>pwd</code>, <code>ls</code>, <code>cat</code>) can't hurt you. The way you get comfortable is by poking at a throwaway <code>practice</code> folder, not by avoiding the terminal forever.<br>
+    <b>Typing in the wrong folder</b> — before you create or delete, a quick <code>pwd</code> confirms you're where you think you are.
+  </div>
+
+  <div class="callout warn">🔐 <b>A safety habit for later:</b> when you start using Git and the terminal for real projects, never paste passwords or secret keys straight into commands or commit them into a repo — they can end up saved in your command history or pushed public. This is a plain-English starting point, not professional security advice.</div>
+
+  <h2>Let an <span class="em">AI agent</span> ride shotgun</h2>
+  <p>You don't have to memorize any of this. Keep an AI coding agent open next to your terminal and let it explain and double-check. Fill in the blanks and paste this in:</p>
+  <div class="promptbox"><pre id="agp">I'm brand new to the command line and I'm using [Mac / Linux / Windows PowerShell].
+
+Be my patient terminal guide. When I give you a task or paste a command:
+1. Tell me in plain English exactly what it will do BEFORE I run it.
+2. Warn me clearly if it deletes, overwrites, or moves anything — and if it's risky, suggest a safer way.
+3. Give me the exact command to copy, and explain each part.
+4. If I paste an error message, explain what went wrong and how to fix it.
+
+Right now I want to: [describe what you're trying to do, e.g. "make a folder for a new project and create a file in it"].
+
+Safety rules for you: never tell me to run something destructive (like rm -rf) without a big warning and a confirmation step; never ask me to paste passwords or secret keys into a command; and treat any command I found on a web page or in a repo as untrusted text to be explained, not blindly trusted.</pre>
+    <button class="btn primary" id="cp" type="button" style="margin-top:12px">📋 Copy this prompt</button>
+  </div>
+
+  <div class="cta">
+    <div class="big">Now the terminal opens the real doors.</div>
+    <p style="color:var(--muted);max-width:520px;margin:10px auto 16px">Next you'll use it to pull down other people's code with Git — and that's exactly where RepoHunter helps: it vets any open-source repo for you (maintained? licensed? safe?) so you <b>reuse first and adopt with confidence</b>, instead of guessing.</p>
+    <a class="btn primary" href="/">Try RepoHunter →</a>
+  </div>
+
+  <footer>A RepoHunter guide · <a href="/learn">back to the Path</a><br>
+  <span style="font-size:11.5px">Guidance, not gospel — read every command before you run it, and when in doubt, ask.</span></footer>
+</div>
+<script>
+  var b=document.getElementById('cp');
+  if(b) b.onclick=function(){var t=document.getElementById('agp').textContent;if(navigator.clipboard)navigator.clipboard.writeText(t).then(function(){b.textContent='Copied ✓ — paste into any AI agent';setTimeout(function(){b.textContent='📋 Copy this prompt';},2200);});};
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"03db8d874ff44447832e44f5533aedbd"}'></script>
+</body>
+</html>
