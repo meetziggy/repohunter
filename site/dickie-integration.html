@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dickie integration — RepoHunter</title>
+<meta name="description" content="How Dickie uses RepoHunter and local Ollama to evaluate open-source patterns against its own project constraints.">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#070b16">
+<style>
+  :root{--lime:#b8ff3c;--cyan:#38bdf8;--bg:#070b16;--card:#111a2b;--line:#22304a;--text:#e6edf7;--muted:#8fa0bd;
+    --grad:linear-gradient(120deg,var(--lime),var(--cyan))}
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1100px 600px at 50% -8%,#141d33,var(--bg) 55%);color:var(--text);
+    font:16px/1.65 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif}
+  a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 22px}
+  nav{display:flex;align-items:center;gap:12px;padding:20px 0}
+  nav img{width:34px;height:34px}nav .name{font-weight:800;font-size:18px}
+  nav .spacer{flex:1}nav a.home{color:var(--muted);font-weight:700;font-size:14px}
+  .hero{padding:34px 0 12px}
+  .eyebrow{color:var(--lime);font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+  h1{font-size:clamp(32px,6vw,48px);font-weight:800;letter-spacing:-.03em;line-height:1.08;margin:10px 0 14px}
+  h1 .accent{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:var(--muted);font-size:19px;max-width:680px}.lede b{color:var(--text)}
+  h2{font-size:13px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:9px;margin:40px 0 16px}
+  h3{font-size:17px;margin:0 0 5px}
+  p{color:#d3ddef}
+  code{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:2px 6px;color:var(--text);font:13.5px ui-monospace,Menlo,monospace}
+  .flow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+  .step .number{color:var(--lime);font-size:12px;font-weight:800;letter-spacing:.12em;margin-bottom:9px}
+  .step p{color:var(--muted);font-size:14px;line-height:1.5;margin:0}
+  .callout{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--lime);border-radius:10px;padding:15px 18px;margin:20px 0}
+  .callout p{margin:0}.callout b{color:var(--text)}
+  .links{margin-top:10px}
+  .links a{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 15px;margin:6px 8px 0 0;font-weight:700;color:var(--text)}
+  .links a:hover{border-color:var(--lime);text-decoration:none}
+  footer{border-top:1px solid var(--line);margin-top:50px;padding:26px 0 50px;text-align:center;color:var(--muted);font-size:13px}
+  @media(max-width:620px){.flow{grid-template-columns:1fr}.hero{padding-top:24px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <img src="/logo.svg" alt=""><span class="name">RepoHunter</span>
+    <span class="spacer"></span>
+    <a class="home" href="/">← Home</a>
+  </nav>
+
+  <header class="hero">
+    <div class="eyebrow">A real reuse-first workflow</div>
+    <h1>Dickie asks RepoHunter<br><span class="accent">what is worth learning from.</span></h1>
+    <p class="lede">RepoHunter is the evaluation engine for another working project: <b>Dickie</b> uses it to judge open-source patterns against Dickie's own constraints before anyone reaches for a rewrite, a dependency, or a framework.</p>
+  </header>
+
+  <h2>What Dickie is</h2>
+  <p>Dickie—also known as agent-forge—is Brian Gorzelic's private, local, Claude-Code-based multi-agent orchestration harness. Its job is practical coordination, and its shape is deliberately boring: a bash-and-Python harness, not a destination for an entire third-party framework.</p>
+  <p>That makes the useful question narrower than “is this repository good?” Dickie needs to know whether a project contains a portable pattern worth learning from, whether that pattern fits its constraints, and whether adopting the idea is cheaper and clearer than building it again.</p>
+
+  <h2>How the integration works</h2>
+  <div class="flow">
+    <div class="step">
+      <div class="number">01 · PROFILE</div>
+      <h3>Describe the real project</h3>
+      <p>A Dickie-specific project profile records its constraints and the kinds of reusable patterns it is looking for.</p>
+    </div>
+    <div class="step">
+      <div class="number">02 · EVALUATE</div>
+      <h3>Check a candidate</h3>
+      <p><code>repohunter.py evaluate &lt;owner/repo&gt;</code> examines a repository through that project-specific lens.</p>
+    </div>
+    <div class="step">
+      <div class="number">03 · DECIDE</div>
+      <h3>Get a usable dossier</h3>
+      <p>The result is a structured GO / MAYBE / SKIP decision about fit, tradeoffs, and the right reuse move.</p>
+    </div>
+  </div>
+  <p>The evaluation runs locally through Ollama, so Dickie can repeat the check without an API bill. The integration does not recreate RepoHunter's engine inside agent-forge; it uses RepoHunter as the tool built for this decision.</p>
+
+  <div class="callout">
+    <p><b>Reuse-first, applied to the reuse tool itself.</b> Dickie supplies its context. RepoHunter supplies the evaluation. Local Ollama supplies the model backend. Each piece keeps its own job.</p>
+  </div>
+
+  <h2>From research session to repeatable check</h2>
+  <p>Earlier evaluations of <a href="https://github.com/owainlewis/neo" target="_blank" rel="noopener">owainlewis/neo ↗</a>, <a href="https://github.com/smtg-ai/claude-squad" target="_blank" rel="noopener">smtg-ai/claude-squad ↗</a>, and <a href="https://github.com/disler/super-simple-software-factory" target="_blank" rel="noopener">disler/super-simple-software-factory ↗</a> required hours of manual research to find portable orchestration patterns. Those projects and their authors remain the sources of the ideas; RepoHunter helps make the fit assessment repeatable for future candidates.</p>
+  <p>That attribution matters. RepoHunter's ground rule is simple: <b>promote authors, never strip them.</b> Evaluation should lead back to the people and repositories that produced the work—not blur their contribution into somebody else's system.</p>
+
+  <h2>Use the same lens</h2>
+  <p>RepoHunter can evaluate a candidate against your project's constraints, too. Start with the quickstart, or read why its adoption decisions are intentionally project-specific.</p>
+  <div class="links">
+    <a href="https://github.com/meetziggy/repohunter#quickstart" target="_blank" rel="noopener">RepoHunter quickstart ↗</a>
+    <a href="/about.html">About RepoHunter</a>
+    <a href="/">Back home</a>
+  </div>
+</div>
+
+<footer><div class="wrap">MIT © 2026 Chris Gorzelic &amp; Brian Gorzelic · built on open source, given back · maintained by Ziggy 🤖</div></footer>
+</body>
+</html>
