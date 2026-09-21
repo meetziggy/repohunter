@@ -10,9 +10,20 @@ Python — no dependencies.
 > There is **no `curl | bash`** here — that's an insecure pattern (and one RepoHunter itself flags).
 > It's a normal MCP server: point your client at it with a small config block.
 
+## The fastest path: install the plugin
+
+In Claude Code, this repo serves as its own marketplace and ships the server **and** the
+skills that teach an agent to use it:
+
+```
+/plugin marketplace add meetziggy/repohunter
+/plugin install repohunter
+```
+
+Everything below is for wiring the server up by hand, or for other agents.
+
 ## The command
 
-Once it's on PyPI (registry publish pending):
 ```
 uvx repohunter-mcp
 ```

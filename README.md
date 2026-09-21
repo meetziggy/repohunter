@@ -16,6 +16,19 @@
 
 ---
 
+## Free, open, and inspectable
+
+Open-source discovery should be open. RepoHunter is free and MIT-licensed, with no account and no
+RepoHunter search-credit system for public repository discovery.
+
+- **Inspect the decision** — see the signals behind every **GO / MAYBE / SKIP** verdict instead of
+  accepting an opaque score.
+- **Run it locally** — keep project context on your machine when you use the default local model;
+  external AI providers are optional and use your own configuration.
+- **Stay in control** — RepoHunter drafts an integration, smoke-test, and rollback plan, then stops
+  for human approval before anything is adopted.
+- **Use and improve the method** — the source and scoring logic are public under the MIT license.
+
 > **Status: early & moving fast.** The engine and UI exist and run inside their origin project; this
 > is the standalone extraction being generalized for everyone. Expect rough edges — and rapid,
 > agent-driven improvement.
@@ -97,6 +110,12 @@ python3 repohunter.py serve             # → http://127.0.0.1:8130
 
 > Runs on stdlib Python — no install step. Default brain is a local Ollama model (no API bill);
 > point it at OpenAI/OpenRouter in `config.json` if you'd rather.
+
+## Agent-to-agent peer
+
+RepoHunter can run as an authenticated, read-only peer for the SpookyJuice hub.
+The current adapter is explicitly labeled as SpookyJuice's custom binding, not
+Linux Foundation A2A 1.0 conformance. See [A2A-INSTALL.md](A2A-INSTALL.md).
 
 ## Roadmap
 

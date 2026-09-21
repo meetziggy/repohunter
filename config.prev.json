@@ -1,0 +1,129 @@
+{
+  "project": {
+    "name": "agentic-blueprint modernization",
+    "profile": "A solo operator's ~95-repo portfolio being consolidated around agent-native engineering and metered/agent-internet monetization. Existing assets: agent-forge (parallel Claude Code agents in tmux + git worktrees, SQLite coordination DB, guardrail hooks, loopback HTTP brain API, A2A peer bus over Tailscale); agent-spend-guard (deterministic approval gates + audit trail for agent tool calls, Python, v0.1.0, not on PyPI); ghostlink (hardened stdio MCP server exposing sandboxed repo tools, shipped to npm, roadmap Phase 2 = HTTP/SSE + OAuth2.1 + multi-tenant + per-tenant rate limiting); quality-gates (installable Claude Code hooks + git hooks + CI templates -- the deterministic enforcement layer); spookyjuice.ai (production 24/7 persona agent platform on a VPS, 63-tool registry, 7-gate execution gateway, Postgres+pgvector memory, voice + SMS + Telegram channels, billing/cost-limit endpoints stubbed); agent-skills (470-skill library in Anthropic SKILL.md format); clawmart (skills/personas marketplace, 169 sales); home-base (multi-tenant platform for local service businesses with an A2A booking API + agent card); digitalposture.ai (productized agent-readiness/growth audit service for small businesses); techdeck + signal-app + netaudit (RF/network field diagnostics generating real site measurements). ACTIVE GOALS, in priority order: (P0) wire one end-to-end AI Developer Workflow where a ticket goes to a build agent, a NATIVE on-disk linter/typechecker runs OUTSIDE the agent, failures loop back on the same session id, tests run, human is notified -- strictly decoupling deterministic code from agent reasoning; (P1) bounded context compaction -- write raw tool logs to disk with node IDs, keep only a Mermaid task canvas in-prompt, fetch-by-id on error, cut tokens on long unattended runs; (P1) usage metering and per-tenant billing on MCP endpoints so agent resources become billable; (P1) enforce vertical-slice/tracer-bullet builds and require a measurable goal before any scaffold; (P2) per-run provisioned API keys with hard spend ceilings that die on teardown; (P2) serverless hibernation, event-driven agent proactivity, and a nightly eval loop that proposes skill-file edits; (P2) tooling to audit how AI assistants describe a local business (buyer-intent prompt runs, llms.txt, schema, comparison pages) for a paid agent-readiness service. CONSTRAINTS: local-first and self-hostable strongly preferred; macOS + Apple Silicon dev machine, a Linux VPS, and Android/arm64 edge nodes; Python and TypeScript are the working languages; must not require a proprietary SaaS to function; permissive licenses only -- AGPL and source-available/PolyForm-style licenses that block resale are a problem because several of these components need to be sellable. STRONG BIAS: adopt something that already works over building it; the portfolio's failure mode is building everything from scratch and shipping nothing metered. PENDING ADOPTIONS as of 2026-08-15 (judge overlap against these, do not recommend duplicates): huangruiteng/loopx (MIT) is being adopted as the state kernel for the P0 ADW and may also satisfy the context-compaction goal; gastownhall/beads (MIT) is being adopted to replace agent-forge's bespoke SQLite coordination DB and supply hierarchical node IDs; max-sixty/worktrunk (MIT OR Apache-2.0) is being adopted as the git-worktree layer under agent-forge; a2aproject/A2A (Apache-2.0) is being adopted to replace four hand-rolled A2A implementations across repohunter, agent-forge, home-base and spookyjuice -- home-base's booking endpoint is a customer-facing differentiator whose protocol conformance is unverified. Also note: the T05 target architecture is explicitly modeled on Vercel's internal 'V' agent and the EVE framework -- router-not-god-agent, filesystem-as-config (instructions/tools/skills folders), serverless hibernation, event-driven proactivity, and a nightly eval loop that proposes skill-file edits. A planned B03 product is a narrow agent-governance / spend-and-safety audit tool: paste an agent config, get back guardrail gaps, unbounded spend paths and missing approval gates, scored, with fixes. Flag any repo that would COMPETE with that product, not just complement it.",
+    "relevance_keywords": [
+      "agent harness",
+      "agent orchestration",
+      "parallel agents",
+      "git worktree",
+      "context compaction",
+      "agent memory",
+      "session management",
+      "deterministic",
+      "linter",
+      "code review",
+      "static analysis",
+      "MCP server",
+      "metering",
+      "usage billing",
+      "rate limiting",
+      "A2A",
+      "agent protocol",
+      "spend guard",
+      "token usage",
+      "cost tracking",
+      "skills",
+      "sandbox",
+      "self-hosted",
+      "local-first",
+      "SEO",
+      "llms.txt",
+      "eve",
+      "software factory",
+      "agent template",
+      "code review bot",
+      "security harness",
+      "skill distribution",
+      "hibernation",
+      "event-driven",
+      "port forwarding",
+      "generative ui"
+    ]
+  },
+  "llm": {
+    "backend": "claude-cli",
+    "base_url": "http://localhost:11434/v1",
+    "model": "",
+    "api_key_env": ""
+  },
+  "github_token_env": "GITHUB_TOKEN",
+  "seed": [
+    {
+      "slug": "vercel-labs/eve-software-factory-template",
+      "category": "T05+T07 eve",
+      "why": "'Foreman, an eve Software Factory' -- the bridge between the T05 EVE architecture and the T07 ADW.",
+      "featured": true
+    },
+    {
+      "slug": "vercel-labs/deepsec",
+      "category": "T07 + B03 rival",
+      "why": "Security harness finding vulnerabilities via coding agents -- adjacent to the planned agent-governance audit product.",
+      "featured": true
+    },
+    {
+      "slug": "vercel-labs/openreview",
+      "category": "T07 deterministic ADW",
+      "why": "Self-hosted AI code review bot -- the review stage of the P0 ADW.",
+      "featured": true
+    },
+    {
+      "slug": "vercel-labs/portless",
+      "category": "T01 parallel agents",
+      "why": "Stable named local URLs for humans and agents -- solves per-worktree port collisions at fleet scale.",
+      "featured": true
+    },
+    {
+      "slug": "vercel-labs/skills",
+      "category": "B03 distribution",
+      "why": "'npx skills' open agent skills tool -- a distribution rail for the 470-skill library and clawmart catalog.",
+      "featured": true
+    },
+    {
+      "slug": "vercel-labs/open-agents",
+      "category": "T05 enterprise arch",
+      "why": "Open source template for cloud agents -- compare against spookyjuice's homegrown runtime.",
+      "featured": true
+    },
+    {
+      "slug": "vercel-labs/ralph-loop-agent",
+      "category": "T07 autonomy",
+      "why": "'Continuous Autonomy for the AI SDK' -- long-running unattended loop; check overlap with loopx.",
+      "featured": true
+    },
+    {
+      "slug": "vercel-labs/personal-agent-template",
+      "category": "T04/T05 memory",
+      "why": "Durable personal agent with long-term memory + Slack/Linear channels.",
+      "featured": true
+    },
+    {
+      "slug": "vercel-labs/emulate",
+      "category": "T01 sandboxes",
+      "why": "Local API emulation for CI and no-network sandboxes.",
+      "featured": true
+    },
+    {
+      "slug": "vercel-labs/agent-skills",
+      "category": "B03 distribution",
+      "why": "Vercel's official skills collection -- note: no LICENSE file."
+    },
+    {
+      "slug": "vercel-labs/coding-agent-template",
+      "category": "T01 sandboxes",
+      "why": "Multi-agent coding platform on Vercel Sandbox + AI Gateway."
+    },
+    {
+      "slug": "vercel-labs/just-bash",
+      "category": "T07 deterministic",
+      "why": "Bash for agents -- note: no LICENSE file."
+    },
+    {
+      "slug": "vercel-labs/web-interface-guidelines",
+      "category": "B02",
+      "why": "Guidelines for building web interfaces -- agent-readability adjacent."
+    }
+  ],
+  "output": "data/repostore.json",
+  "port": 8130
+}

@@ -3,6 +3,34 @@
 All notable changes to RepoHunter are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/); pre-1.0 releases are date-based.
 
+## [0.2.0] — 2026-08-20 — ship the reflex with the tools
+### Added
+- **Claude Code plugin** — the repo is now its own single-plugin marketplace.
+  `/plugin marketplace add meetziggy/repohunter` then `/plugin install repohunter`
+  installs the skills *and* wires the MCP server in one step
+  (`.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`).
+- **`repo-intake` skill** — the full gate: scan → triage → evaluate → fit-map →
+  INTEGRATE / CHERRY-PICK / LOGIC-GATHER / SKIP, run by a party of specialist agents.
+  Includes the party spec in `references/`.
+- **Named project profiles.** `config.json` may now carry a `profiles` map; select with
+  `--profile <name>` / `REPOHUNTER_PROFILE`, list with `repohunter profiles`. The same
+  repo is often a GO for one project and a SKIP for another — the lens decides as much
+  as the repo does. An unknown profile is a hard error rather than a silent fallback.
+- **`repohunter install-skill [dir]`** — copy the bundled skills into an agent's skills
+  directory for agents without plugin support.
+- **`.skill` bundles** built per release for skill stores that take an upload.
+- Release workflow: manifest validation, tests, wheel + sdist, an sdist-contents check
+  that fails if the skills went missing, and PyPI publish via Trusted Publishing.
+
+### Fixed
+- `repohunter_artifacts` was never listed in `py-modules`, so it did not exist in an
+  installed copy despite shipping its own tests. Now packaged, with a
+  `repohunter-artifacts` console script.
+- `MANIFEST.in` added so the sdist carries the skills and plugin manifests.
+- Safety scan: a UTF-8 BOM at byte 0 no longer counts as hidden text, and AWS's
+  canonical documentation keys (`AKIAIOSFODNN7EXAMPLE`) no longer count as leaked
+  secrets. Both were burying real findings in noise.
+
 ## [Unreleased]
 - Soak-week hardening + full docs (see `SOAK_WEEK.md`)
 - Landing-page guided walkthrough + larger hero logo

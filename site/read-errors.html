@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>How to read an error message | RepoHunter</title>
-<meta name="description" content="Error messages aren't the computer yelling at you — they're it telling you exactly what broke and where. Here's how to read one, in plain English, without panicking.">
+<meta name="description" content="Error messages aren't the computer yelling at you — they're it telling you exactly what broke and where. Here's how to read one, in clear, accessible language, without panicking.">
 <link rel="icon" type="image/svg+xml" href="/logo.svg">
 <meta name="theme-color" content="#070b16">
 <meta property="og:title" content="How to read an error message">
@@ -85,7 +85,7 @@
 
   <h2>Reading a stack trace: <span class="em">start at the ends</span></h2>
   <p>A stack trace can be a dozen lines long, which is what makes it look intimidating. You don't read all of it. You read the ends.</p>
-  <div class="step"><div class="n">1</div><div class="b"><h3>Read the very last line first — that's the <i>what</i> and <i>why</i></h3><p>The final line (in Python and many others) is the actual error: the type and the plain-English reason, e.g. <code>NameError: name 'total' is not defined</code>. That one line usually tells you the real problem. Read it slowly, like a sentence, because it literally is one.</p></div></div>
+  <div class="step"><div class="n">1</div><div class="b"><h3>Read the very last line first — that's the <i>what</i> and <i>why</i></h3><p>The final line (in Python and many others) is the actual error: the type and the clear reason, e.g. <code>NameError: name 'total' is not defined</code>. That one line usually tells you the real problem. Read it slowly, like a sentence, because it literally is one.</p></div></div>
   <div class="step"><div class="n">2</div><div class="b"><h3>Find <i>your</i> file in the middle — that's the <i>where</i></h3><p>The stack trace lists files. Some belong to libraries you installed (long paths, folders like <code>site-packages</code> or <code>node_modules</code>). Skip those. Look for <b>your own file names</b> — the ones you wrote. That line, with its line number, is where to put your cursor.</p></div></div>
   <div class="step"><div class="n">3</div><div class="b"><h3>Know which end holds your code</h3><p>Different languages print the chain in different orders. <b>Python</b> puts the error at the <i>bottom</i> and your earliest code near the top — so people say "read Python tracebacks bottom-up" to find the failure, then scan up for your own file. <b>JavaScript</b> usually puts the error message at the <i>top</i>, with the call chain below it. Either way the trick is the same: find the error sentence, then find the nearest line that's <i>your</i> code.</p></div></div>
 
@@ -102,11 +102,11 @@
     <tr><td><b><code>PermissionError</code> / <code>EACCES</code> / <code>Permission denied</code></b></td><td>The program isn't allowed to touch that file, folder, or port. Fix the location or the permissions — resist the urge to just slap "run as admin" on it.</td></tr>
   </table>
 
-  <div class="callout warn">🔒 <b>A security note.</b> When an error mentions <b>permissions</b> or asks you to run something with elevated rights (<code>sudo</code>, "run as administrator"), pause. Granting broad power to fix a small error is how small mistakes become big ones. And <b>never paste secrets</b> — API keys, passwords, tokens — into a search box or an AI along with your error. This is a plain-English starting point, not professional security advice.</div>
+  <div class="callout warn">🔒 <b>A security note.</b> When an error mentions <b>permissions</b> or asks you to run something with elevated rights (<code>sudo</code>, "run as administrator"), pause. Granting broad power to fix a small error is how small mistakes become big ones. And <b>never paste secrets</b> — API keys, passwords, tokens — into a search box or an AI along with your error. This is a clear starting point, not professional security advice.</div>
 
   <h2>Search it, then <span class="em">ask an AI</span></h2>
   <p>You've read the error. Still stuck? That's normal. Here's the order that works:</p>
-  <div class="step"><div class="n">1</div><div class="b"><h3>Search the error <i>text</i>, not your feelings</h3><p>Copy the error <b>type and the plain-English part</b> (e.g. <code>ModuleNotFoundError: No module named 'requests'</code>) and paste that into a search engine. Millions of people have hit the exact same message — you're rarely the first. <b>Delete anything personal first</b>: your file paths, usernames, and especially keys or tokens.</p></div></div>
+  <div class="step"><div class="n">1</div><div class="b"><h3>Search the error <i>text</i>, not your feelings</h3><p>Copy the error <b>type and the clear part</b> (e.g. <code>ModuleNotFoundError: No module named 'requests'</code>) and paste that into a search engine. Millions of people have hit the exact same message — you're rarely the first. <b>Delete anything personal first</b>: your file paths, usernames, and especially keys or tokens.</p></div></div>
   <div class="step"><div class="n">2</div><div class="b"><h3>When to hand it to an AI</h3><p>If the search results are murky, paste the error into an AI coding assistant along with the small chunk of code the error pointed at. An AI is great at "what does this message mean and what usually causes it?" Give it the <i>where</i> (your file + line) and the surrounding lines so it isn't guessing.</p></div></div>
   <div class="step"><div class="n">3</div><div class="b"><h3>Change ONE thing at a time</h3><p>The classic beginner trap is panic-editing five things at once, then not knowing which change helped (or hurt). Make one change, run it again, read the new error. Errors that <i>move</i> or <i>change</i> are progress — it means your last edit did something. Slow is smooth; smooth is fast.</p></div></div>
 
@@ -132,7 +132,7 @@ The code it pointed at (my file + the lines around the reported line number):
 What I was trying to do: [describe in one sentence].
 
 Please:
-1. Tell me in plain English WHAT went wrong, WHERE (which file + line is MY code, not a library's), and WHY.
+1. Tell me in clear, accessible language WHAT went wrong, WHERE (which file + line is MY code, not a library's), and WHY.
 2. List the 2–3 most likely causes for a beginner, most likely first.
 3. Suggest ONE small change to try first, and what new result would tell me it worked.
 4. Point out anything in the message I should learn to recognize next time.

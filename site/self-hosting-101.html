@@ -117,7 +117,7 @@
   <div class="step"><div class="n">2</div><div class="b"><h3>To reach it from away, use a VPN — not an open port</h3><p>A <b>VPN</b> ("Virtual Private Network") creates a private, encrypted tunnel back to your home network, so your phone acts like it's sitting on your couch. <b>Tailscale</b> is the beginner favorite: install it on your server and your phone, and they find each other privately — no ports opened to strangers. This is the safest way to use your stuff on the go.</p></div></div>
   <div class="step"><div class="n">3</div><div class="b"><h3>If you must publish something, put a reverse proxy in front</h3><p>A <b>reverse proxy</b> (tools like Caddy or Nginx Proxy Manager) is a polite doorman that sits in front of your app: it handles the <b>https</b> lock (encryption) and gives you one controlled entrance instead of many. It doesn't replace the rules above — it's the right tool <i>when</i> you genuinely need public access.</p></div></div>
   <div class="step"><div class="n">4</div><div class="b"><h3>Strong, unique passwords — and updates</h3><p>Change every default password immediately (defaults are public knowledge). Use a long, unique password per app — a password manager makes this painless. Turn on two-factor if the app offers it. And <b>keep things updated</b>: most compromises hit known holes that a routine update already closed.</p></div></div>
-  <div class="callout warn">⚠️ <b>A plain-English starting point, not legal or professional security advice.</b> Self-hosting means <i>you</i> are now the one responsible for backups and safety. Keep a backup of anything you'd hate to lose (the app's data folder, copied somewhere else), and when in doubt, keep it VPN-only. For anything sensitive, get a second opinion from a qualified pro before exposing it to the internet.</div>
+  <div class="callout warn">⚠️ <b>A clear starting point, not legal or professional security advice.</b> Self-hosting means <i>you</i> are now the one responsible for backups and safety. Keep a backup of anything you'd hate to lose (the app's data folder, copied somewhere else), and when in doubt, keep it VPN-only. For anything sensitive, get a second opinion from a qualified pro before exposing it to the internet.</div>
 
   <h2>🚩 <span class="em">Common mistakes</span> beginners make</h2>
   <div class="callout bad">
@@ -138,7 +138,7 @@
 
 Walk me through it safely, step by step:
 1. Confirm the official install method (prefer the project's Docker / Docker Compose image; avoid "curl | bash" from unofficial sources).
-2. Give me a Docker Compose file with data stored in a folder I can back up, and explain each line in plain English.
+2. Give me a Docker Compose file with data stored in a folder I can back up, and explain each line in clear, accessible language.
 3. Set it up to be reachable ONLY on my home network by default — do NOT open any ports to the internet.
 4. If I want to use it away from home, show me how to do it with a VPN like Tailscale instead of exposing ports.
 5. Remind me to change default passwords, enable 2FA if available, and how to keep it updated.
@@ -155,7 +155,7 @@ Safety rules for you: never put real passwords or API keys into code or commit t
   </div>
 
   <footer>A RepoHunter guide · <a href="/learn">back to the Path</a> · <a href="/free">next: free open-source alternatives →</a><br>
-  <span style="font-size:11.5px">A plain-English starting point, not legal or professional advice — always verify security, backups, and licenses yourself before you rely on anything.</span></footer>
+  <span style="font-size:11.5px">A clear starting point, not legal or professional advice — always verify security, backups, and licenses yourself before you rely on anything.</span></footer>
 </div>
 <script>
   var b=document.getElementById('cp');

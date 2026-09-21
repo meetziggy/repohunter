@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "repohunter"
-version = "0.1.0"
+version = "0.2.0"
 description = "Reuse, don't reinvent — the reuse-first scout for open source. Evaluate repos for your project and your machine, then plan the integration."
 readme = "README.md"
 license = { text = "MIT" }
@@ -29,6 +29,8 @@ Changelog = "https://github.com/meetziggy/repohunter/blob/main/CHANGELOG.md"
 [project.scripts]
 repohunter = "repohunter:main"
 repohunter-mcp = "repohunter_mcp:main"
+repohunter-agent = "repohunter_agent:main"
+repohunter-artifacts = "repohunter_artifacts:main"
 
 [tool.setuptools]
-py-modules = ["repohunter", "repohunter_mcp"]
+py-modules = ["repohunter", "repohunter_mcp", "repohunter_agent", "repohunter_artifacts"]

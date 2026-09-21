@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "repohunter",
+  "displayName": "RepoHunter",
+  "version": "0.2.0",
+  "description": "Reuse before you reinvent. Scan, evaluate and fit-map any repo before you adopt it \u2014 real GitHub data, a safety scan, and a GO/MAYBE/SKIP verdict against your project.",
+  "author": {
+    "name": "Brian Gorzelic",
+    "url": "https://repohunter.dev"
+  },
+  "homepage": "https://repohunter.dev",
+  "repository": "https://github.com/meetziggy/repohunter",
+  "license": "MIT",
+  "keywords": [
+    "code-reuse",
+    "open-source",
+    "security",
+    "supply-chain",
+    "github",
+    "evaluation"
+  ],
+  "skills": "./skills/",
+  "mcpServers": {
+    "repohunter": {
+      "command": "uvx",
+      "args": [
+        "repohunter-mcp"
+      ],
+      "env": {
+        "GITHUB_TOKEN": ""
+      }
+    }
+  }
+}
