@@ -10,7 +10,7 @@ Skills:
   find_repos      — find reuse candidates for a need (live GitHub search, ranked)
   portfolio_scan  — a GitHub user/org's public work as FACTS + patterns (never a judgment of the person)
 
-MIT (c) 2026 Chris Gorzelic.
+MIT (c) 2026 Brian Gorzelic.
 """
 import json
 import math
