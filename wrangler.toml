@@ -1,0 +1,11 @@
+name = "repohunter"
+compatibility_date = "2026-09-22"
+pages_build_output_dir = "site"
+
+# repohunter.dev is already live on Cloudflare Pages via a dashboard-configured
+# git integration (confirmed 2026-09-22: cf-ray header present, DNS on
+# Cloudflare anycast ranges, HTML served DYNAMIC / assets REVALIDATED — the
+# standard Pages caching split). This file codifies that project's config in
+# version control; it does not change how the existing dashboard integration
+# behaves. It also lets `wrangler pages deploy site` be run from a workflow
+# instead of only from the dashboard's own git watcher.
