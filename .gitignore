@@ -6,11 +6,17 @@ __pycache__/
 # build artifacts
 dist/
 *.egg-info/
+build/
 # generated data + local config with secrets
 data/
 repostore.json
 config.json
+config.json.bak*
+config.prev.json
 .cache/
+
+# stray lock-file debris (should never be committed)
+_to_delete/
 
 # internal / local-only
 .wrangler/
