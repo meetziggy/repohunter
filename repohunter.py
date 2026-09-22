@@ -39,6 +39,51 @@ UA = "RepoHunter/0.1"
 
 
 # ── Config ────────────────────────────────────────────────────────────────────
+def resolve_profile(cfg, name=None):
+    """Pick the active project lens. Pure — unit-testable.
+
+    config.json carries either a single "project" object (the original shape) or a
+    "profiles" map of named project objects. The named map is what lets one install
+    evaluate a repo for Dickie, then for RepoHunter itself, without hand-editing
+    config.json between runs — a repo that is a GO for one is often a SKIP for another,
+    and the difference is the lens, not the repo.
+
+    Returns (project_dict, active_name). Raises KeyError for an unknown name: silently
+    scoring against the wrong lens produces a confidently wrong verdict, which is worse
+    than no verdict at all.
+    """
+    profiles = cfg.get("profiles") or {}
+    if not profiles:
+        # An explicit request for a lens this config cannot provide must fail. Falling
+        # through to the single "project" block would score the repo against the wrong
+        # project while looking like it honoured the flag.
+        if name:
+            raise KeyError(name)
+        return cfg.get("project") or {}, None
+    chosen = name or cfg.get("default_profile") or next(iter(profiles))
+    if chosen not in profiles:
+        raise KeyError(chosen)
+    merged = dict(cfg.get("project") or {})
+    merged.update(profiles[chosen] or {})
+    return merged, chosen
+
+
+def profile_names(cfg):
+    """Named profiles available in this config, in declaration order."""
+    return list((cfg.get("profiles") or {}).keys())
+
+
+def _argv_profile(argv=None):
+    """Read --profile/-p out of argv without disturbing the positional grammar."""
+    argv = list(sys.argv[1:] if argv is None else argv)
+    for i, tok in enumerate(argv):
+        if tok in ("--profile", "-p") and i + 1 < len(argv):
+            return argv[i + 1]
+        if tok.startswith("--profile="):
+            return tok.split("=", 1)[1]
+    return None
+
+
 def _load_config():
     defaults = {
         "project": {"name": "My Project",
@@ -64,6 +109,19 @@ def _load_config():
 
 
 CFG = _load_config()
+# Selection is lenient here so `import repohunter` never explodes on a bad env var;
+# main() re-validates strictly before doing any work, so the CLI still fails loudly.
+ACTIVE_PROFILE = None
+_env_want = os.environ.get("REPOHUNTER_PROFILE")
+_want = _env_want or _argv_profile()
+try:
+    CFG["project"], ACTIVE_PROFILE = resolve_profile(CFG, _want)
+except KeyError:
+    # Only warn for the env var. A bad --profile is about to get a better error from
+    # main(), and two messages for one mistake is noise.
+    if _env_want:
+        sys.stderr.write("unknown profile %r from REPOHUNTER_PROFILE; using default\n" % _want)
+    CFG["project"], ACTIVE_PROFILE = resolve_profile(CFG, None)
 # Data + cache live where the user runs (their project), not in the install dir — so the
 # pip/pipx console-script works instead of trying to write into site-packages.
 OUT = CFG["output"] if os.path.isabs(CFG["output"]) else os.path.join(os.getcwd(), CFG["output"])
@@ -1052,6 +1110,24 @@ def serve():
     http.server.HTTPServer(("127.0.0.1", port), H).serve_forever()
 
 
+def profiles_mode():
+    """List the project lenses this config can evaluate against."""
+    names = profile_names(CFG)
+    if not names:
+        print("No named profiles. Using the single \"project\" block: %s"
+              % (CFG["project"].get("name") or "(unnamed)"))
+        print("\nAdd a \"profiles\" map to config.json to evaluate one repo against "
+              "several projects.")
+        return 0
+    default = CFG.get("default_profile") or names[0]
+    for n in names:
+        p = (CFG.get("profiles") or {}).get(n) or {}
+        mark = "*" if n == (ACTIVE_PROFILE or default) else " "
+        print("%s %-16s %s" % (mark, n, (p.get("name") or "")))
+    print("\n* = active. Select with --profile <name> or REPOHUNTER_PROFILE.")
+    return 0
+
+
 USAGE = """RepoHunter — reuse, don't reinvent.
 
   repohunter refresh                     build the store from your config.json seed
@@ -1062,6 +1138,11 @@ USAGE = """RepoHunter — reuse, don't reinvent.
   repohunter scan <owner/repo> [--json]  safety scan only: prompt-injection, hidden
                                          text, piped installs, leaked secrets
   repohunter serve                       serve the UI + API on http://127.0.0.1:<port>
+  repohunter profiles                    list the project lenses in your config
+
+Global:
+  --profile <name>                       evaluate against a named profile from config.json
+                                         (or set REPOHUNTER_PROFILE)
 """
 
 
@@ -1073,6 +1154,16 @@ def main(argv=None):
     if cmd in ("help", "-h", "--help"):
         print(USAGE)
         return 0
+    # Strict here even though import-time selection is lenient: scoring a repo against
+    # the wrong project is a confidently wrong answer, and those are the expensive kind.
+    want = os.environ.get("REPOHUNTER_PROFILE") or _argv_profile(argv)
+    if want:
+        try:
+            resolve_profile(CFG, want)
+        except KeyError:
+            known = ", ".join(profile_names(CFG)) or "(none defined)"
+            sys.stderr.write("error: unknown profile '%s'. Known profiles: %s\n" % (want, known))
+            return 2
     needs = {"evaluate": 1, "plan": 1, "ingest-video": 1, "decide": 2, "scan": 1}
     if cmd in needs and len(a) < needs[cmd]:
         sys.stderr.write("error: '%s' needs %d argument(s).\n\n%s" % (cmd, needs[cmd], USAGE))
@@ -1080,7 +1171,7 @@ def main(argv=None):
     fn = {"evaluate": lambda: evaluate(a[0]), "plan": lambda: plan_mode(a[0]),
           "decide": lambda: decide_mode(a[0], a[1]), "ingest-video": lambda: ingest_video(a[0]),
           "scan": lambda: scan_mode(a[0], as_json="--json" in a),
-          "serve": serve, "refresh": refresh}.get(cmd)
+          "serve": serve, "refresh": refresh, "profiles": profiles_mode}.get(cmd)
     if fn is None:
         sys.stderr.write("error: unknown command '%s'.\n\n%s" % (cmd, USAGE))
         return 2

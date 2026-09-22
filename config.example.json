@@ -7,6 +7,21 @@
     "relevance_keywords": ["cli", "library", "api", "self-hosted", "local", "agent", "llm"]
   },
 
+  "_profiles_note": "OPTIONAL. If you maintain more than one project, name them here instead of editing \"project\" between runs. Each profile inherits from \"project\" and overrides what it sets. Select with `repohunter evaluate <repo> --profile <name>` or REPOHUNTER_PROFILE. The same repo is often a GO for one project and a SKIP for another -- the lens decides as much as the repo does. Delete this block if you only have one project.",
+  "profiles": {
+    "my-app": {
+      "name": "My App",
+      "profile": "The user-facing product. TypeScript, ships to customers, permissive licences only because components get resold.",
+      "relevance_keywords": ["typescript", "react", "api"]
+    },
+    "my-tooling": {
+      "name": "My Tooling",
+      "profile": "Internal developer tooling. Python, runs locally, licence is less critical because nothing here is distributed.",
+      "relevance_keywords": ["cli", "python", "automation"]
+    }
+  },
+  "default_profile": "my-app",
+
   "llm": {
     "_note": "Any OpenAI-compatible endpoint. Default: local Ollama (no API bill). For OpenAI/OpenRouter set base_url + api_key_env. For the Claude CLI set backend to 'claude-cli'. Optional 'fallback' names a second backend to try if the first comes back empty (e.g. a subscription-backed CLI hitting a usage cap). A failure on either backend is logged to stderr with the reason.",
     "backend": "ollama",
