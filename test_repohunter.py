@@ -122,6 +122,26 @@ class SafetyScan(unittest.TestCase):
         rh.apply_safety(meta3)
         self.assertEqual(meta3["dossier"]["verdict"], "SKIP")
 
+    def test_zero_files_is_unknown_not_clean(self):
+        """A rate-limited fetch reads zero files. Calling that 'clean' is a false clean —
+        it is indistinguishable from a repo that was actually checked."""
+        orig_top, orig_agent = rh._fetch_text_files, rh._fetch_agent_config_files
+        rh._fetch_text_files = lambda slug: []
+        rh._fetch_agent_config_files = lambda slug, **kw: []
+        try:
+            s = rh.safety_scan("who/ever")
+        finally:
+            rh._fetch_text_files, rh._fetch_agent_config_files = orig_top, orig_agent
+        self.assertEqual(s["level"], "unknown")
+        self.assertEqual(s["files_scanned"], 0)
+        self.assertIn("NOT a clean result", s["note"])
+
+    def test_unknown_scan_caps_a_go(self):
+        meta = {"dossier": {"verdict": "GO", "recommendation": "adopt"},
+                "safety": {"level": "unknown"}}
+        rh.apply_safety(meta)
+        self.assertEqual(meta["dossier"]["verdict"], "MAYBE")
+
     def test_scan_needs_arg(self):
         self.assertEqual(rh.main(["scan"]), 2)
 

@@ -28,6 +28,7 @@ import sys
 import time
 import urllib.request
 import urllib.error
+import urllib.parse
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 NOW = int(time.time())
@@ -331,6 +332,62 @@ def scan_text(name, text):
     return findings
 
 
+# Directories and filenames that carry instructions aimed at whatever agent
+# reads the repo. These are the whole reason `scan` exists, and until 2026-09-21
+# it never looked at them — it read the README and top-level files only, so a
+# skill pack could ship 40 command files and still report "2 files scanned".
+AGENT_CONFIG_PREFIXES = (
+    ".claude/", ".agents/", ".cursor/", ".github/copilot", ".codex/", ".gemini/",
+    "skills/", "agents/", "commands/", "prompts/", ".windsurf/", ".continue/",
+)
+AGENT_CONFIG_NAMES = (
+    "agents.md", "claude.md", "cursor.md", ".cursorrules", "skill.md",
+    "agent.md", "gemini.md", "copilot-instructions.md",
+)
+AGENT_CONFIG_EXTS = (".md", ".mdx", ".json", ".toml", ".yaml", ".yml", ".txt")
+
+
+def _fetch_agent_config_files(slug, cap=40, max_bytes=300000):
+    """Walk the repo tree for agent-directed instruction files.
+
+    Separate from the top-level pass because these are the highest-risk text in
+    any repo: a human may never read them, but an agent will.
+    """
+    files = []
+    try:
+        tree = gh("/repos/%s/git/trees/HEAD?recursive=1" % slug).get("tree") or []
+    except Exception:
+        return files
+    picks = []
+    for node in tree:
+        if node.get("type") != "blob":
+            continue
+        path = node.get("path", "")
+        low = path.lower()
+        base = low.rsplit("/", 1)[-1]
+        in_dir = low.startswith(AGENT_CONFIG_PREFIXES) or any(
+            ("/" + pre) in ("/" + low) for pre in AGENT_CONFIG_PREFIXES
+        )
+        if not (in_dir or base in AGENT_CONFIG_NAMES):
+            continue
+        if not low.endswith(AGENT_CONFIG_EXTS):
+            continue
+        if (node.get("size") or 0) > max_bytes:
+            continue
+        picks.append((node.get("size") or 0, path))
+    # Biggest first: a 38KB command file is likelier to hide something than a stub.
+    picks.sort(reverse=True)
+    for _, path in picks[:cap]:
+        try:
+            url = "https://raw.githubusercontent.com/%s/HEAD/%s" % (slug, urllib.parse.quote(path))
+            req = urllib.request.Request(url, headers={"User-Agent": UA})
+            with urllib.request.urlopen(req, timeout=20) as r:
+                files.append((path, r.read().decode("utf-8", "ignore")[:200000]))
+        except Exception:
+            pass
+    return files
+
+
 def _fetch_text_files(slug, cap=8):
     """README + top-level docs/scripts/manifests, size-capped. Best-effort."""
     import base64
@@ -365,6 +422,10 @@ def _fetch_text_files(slug, cap=8):
 
 def safety_scan(slug):
     files = _fetch_text_files(slug)
+    seen = {n for n, _ in files}
+    for name, text in _fetch_agent_config_files(slug):
+        if name not in seen:
+            files.append((name, text))
     findings = []
     for name, text in files:
         findings.extend(scan_text(name, text))
@@ -372,6 +433,13 @@ def safety_scan(slug):
     level = "high" if "high" in sevs else "medium" if "medium" in sevs else \
         "low" if findings else "clean"
     risk = min(100, sum({"high": 40, "medium": 15, "low": 5}[s] for s in sevs))
+    if not files:
+        # Nothing was fetched — almost always a GitHub 403/404 (unauthenticated rate limit),
+        # not a repo with no text in it. Reporting "clean" here is a FALSE clean, so don't.
+        return {"level": "unknown", "risk": 0, "findings": [], "files_scanned": 0,
+                "note": "Scan could not read any files — likely a GitHub rate limit or a "
+                        "missing/renamed repo. This is NOT a clean result. Set GITHUB_TOKEN "
+                        "and re-run."}
     return {"level": level, "risk": risk, "findings": findings[:40], "files_scanned": len(files),
             "note": "Heuristic risk assessment, not a certification — a clean scan means these "
                     "checks found nothing, not that the repo is safe."}
@@ -386,6 +454,11 @@ def apply_safety(meta):
         d["verdict"] = "SKIP"
         d["recommendation"] = ("⚠ SAFETY: high-risk findings (see safety scan) — verdict "
                                "downgraded to SKIP. ") + str(d.get("recommendation", ""))
+    elif s["level"] == "unknown" and d.get("verdict") == "GO":
+        d["verdict"] = "MAYBE"
+        d["recommendation"] = ("⚠ SAFETY: scan read zero files (rate limit or missing repo) — "
+                               "verdict capped at MAYBE until a real scan runs. ") + str(
+            d.get("recommendation", ""))
     elif s["level"] == "medium" and d.get("verdict") == "GO":
         d["verdict"] = "MAYBE"
         d["recommendation"] = ("⚠ SAFETY: medium-risk findings (see safety scan) — verdict "
@@ -561,7 +634,8 @@ def scan_mode(slug, as_json=False):
     s = safety_scan(slug)
     if as_json:
         print(json.dumps({"repo": slug, **s}, indent=2)); return 0
-    icon = {"clean": "✓", "low": "·", "medium": "⚠", "high": "✗"}[s["level"]]
+    icon = {"clean": "✓", "low": "·", "medium": "⚠", "high": "✗",
+            "unknown": "?"}[s["level"]]
     print("%s %s — %s risk (%d/100), %d file(s) scanned" % (
         icon, slug, s["level"].upper(), s["risk"], s["files_scanned"]))
     for f in s["findings"]:
