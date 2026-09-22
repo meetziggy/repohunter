@@ -19,12 +19,15 @@ Stdlib only (plus optional yt-dlp for video ingest). MIT (c) 2026 Brian Gorzelic
 """
 from __future__ import annotations
 
+import contextlib
+import fcntl
 import json
 import math
 import os
 import re
 import subprocess
 import sys
+import tempfile
 import time
 import urllib.request
 import urllib.error
@@ -626,6 +629,34 @@ def make_plan(meta, specs):
 
 
 # ── Store I/O ─────────────────────────────────────────────────────────────────
+STORE_LOCK = OUT + ".lock"
+
+
+@contextlib.contextmanager
+def _flock(timeout=180):
+    """Exclusive advisory lock on the store. Two concurrent `evaluate` runs used to
+    read-modify-write the same file and the loser's records vanished."""
+    os.makedirs(os.path.dirname(OUT) or ".", exist_ok=True)
+    fh = open(STORE_LOCK, "a+")
+    deadline = time.time() + timeout
+    try:
+        while True:
+            try:
+                fcntl.flock(fh.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                break
+            except OSError:
+                if time.time() > deadline:
+                    raise TimeoutError("store lock still held after %ds — is another "
+                                       "repohunter run stuck?" % timeout)
+                time.sleep(0.25)
+        yield
+    finally:
+        try:
+            fcntl.flock(fh.fileno(), fcntl.LOCK_UN)
+        finally:
+            fh.close()
+
+
 def _load_store():
     if os.path.exists(OUT):
         try:
@@ -635,13 +666,47 @@ def _load_store():
     return {"repos": []}
 
 
-def _save_store(store, specs=None):
-    store["repos"].sort(key=lambda x: x["scores"]["overall"], reverse=True)
+def _write_store(store, specs=None):
+    """Serialize the store atomically. Caller must already hold the lock."""
+    store["repos"].sort(key=lambda x: (x.get("scores") or {}).get("overall", 0), reverse=True)
     store.update({"schema": STORE_SCHEMA, "generated": NOW, "count": len(store["repos"])})
     if specs:
         store["machine"] = specs
-    os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    json.dump(store, open(OUT, "w"), indent=2)
+    os.makedirs(os.path.dirname(OUT) or ".", exist_ok=True)
+    # Write-then-rename: a crash mid-write leaves the old store intact instead of a
+    # half-written file that fails to parse on the next load.
+    fd, tmp = tempfile.mkstemp(dir=os.path.dirname(OUT) or ".", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w") as fh:
+            json.dump(store, fh, indent=2)
+            fh.flush()
+            os.fsync(fh.fileno())
+        os.replace(tmp, OUT)
+    except Exception:
+        try:
+            os.unlink(tmp)
+        except Exception:
+            pass
+        raise
+
+
+def _save_store(store, specs=None):
+    with _flock():
+        _write_store(store, specs)
+
+
+@contextlib.contextmanager
+def store_txn(specs=None):
+    """Read-modify-write the store under one lock. Do NOT do network or LLM work
+    inside this block — the lock is held for its whole duration."""
+    with _flock():
+        store = _load_store()
+        yield store
+        _write_store(store, specs)
+
+
+def _find(store, rid):
+    return next((x for x in store["repos"] if x["id"].lower() == rid.lower()), None)
 
 
 def build_one(entry, specs, deep=False):
@@ -694,24 +759,29 @@ def evaluate(slug):
     r = build_one({"slug": slug, "featured": True}, specs, deep=True)
     if not r:
         print("could not resolve %s" % slug); return 1
-    store = _load_store()
-    store["repos"] = [x for x in store["repos"] if x.get("id") != r["id"]] + [r]
-    _save_store(store, specs)
+    with store_txn(specs) as store:
+        store["repos"] = [x for x in store["repos"] if x.get("id") != r["id"]] + [r]
     print("→ evaluated %s (%s)" % (r["id"], r.get("dossier", {}).get("verdict", "?")))
     return 0
 
 
 def plan_mode(slug):
-    store = _load_store()
     rid = re.sub(r".*github\.com/", "", slug).replace(".git", "").strip("/")
-    repo = next((x for x in store["repos"] if x["id"].lower() == rid.lower()), None)
-    if not repo:
-        print("not in store: %s" % rid); return 1
-    specs = store.get("machine") or machine_specs()
-    repo["integration"] = {"status": "planning", "updated": NOW}
-    _save_store(store)
-    repo["integration"] = {"status": "planned", "plan": make_plan(repo, specs), "updated": NOW}
-    _save_store(store)
+    with store_txn() as store:
+        repo = _find(store, rid)
+        if not repo:
+            print("not in store: %s" % rid); return 1
+        specs = store.get("machine") or machine_specs()
+        repo["integration"] = {"status": "planning", "updated": NOW}
+        snapshot = dict(repo)
+    # make_plan calls an LLM — minutes, sometimes. Do it OUTSIDE the lock, then
+    # re-open the store to write the result.
+    plan = make_plan(snapshot, specs)
+    with store_txn() as store:
+        repo = _find(store, rid)
+        if repo is None:
+            print("not in store: %s" % rid); return 1
+        repo["integration"] = {"status": "planned", "plan": plan, "updated": NOW}
     print("planned %s" % rid); return 0
 
 
@@ -732,16 +802,16 @@ def scan_mode(slug, as_json=False):
 
 
 def decide_mode(slug, decision):
-    store = _load_store()
     rid = re.sub(r".*github\.com/", "", slug).replace(".git", "").strip("/")
-    repo = next((x for x in store["repos"] if x["id"].lower() == rid.lower()), None)
-    if not repo:
-        print("not in store: %s" % rid); return 1
-    ig = repo.get("integration") or {}
-    repo["integration"] = {"status": "approved" if decision == "approve" else "evaluated",
-                           "plan": ig.get("plan"), "updated": NOW}
-    _save_store(store)
-    print("%s -> %s" % (rid, repo["integration"]["status"])); return 0
+    with store_txn() as store:
+        repo = _find(store, rid)
+        if not repo:
+            print("not in store: %s" % rid); return 1
+        ig = repo.get("integration") or {}
+        repo["integration"] = {"status": "approved" if decision == "approve" else "evaluated",
+                               "plan": ig.get("plan"), "updated": NOW}
+        status = repo["integration"]["status"]
+    print("%s -> %s" % (rid, status)); return 0
 
 
 # ── YouTube ingest (optional; needs yt-dlp) ───────────────────────────────────
@@ -801,28 +871,39 @@ def ingest_video(url):
     for s in (_json_from(llm(YT_EXTRACT, "Title: %s\n\n%s" % (title, text[:9000]), 120), "[", "]") or []):
         if isinstance(s, str) and s.count("/") == 1:
             slugs.add(s.strip().lower())
-    specs = machine_specs(); store = _load_store()
-    have = {x["id"].lower(): x for x in store["repos"]}
+    specs = machine_specs()
     src = {"type": "youtube", "title": title, "url": url, "id": info.get("id", "")}
-    added = 0
+    known = {x["id"].lower() for x in _load_store()["repos"]}
+    wanted, fetched = [], []
     for slug in sorted(slugs):
         slug = re.sub(r"[^A-Za-z0-9_./\-]", "", slug)
         if slug.count("/") != 1 or slug.endswith("/"):
             continue
-        if slug in have:
-            have[slug].setdefault("sources", [])
-            if not any(x.get("id") == src["id"] for x in have[slug]["sources"]):
-                have[slug]["sources"].append(src)
+        wanted.append(slug)
+        if slug in known:
             continue
+        # Network work happens BEFORE the lock — holding it across N GitHub calls
+        # would block every other repohunter process for minutes.
         meta = fetch_repo(slug)
         if not meta:
             continue
         meta.update({"category": "From a video", "why": "Recommended in: %s" % title,
                      "scores": score(meta, title), "resource_fit": resource_fit(meta, specs),
                      "status": "candidate", "sources": [src]})
-        store["repos"].append(meta); have[slug] = meta; added += 1
-        print("  + %s" % slug)
-    _save_store(store, specs)
+        fetched.append(meta)
+    added = 0
+    with store_txn(specs) as store:
+        have = {x["id"].lower(): x for x in store["repos"]}
+        for slug in wanted:  # re-check under the lock; another run may have added it
+            if slug in have:
+                have[slug].setdefault("sources", [])
+                if not any(x.get("id") == src["id"] for x in have[slug]["sources"]):
+                    have[slug]["sources"].append(src)
+        for meta in fetched:
+            if meta["id"].lower() in have:
+                continue
+            store["repos"].append(meta); have[meta["id"].lower()] = meta; added += 1
+            print("  + %s" % meta["id"].lower())
     print("→ ingested %d repo(s) from: %s" % (added, title)); return 0
 
 
