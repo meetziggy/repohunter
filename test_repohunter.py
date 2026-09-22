@@ -254,5 +254,49 @@ class LlmFailureVisibility(unittest.TestCase):
             rh.CFG["llm"] = original
 
 
+class StoreConcurrency(unittest.TestCase):
+    def test_txn_serializes_read_modify_write(self):
+        """Two nested-in-sequence transactions must both survive."""
+        import json, os, tempfile
+        d = tempfile.mkdtemp()
+        old_out, old_lock = rh.OUT, rh.STORE_LOCK
+        rh.OUT = os.path.join(d, "store.json")
+        rh.STORE_LOCK = rh.OUT + ".lock"
+        try:
+            json.dump({"repos": []}, open(rh.OUT, "w"))
+            for i in range(3):
+                with rh.store_txn() as store:
+                    store["repos"].append({"id": "a/%d" % i, "scores": {"overall": i}})
+            got = json.load(open(rh.OUT))
+            self.assertEqual(len(got["repos"]), 3)
+        finally:
+            rh.OUT, rh.STORE_LOCK = old_out, old_lock
+
+    def test_write_is_atomic_no_partial_file(self):
+        import json, os, tempfile
+        d = tempfile.mkdtemp()
+        old_out, old_lock = rh.OUT, rh.STORE_LOCK
+        rh.OUT = os.path.join(d, "store.json")
+        rh.STORE_LOCK = rh.OUT + ".lock"
+        try:
+            rh._save_store({"repos": [{"id": "a/b", "scores": {"overall": 1}}]})
+            self.assertTrue(json.load(open(rh.OUT))["repos"])
+            self.assertFalse([f for f in os.listdir(d) if f.endswith(".tmp")])
+        finally:
+            rh.OUT, rh.STORE_LOCK = old_out, old_lock
+
+    def test_sort_survives_a_record_with_no_scores(self):
+        import json, os, tempfile
+        d = tempfile.mkdtemp()
+        old_out, old_lock = rh.OUT, rh.STORE_LOCK
+        rh.OUT = os.path.join(d, "store.json")
+        rh.STORE_LOCK = rh.OUT + ".lock"
+        try:
+            rh._save_store({"repos": [{"id": "a/b"}, {"id": "c/d", "scores": {"overall": 9}}]})
+            self.assertEqual(json.load(open(rh.OUT))["repos"][0]["id"], "c/d")
+        finally:
+            rh.OUT, rh.STORE_LOCK = old_out, old_lock
+
+
 if __name__ == "__main__":
     unittest.main()
