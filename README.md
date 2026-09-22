@@ -4,6 +4,8 @@
   <img src="https://img.shields.io/badge/license-MIT-b8ff3c" alt="MIT">
   <img src="https://img.shields.io/badge/local--first-%E2%9C%93-38bdf8" alt="local-first">
   <img src="https://img.shields.io/badge/AI-pluggable%20(Ollama%20%2F%20your%20key)-a78bfa" alt="pluggable AI">
+  <img src="https://img.shields.io/badge/install-uvx%20%2F%20pipx-2b6cb0" alt="installable via uvx or pipx">
+  <img src="https://img.shields.io/badge/MCP-server%20%2B%20Claude%20Code%20plugin-f5a623" alt="MCP server and Claude Code plugin">
   <img src="https://img.shields.io/badge/maintained%20by-Ziggy%20%F0%9F%A4%96-0b1220" alt="maintained by Ziggy">
 </p>
 
@@ -49,6 +51,8 @@ what will it cost me?"** For any repo it writes an **integration dossier**:
 - **Does it run on your hardware?** — a real resource/horsepower fit check
 - A **kind classification** (tool / library / MCP server / model / *aggregate-list* / reference…) →
   the *right move* (integrate the code, add as a discovery source, mine for candidates, or skip)
+- **Can you actually ship it?** — a license/resale-risk read (permissive / weak or strong copyleft /
+  source-available), so a GPL or BUSL dependency doesn't quietly end up inside something you sell
 - A verdict: **GO / MAYBE / SKIP**
 
 Health scoring is a commodity RepoHunter can *use as an input* (OpenSSF Scorecard, deps.dev). The
@@ -87,6 +91,21 @@ _(An automated builder that runs the plan and opens the PR for you is on the roa
 
 ## Quickstart
 
+**Fastest — no clone, one command:**
+
+```bash
+uvx --from git+https://github.com/meetziggy/repohunter repohunter scan <owner/repo>
+```
+
+**To keep using it — install it properly:**
+
+```bash
+uv tool install git+https://github.com/meetziggy/repohunter   # or: pipx install git+https://...
+repohunter profiles                                            # confirm it's on your PATH
+```
+
+**To hack on it:**
+
 ```bash
 git clone https://github.com/meetziggy/repohunter
 cd repohunter
@@ -95,8 +114,29 @@ python3 repohunter.py refresh           # build the store from your seed list
 python3 repohunter.py serve             # → http://127.0.0.1:8130
 ```
 
-> Runs on stdlib Python — no install step. Default brain is a local Ollama model (no API bill);
-> point it at OpenAI/OpenRouter in `config.json` if you'd rather.
+> Stdlib Python, zero dependencies — every path above works with nothing but Python 3.9+. Default
+> brain is a local Ollama model (no API bill); point it at OpenAI/OpenRouter in `config.json` if
+> you'd rather.
+
+**Commands:**
+
+```
+repohunter scan <owner/repo>          safety scan only — prompt-injection, hidden text, leaked secrets
+repohunter evaluate <owner/repo>      deep-evaluate: dossier + GO/MAYBE/SKIP
+repohunter plan <owner/repo>          draft an integration plan
+repohunter decide <owner/repo> approve|reject
+repohunter profiles                   list the project lenses in your config
+repohunter refresh                    re-evaluate everything in your seed list
+repohunter serve                      UI + API on http://127.0.0.1:8130
+```
+
+Add `--profile <name>` to any command to evaluate against a different configured project —
+`config.example.json` ships a few real ones. One install, several lenses, no re-editing
+`config.json` to switch between what you're juggling.
+
+**As an MCP server or Claude Code plugin, instead of the CLI:** see
+[`MCP-INSTALL.md`](MCP-INSTALL.md) — `uvx repohunter-mcp`, or `/plugin install repohunter` in
+Claude Code. Same engine, wired into your agent instead of your terminal.
 
 ## Roadmap
 
