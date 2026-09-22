@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dependency hell, explained | RepoHunter</title>
-<meta name="description" content="Packages, node_modules, lockfiles, version ranges, and why installs conflict — the plain-English guide to dependency hell, so you can fix it instead of fearing it.">
+<meta name="description" content="Packages, node_modules, lockfiles, version ranges, and why installs conflict — the clear guide to dependency hell, so you can fix it instead of fearing it.">
 <link rel="icon" type="image/svg+xml" href="/logo.svg">
 <meta name="theme-color" content="#070b16">
 <meta property="og:title" content="Dependency hell, explained">
-<meta property="og:description" content="What node_modules is, why lockfiles fix 'works on my machine', and how to untangle a conflict — in plain English.">
+<meta property="og:description" content="What node_modules is, why lockfiles fix 'works on my machine', and how to untangle a conflict — in clear, accessible language.">
 <meta property="og:image" content="https://repohunter.dev/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <style>
@@ -71,7 +71,7 @@
   <h2>First, what's a <span class="em">dependency?</span></h2>
   <p>Almost no software is written from scratch. When you build a project, you lean on code other people already wrote and shared — a date formatter, a web framework, a math library. Those reusable building blocks go by a few names that all mean roughly the same thing:</p>
   <table>
-    <tr><th>Word</th><th>Plain-English meaning</th></tr>
+    <tr><th>Word</th><th>Clear meaning</th></tr>
     <tr><td><b>Library</b></td><td>A bundle of ready-made code you call from your own — someone solved a problem so you don't have to.</td></tr>
     <tr><td><b>Package</b></td><td>A library wrapped up so a tool can download and install it for you (with a name and a version).</td></tr>
     <tr><td><b>Dependency</b></td><td>A package <i>your</i> project depends on to run. Your dependencies have their own dependencies — that chain is the "dependency tree."</td></tr>
@@ -146,7 +146,7 @@
     <b>Ignoring the actual error text</b> — the fix is usually written right there. Guessing wastes more time than reading.<br>
     <b>Not committing the lockfile</b> — the #1 cause of "works on my machine." Commit it.</div>
 
-  <div class="callout warn">⚠️ <b>A note on security.</b> An install error is annoying; a compromised dependency is dangerous. Be extra careful pasting install commands from random blog posts, and never run <code>curl … | bash</code> from a source you don't trust. When you upgrade, glance at <i>who</i> shipped the new version. <i>This is a plain-English starting point, not professional security advice — verify anything that touches production or secrets yourself.</i></div>
+  <div class="callout warn">⚠️ <b>A note on security.</b> An install error is annoying; a compromised dependency is dangerous. Be extra careful pasting install commands from random blog posts, and never run <code>curl … | bash</code> from a source you don't trust. When you upgrade, glance at <i>who</i> shipped the new version. <i>This is a clear starting point, not professional security advice — verify anything that touches production or secrets yourself.</i></div>
 
   <h2>Let an <span class="em">AI agent</span> diagnose it</h2>
   <p>Copy the full error, then paste this into any AI coding agent:</p>
@@ -157,7 +157,7 @@
 My setup: [language + version, e.g. Node 20], package manager [npm/yarn/pnpm/poetry], and I do / don't have a committed lockfile.
 
 Please:
-1. Explain in plain English what's actually conflicting and why.
+1. Explain in clear, accessible language what's actually conflicting and why.
 2. Tell me the safest fix first (read-the-error / targeted update), and only suggest a clean reinstall if it's genuinely the right call — explain the trade-off.
 3. If a version needs to change, name the specific package and version, and warn me if it's a breaking (major) bump.
 4. Show me the exact commands, one step at a time, and what to check after each.

@@ -427,6 +427,24 @@ python3 repohunter.py <span class="p">serve</span>
       your agent calls RepoHunter automatically — an MCP server that checks <i>before</i> it installs. Same verdict, zero clicks.</p>
   </section>
 
+  <section id="open">
+    <div class="h2">Open-source discovery should be open</div>
+    <div class="h2b">No account. No paid search credits. No black-box verdict.</div>
+    <p class="diff">RepoHunter is free and MIT-licensed. Search public repositories without buying a quota,
+      inspect the signals behind every <b>GO / MAYBE / SKIP</b> decision, and run the full workflow locally.
+      It drafts a reviewable integration, smoke-test, and rollback plan — then stops for human approval
+      before anything is adopted.</p>
+    <div class="grid">
+      <div class="feat"><h3>Free to use</h3><p>No account and no RepoHunter search-credit system. Public discovery stays accessible.</p></div>
+      <div class="feat"><h3>Open to inspect</h3><p>The code, scoring method, and decision signals are public under the MIT license.</p></div>
+      <div class="feat"><h3>You stay in control</h3><p>No surprise installation. Review the evidence and plan before you or your agent changes a project.</p></div>
+    </div>
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/meetziggy/repohunter" target="_blank" rel="noopener">View the source on GitHub</a>
+      <a class="btn ghost" href="https://github.com/meetziggy/repohunter#quickstart" target="_blank" rel="noopener">Run it locally</a>
+    </div>
+  </section>
+
   <section id="how">
     <div class="h2">Not another repo health-scorer</div>
     <div class="h2b">It answers the question you actually have</div>
@@ -557,6 +575,28 @@ ecosystem/day = AI-devs × redundant-lines/day × 40</pre>
         <a id="bg_report" href="/r/ollama/ollama" style="color:var(--cyan);font-family:ui-monospace,monospace">repohunter.dev/r/ollama/ollama</a></div>
       <p class="est-note">Transparent score over live GitHub data — <b style="color:var(--text)">not a safety or security
         rating</b> (that layer ships only after we validate it). Public repos need no login; the badge updates itself.</p>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="h2">A fair question</div>
+    <div class="h2b">Why use RepoHunter instead of ChatGPT or Claude Code?</div>
+    <div class="story">
+      <p><b>Use a general AI assistant to reason, explain, and help you build.</b> Use RepoHunter when
+        you need an open-source adoption decision tied to inspectable repository evidence, a
+        consistent method, and a result someone else can review. They work well together:
+        RepoHunter gathers and structures the evidence; you and your assistant decide what that
+        evidence means for your project.</p>
+      <p>RepoHunter is read-only, shows the signals behind its guidance, and can run locally so you
+        stay in control of your workflow. Missing or stale evidence should remain visible rather
+        than being filled in with a confident guess. Its GO / MAYBE / SKIP result is a heuristic for
+        a use case—not a security audit, a guarantee, or a verdict on a maintainer.</p>
+      <p><b>We do not yet claim RepoHunter is cheaper or faster.</b> The site includes an illustrative
+        reuse calculator, but there is no controlled RepoHunter-versus-ChatGPT-or-Claude-Code
+        benchmark yet. A defensible comparison must publish dated runs with wall-clock time,
+        provider-reported tokens, tool calls, current prices, evidence completeness, and repeated-run
+        consistency. Until then, the measured benefit is still an open question; the immediate value
+        is a more reproducible, reviewable decision process.</p>
     </div>
   </section>
 
