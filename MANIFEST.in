@@ -1,0 +1,13 @@
+# The sdist carries the skills and the plugin manifests, so `pip install` from source
+# and `repohunter install-skill` both work without a git clone.
+include LICENSE README.md CHANGELOG.md MANIFESTO.md
+include MCP-INSTALL.md A2A-INSTALL.md SECURITY.md
+include config.example.json
+recursive-include skills *.md
+recursive-include .claude-plugin *.json
+prune site
+prune data
+prune build
+prune worker
+prune brand-assets
+global-exclude __pycache__ *.py[cod] .DS_Store

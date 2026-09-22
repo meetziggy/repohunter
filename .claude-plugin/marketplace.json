@@ -1,0 +1,23 @@
+{
+  "name": "repohunter",
+  "displayName": "RepoHunter",
+  "owner": { "name": "Brian Gorzelic", "url": "https://repohunter.dev" },
+  "description": "The reuse-first gate: check a repo before you adopt it.",
+  "homepage": "https://repohunter.dev",
+  "repository": "https://github.com/meetziggy/repohunter",
+  "license": "MIT",
+  "plugins": [
+    {
+      "name": "repohunter",
+      "displayName": "RepoHunter",
+      "description": "Scan, evaluate and fit-map any repo before you adopt it. Ships the evaluation tools (MCP) and the reflex to use them (skills).",
+      "version": "0.2.0",
+      "source": "./",
+      "author": { "name": "Brian Gorzelic", "url": "https://repohunter.dev" },
+      "repository": "https://github.com/meetziggy/repohunter",
+      "homepage": "https://repohunter.dev",
+      "license": "MIT",
+      "keywords": ["code-reuse", "security", "supply-chain", "github"]
+    }
+  ]
+}
