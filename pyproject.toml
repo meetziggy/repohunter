@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "repohunter"
-version = "0.1.0"
+version = "0.2.0"
 description = "Reuse, don't reinvent — the reuse-first scout for open source. Evaluate repos for your project and your machine, then plan the integration."
 readme = "README.md"
 license = { text = "MIT" }
