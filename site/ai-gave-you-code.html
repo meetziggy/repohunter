@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI gave you code — now what? | RepoHunter</title>
-<meta name="description" content="AI code is fast but often 'almost right.' Here's the plain-English, verify-don't-paste workflow that keeps AI-written code from quietly breaking your project.">
+<meta name="description" content="AI code is fast but often 'almost right.' Here's the clear, verify-don't-paste workflow that keeps AI-written code from quietly breaking your project.">
 <link rel="icon" type="image/svg+xml" href="/logo.svg">
 <meta name="theme-color" content="#070b16">
 <meta property="og:title" content="AI gave you code — now what?">
-<meta property="og:description" content="AI code is confident, not always correct. The verify-don't-paste workflow, in plain English, for beginners.">
+<meta property="og:description" content="AI code is confident, not always correct. The verify-don't-paste workflow, in clear, accessible language, for beginners.">
 <meta property="og:image" content="https://repohunter.dev/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <style>
@@ -63,7 +63,7 @@
     <div class="kick">code with AI · tier 2</div>
     <h1>AI gave you code — <span class="g">now what?</span></h1>
     <p class="lede">An AI assistant just handed you a block of code that looks perfect. The catch: <b>"looks right" and "is right" are not the same thing</b>. This is the single biggest trap for new developers today — and the fix is a simple habit anyone can learn.</p>
-    <div class="meta">A RepoHunter guide · ~8 min read · plain English for beginners</div>
+    <div class="meta">A RepoHunter guide · ~8 min read · clear language for beginners</div>
   </header>
 
   <div class="eli5">🧒 <b>In one sentence:</b> AI writes code that is confident, not guaranteed correct — so never paste it and run it blind; <i>understand it, run it in small pieces, and test that it actually does what you think</i> before you trust it.</div>
@@ -99,7 +99,7 @@
     <b>Copying config or install steps blindly</b> — a wrong setting or a bad <code>install</code> command can hurt more than a buggy function.
   </div>
 
-  <div class="callout warn">⚠️ <b>Security &amp; license note:</b> before you ship AI code that touches user data, passwords, payments, or that you copied from somewhere, get a second set of eyes and confirm you're allowed to use it. This guide is a plain-English starting point, <b>not legal or professional security advice</b> — when real money, personal data, or the law is involved, verify with a qualified person.</div>
+  <div class="callout warn">⚠️ <b>Security &amp; license note:</b> before you ship AI code that touches user data, passwords, payments, or that you copied from somewhere, get a second set of eyes and confirm you're allowed to use it. This guide is a clear starting point, <b>not legal or professional security advice</b> — when real money, personal data, or the law is involved, verify with a qualified person.</div>
 
   <h2>Make the AI <span class="em">check its own work</span></h2>
   <p>You can turn the AI's confidence into a feature by asking it to explain and audit what it just wrote. Paste this into any AI coding agent right after it hands you code:</p>
@@ -108,7 +108,7 @@
 [paste the code]
 
 Before I use it, help me trust it. Do all of the following:
-1. Explain what it does in plain English, line by line — no jargon without defining it.
+1. Explain what it does in clear, accessible language, line by line — no jargon without defining it.
 2. List every assumption it makes (inputs, versions, libraries) and confirm each function/library it calls actually exists.
 3. Point out the edge cases it does NOT handle (empty values, zero, very large input, bad/weird input).
 4. Tell me where it could break something already in my project, and what I should re-test.

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Work with an AI coding agent safely | RepoHunter</title>
-<meta name="description" content="AI coding agents can read your files, edit them, and run commands. That's powerful — and worth a few guardrails. Here's how to work with one safely, in plain English.">
+<meta name="description" content="AI coding agents can read your files, edit them, and run commands. That's powerful — and worth a few guardrails. Here's how to work with one safely, in clear, accessible language.">
 <link rel="icon" type="image/svg+xml" href="/logo.svg">
 <meta name="theme-color" content="#070b16">
 <meta property="og:title" content="Work with an AI coding agent safely">
@@ -127,7 +127,7 @@
   <div class="promptbox"><pre id="agp">You are helping me with [describe the task] in my project.
 
 Work in a careful, explain-first mode:
-1. Before changing anything, tell me your plan in plain English — which files you'd touch and why — then WAIT for my go-ahead.
+1. Before changing anything, tell me your plan in clear, accessible language — which files you'd touch and why — then WAIT for my go-ahead.
 2. Do the work on a new branch, not on main. When it's done, bundle it as a pull request I can review.
 3. Show me the diff (old vs. new) for every change before I accept it.
 4. NEVER run destructive commands (rm -rf, git push --force, git reset --hard, dropping data) without asking me first and explaining exactly what they affect.
@@ -139,7 +139,7 @@ My setup: [describe your project + your machine]. Explain any jargon the first t
     <button class="btn primary" id="cp" type="button" style="margin-top:12px">📋 Copy this prompt</button>
   </div>
 
-  <div class="callout warn">⚠️ <b>A plain-English starting point, not legal or professional security advice.</b> These habits dramatically lower your risk, but they don't replace a real security review for anything sensitive or public-facing. When money, private data, or production systems are on the line, get a qualified human to check it too.</div>
+  <div class="callout warn">⚠️ <b>A clear starting point, not legal or professional security advice.</b> These habits dramatically lower your risk, but they don't replace a real security review for anything sensitive or public-facing. When money, private data, or production systems are on the line, get a qualified human to check it too.</div>
 
   <h2>The one thing to <span class="em">remember</span></h2>
   <p>You don't have to be an expert to work safely with an AI agent — you just have to stay in the loop. Review before you accept, keep work on a branch, guard the destructive stuff, protect your secrets, and treat what it reads as untrusted. Do that and the agent is a fast, tireless helper instead of a risk. Approve-first isn't slower — it's how you go fast <i>and</i> sleep at night.</p>

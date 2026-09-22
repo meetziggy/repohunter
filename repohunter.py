@@ -404,7 +404,7 @@ DOSSIER_SYSTEM = (
     "the given hardware; 'n/a — nothing to run' for non-code), improvements (how the "
     "adopter could make it better; 'n/a' if not code), build_vs_integrate (integrate vs "
     "build our own, with reasoning), cost (rough: output tokens, time, agents + upkeep), "
-    "recommendation, verdict (GO/MAYBE/SKIP). Plain English, no markdown, no backticks."
+    "recommendation, verdict (GO/MAYBE/SKIP). Clear Language, no markdown, no backticks."
 )
 PLAN_SYSTEM = (
     "You are a software integration engineer. Produce a concrete, SAFE plan to add this "
