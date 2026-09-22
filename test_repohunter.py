@@ -345,5 +345,57 @@ class LicenseGate(unittest.TestCase):
         self.assertEqual(meta["dossier"]["recommendation"], "adopt it")
 
 
+class Profiles(unittest.TestCase):
+    """Multi-lens config: one install, several projects to judge against."""
+
+    CFG = {
+        "project": {"name": "fallback", "profile": "p", "relevance_keywords": ["a"]},
+        "profiles": {
+            "dickie": {"name": "Dickie", "relevance_keywords": ["sqlite", "a2a"]},
+            "repohunter": {"name": "RepoHunter", "relevance_keywords": ["github"]},
+        },
+        "default_profile": "dickie",
+    }
+
+    def test_no_profiles_returns_project(self):
+        p, name = rh.resolve_profile({"project": {"name": "solo"}})
+        self.assertEqual(p["name"], "solo")
+        self.assertIsNone(name)
+
+    def test_explicit_name_without_profiles_map_is_an_error(self):
+        # Must not silently fall through to "project" — that scores the repo against
+        # the wrong lens while appearing to honour the flag.
+        with self.assertRaises(KeyError):
+            rh.resolve_profile({"project": {"name": "solo"}}, "dickie")
+
+    def test_named_profile_wins_and_inherits(self):
+        p, name = rh.resolve_profile(self.CFG, "dickie")
+        self.assertEqual(name, "dickie")
+        self.assertEqual(p["name"], "Dickie")
+        self.assertEqual(p["relevance_keywords"], ["sqlite", "a2a"])
+        self.assertEqual(p["profile"], "p")  # inherited from the base project block
+
+    def test_default_profile_used_when_unspecified(self):
+        _, name = rh.resolve_profile(self.CFG)
+        self.assertEqual(name, "dickie")
+
+    def test_unknown_profile_raises(self):
+        with self.assertRaises(KeyError):
+            rh.resolve_profile(self.CFG, "nope")
+
+    def test_profile_names_preserve_order(self):
+        self.assertEqual(rh.profile_names(self.CFG), ["dickie", "repohunter"])
+
+    def test_argv_profile_parsing(self):
+        self.assertEqual(rh._argv_profile(["evaluate", "a/b", "--profile", "x"]), "x")
+        self.assertEqual(rh._argv_profile(["evaluate", "a/b", "--profile=y"]), "y")
+        self.assertEqual(rh._argv_profile(["evaluate", "a/b", "-p", "z"]), "z")
+        self.assertIsNone(rh._argv_profile(["evaluate", "a/b"]))
+        self.assertIsNone(rh._argv_profile(["evaluate", "--profile"]))  # dangling flag
+
+    def test_cli_rejects_unknown_profile_before_doing_work(self):
+        self.assertEqual(rh.main(["evaluate", "a/b", "--profile", "definitely-not-real"]), 2)
+
+
 if __name__ == "__main__":
     unittest.main()
