@@ -108,17 +108,44 @@ def machine_specs():
             "os": "macOS" if is_mac else "Linux"}
 
 
+def _first_line(text, fallback):
+    """First non-empty line of subprocess stderr, or a fallback. Pure — no I/O."""
+    lines = (text or "").strip().splitlines()
+    return lines[0] if lines else fallback
+
+
+def _llm_fail(backend, detail):
+    """Stderr diagnostic for a failed LLM backend call. Never raises — callers still get ""
+    on any failure, same contract as before; this only makes the reason visible instead of
+    silently indistinguishable (bad key, dead model ID, network down, and a rate limit all
+    used to look identical: nothing)."""
+    sys.stderr.write("llm[%s] failed: %s\n" % (backend, detail))
+
+
 # ── Pluggable LLM (OpenAI-compatible; local Ollama by default) ────────────────
 def llm(system, prompt, timeout=180):
-    """One chat completion → text (empty string on failure). Never raises."""
+    """One chat completion → text. Tries llm.backend, then llm.fallback if configured and
+    the first attempt came back empty. Never raises."""
     b = CFG["llm"]
-    backend = (b.get("backend") or "ollama").lower()
+    out = _llm_once((b.get("backend") or "ollama").lower(), b, system, prompt, timeout)
+    fb = (b.get("fallback") or "").lower()
+    if not out and fb:
+        # A subscription-backed CLI can go quiet on a usage cap. Don't let that turn into a
+        # silently empty dossier — fall through to the backup backend instead.
+        out = _llm_once(fb, b, system, prompt, timeout)
+    return out
+
+
+def _llm_once(backend, b, system, prompt, timeout):
     if backend == "claude-cli":
         try:
             r = subprocess.run(["claude", "-p", "--append-system-prompt", system, prompt],
                                capture_output=True, text=True, timeout=timeout)
+            if r.returncode != 0:
+                _llm_fail(backend, "exit %d: %s" % (r.returncode, _first_line(r.stderr, "no stderr")))
             return (r.stdout or "").strip()
-        except Exception:
+        except Exception as e:
+            _llm_fail(backend, "%s: %s" % (type(e).__name__, e))
             return ""
     base = (b.get("base_url") or "http://localhost:11434/v1").rstrip("/")
     key = os.environ.get(b.get("api_key_env") or "", "")
@@ -134,7 +161,11 @@ def llm(system, prompt, timeout=180):
         with urllib.request.urlopen(req, timeout=timeout) as r:
             d = json.loads(r.read().decode("utf-8", "ignore"))
         return (d["choices"][0]["message"]["content"] or "").strip()
-    except Exception:
+    except urllib.error.HTTPError as e:
+        _llm_fail(backend, "HTTP %d: %s" % (e.code, e.reason))
+        return ""
+    except Exception as e:
+        _llm_fail(backend, "%s: %s" % (type(e).__name__, e))
         return ""
 
 
