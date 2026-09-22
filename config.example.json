@@ -18,6 +18,9 @@
 
   "github_token_env": "GITHUB_TOKEN",
 
+  "_commercial_note": "OPTIONAL. Set commercial.resale to false if nothing you evaluate is ever shipped inside something you sell -- this turns off the license/resale-risk gate entirely. Defaults to true (gate on) if this whole block is omitted.",
+  "commercial": { "resale": true },
+
   "_seed_note": "Real starter repos so your first `refresh` shows something. Replace with repos relevant to YOUR project. Add \"featured\": true to any to auto-run the full LLM dossier on it.",
   "seed": [
     { "slug": "ollama/ollama", "category": "Local LLM", "why": "Run models locally — RepoHunter's default brain." },

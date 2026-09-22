@@ -298,5 +298,52 @@ class StoreConcurrency(unittest.TestCase):
             rh.OUT, rh.STORE_LOCK = old_out, old_lock
 
 
+class LicenseGate(unittest.TestCase):
+    def test_permissive_is_clear(self):
+        for lic in ("MIT", "Apache-2.0", "BSD-3-Clause", "ISC"):
+            self.assertEqual(rh.license_risk({"license": lic})["verdict"], "clear", lic)
+
+    def test_strong_copyleft_is_blocked(self):
+        for lic in ("AGPL-3.0", "GPL-3.0", "SSPL-1.0"):
+            self.assertEqual(rh.license_risk({"license": lic})["verdict"], "blocked", lic)
+
+    def test_agpl_reason_mentions_network_use(self):
+        self.assertIn("network", rh.license_risk({"license": "AGPL-3.0"})["reason"])
+
+    def test_weak_copyleft_is_caution(self):
+        self.assertEqual(rh.license_risk({"license": "MPL-2.0"})["verdict"], "caution")
+
+    def test_missing_license_is_blocked(self):
+        for lic in ("", "—", None):
+            self.assertEqual(rh.license_risk({"license": lic})["verdict"], "blocked", repr(lic))
+
+    def test_source_available_hint_is_blocked(self):
+        r = rh.license_risk({"license": "NOASSERTION",
+                             "desc": "Licensed under the Business Source License 1.1"})
+        self.assertEqual(r["verdict"], "blocked")
+
+    def test_unclassified_is_caution_not_clear(self):
+        r = rh.license_risk({"license": "NOASSERTION", "desc": "an ordinary tool"})
+        self.assertEqual(r["verdict"], "caution")
+
+    def test_gate_off_returns_na(self):
+        self.assertEqual(rh.license_risk({"license": "AGPL-3.0"}, for_resale=False)["verdict"],
+                         "n/a")
+
+    def test_blocked_license_caps_a_go(self):
+        meta = {"dossier": {"verdict": "GO", "recommendation": "adopt it"},
+                "commercial": {"verdict": "blocked", "license": "AGPL-3.0", "reason": "copyleft"}}
+        rh.apply_license(meta)
+        self.assertEqual(meta["dossier"]["verdict"], "MAYBE")
+        self.assertIn("LICENSE", meta["dossier"]["recommendation"])
+
+    def test_clear_license_changes_nothing(self):
+        meta = {"dossier": {"verdict": "GO", "recommendation": "adopt it"},
+                "commercial": {"verdict": "clear", "license": "MIT", "reason": "permissive"}}
+        rh.apply_license(meta)
+        self.assertEqual(meta["dossier"]["verdict"], "GO")
+        self.assertEqual(meta["dossier"]["recommendation"], "adopt it")
+
+
 if __name__ == "__main__":
     unittest.main()
