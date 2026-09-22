@@ -15,7 +15,7 @@ OpenAI-compatible — local Ollama by default, or OpenAI/OpenRouter/Claude-CLI.
   python3 repohunter.py ingest-video <yt-url>   # mine a video for repos
   python3 repohunter.py serve                   # serve the UI + API locally
 
-Stdlib only (plus optional yt-dlp for video ingest). MIT (c) 2026 Chris Gorzelic.
+Stdlib only (plus optional yt-dlp for video ingest). MIT (c) 2026 Brian Gorzelic.
 """
 from __future__ import annotations
 

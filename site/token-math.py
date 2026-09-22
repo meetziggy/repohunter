@@ -14,7 +14,7 @@ Honesty notes:
   * The "ecosystem" section is a back-of-the-envelope THOUGHT EXPERIMENT, not a measurement. Every
     input is here so you can change it and see the result move.
 
-MIT (c) 2026 Chris Gorzelic & Brian Gorzelic.
+MIT (c) 2026 Brian Gorzelic.
 """
 import json
 import sys
