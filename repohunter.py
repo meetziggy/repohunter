@@ -70,6 +70,8 @@ OUT = CFG["output"] if os.path.isabs(CFG["output"]) else os.path.join(os.getcwd(
 CACHE = os.path.join(os.getcwd(), ".cache", "repohunter")
 STORE_SCHEMA = 1
 PROFILE = CFG["project"]["profile"]
+# Turn this off in config.json if nothing here is ever resold: "commercial": {"resale": false}
+RESALE = bool((CFG.get("commercial") or {}).get("resale", True))
 GHTOK = os.environ.get(CFG.get("github_token_env") or "GITHUB_TOKEN", "")
 
 
@@ -534,6 +536,73 @@ def safety_scan(slug):
                     "checks found nothing, not that the repo is safe."}
 
 
+# ── License / resale gate ────────────────────────────────────────────────────
+# When the thing you are building gets SOLD, license is not a footnote — it decides
+# whether a dependency is usable at all. GitHub reports an SPDX id, "NOASSERTION" for
+# anything it cannot classify (which is where BUSL/PolyForm/Elastic/SSPL land), or
+# nothing at all for a repo with no LICENSE file.
+PERMISSIVE = {"MIT", "MIT-0", "APACHE-2.0", "BSD-2-CLAUSE", "BSD-3-CLAUSE", "BSD-3-CLAUSE-CLEAR",
+              "ISC", "UNLICENSE", "0BSD", "ZLIB", "PSF-2.0", "WTFPL", "BSL-1.0", "CC0-1.0"}
+WEAK_COPYLEFT = {"MPL-2.0", "LGPL-2.1", "LGPL-3.0", "EPL-2.0", "CDDL-1.0"}
+STRONG_COPYLEFT = {"GPL-2.0", "GPL-3.0", "AGPL-3.0", "SSPL-1.0", "OSL-3.0", "EUPL-1.2"}
+SOURCE_AVAILABLE_HINT = re.compile(
+    r"(business source|BUSL|polyform|elastic license|commons clause|SSPL|"
+    r"server side public|fair source|functional source|non-?commercial|CC BY-NC)", re.I)
+
+
+def license_risk(meta, for_resale=True):
+    """Can this be shipped inside something we sell? Facts + a call, never a legal opinion."""
+    raw = (meta.get("license") or "").strip()
+    up = raw.upper()
+    if not for_resale:
+        return {"verdict": "n/a", "license": raw or "—",
+                "reason": "Resale gate is off (config.commercial.resale = false)."}
+    if up in PERMISSIVE:
+        return {"verdict": "clear", "license": raw,
+                "reason": "Permissive — attribution is normally the only obligation."}
+    if up in WEAK_COPYLEFT:
+        return {"verdict": "caution", "license": raw,
+                "reason": "File-level / linking copyleft. Usually shippable if kept as an "
+                          "unmodified dependency, but modifications to ITS files must be "
+                          "published. Do not vendor-and-edit."}
+    if up in STRONG_COPYLEFT:
+        net = " AGPL extends this to users reached over a network, so a hosted service " \
+              "counts as distribution." if up == "AGPL-3.0" else ""
+        return {"verdict": "blocked", "license": raw,
+                "reason": "Strong copyleft — linking it into a proprietary product obliges "
+                          "you to release that product's source under the same terms.%s" % net}
+    if up in ("NOASSERTION", "OTHER"):
+        blob = " ".join(str(meta.get(k, "")) for k in ("desc", "why")) + " " + raw
+        if SOURCE_AVAILABLE_HINT.search(blob):
+            return {"verdict": "blocked", "license": raw,
+                    "reason": "Reads as source-available (BUSL / PolyForm / Elastic / SSPL "
+                              "family). These are written specifically to block resale."}
+        return {"verdict": "caution", "license": raw,
+                "reason": "GitHub could not classify the license — often a custom or "
+                          "source-available term. Read LICENSE by hand before shipping it."}
+    if not raw or raw == "—":
+        return {"verdict": "blocked", "license": "none",
+                "reason": "No LICENSE file. No license means no grant: default copyright "
+                          "reserves all rights to the author. Not usable in a sold product."}
+    return {"verdict": "caution", "license": raw,
+            "reason": "Unrecognized license id — read it before shipping."}
+
+
+def apply_license(meta):
+    """Fold resale risk into the verdict. Like safety: it can downgrade, never upgrade."""
+    d, lic = meta.get("dossier"), meta.get("commercial")
+    if not d or not lic or lic["verdict"] in ("clear", "n/a"):
+        return
+    if lic["verdict"] == "blocked" and d.get("verdict") == "GO":
+        d["verdict"] = "MAYBE"
+        d["recommendation"] = ("⚠ LICENSE (%s): %s Fine to study or self-host; NOT shippable "
+                               "inside something you sell. " % (lic["license"], lic["reason"])
+                               ) + str(d.get("recommendation", ""))
+    elif lic["verdict"] == "caution":
+        d["recommendation"] = ("⚠ LICENSE (%s): %s " % (lic["license"], lic["reason"])
+                               ) + str(d.get("recommendation", ""))
+
+
 def apply_safety(meta):
     """Fuse the safety level into the dossier verdict — findings downgrade, never upgrade."""
     d, s = meta.get("dossier"), meta.get("safety")
@@ -719,11 +788,13 @@ def build_one(entry, specs, deep=False):
     meta["why"] = why
     meta["scores"] = score(meta, why)
     meta["resource_fit"] = resource_fit(meta, specs)
+    meta["commercial"] = license_risk(meta, RESALE)
     meta["status"] = "candidate"
     if deep or (isinstance(entry, dict) and entry.get("featured")):
         meta["safety"] = safety_scan(slug)
         meta["dossier"] = make_dossier(meta, specs)
         apply_safety(meta)
+        apply_license(meta)
         meta["status"] = "evaluated"
     return meta
 
@@ -761,7 +832,10 @@ def evaluate(slug):
         print("could not resolve %s" % slug); return 1
     with store_txn(specs) as store:
         store["repos"] = [x for x in store["repos"] if x.get("id") != r["id"]] + [r]
-    print("→ evaluated %s (%s)" % (r["id"], r.get("dossier", {}).get("verdict", "?")))
+    lic = r.get("commercial") or {}
+    tag = "" if lic.get("verdict") in ("clear", "n/a", None) else \
+        "  [license: %s — %s]" % (lic.get("license"), lic.get("verdict").upper())
+    print("→ evaluated %s (%s)%s" % (r["id"], r.get("dossier", {}).get("verdict", "?"), tag))
     return 0
 
 
