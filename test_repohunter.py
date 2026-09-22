@@ -134,5 +134,47 @@ class JsonFrom(unittest.TestCase):
         self.assertIsNone(rh._json_from("no json here"))
 
 
+class LlmFailureVisibility(unittest.TestCase):
+    """A bad key, a dead model ID, a network failure, and a rate limit used to all look
+    identical to the caller: "". These test the diagnostic-formatting layer directly (pure
+    logic, no network/subprocess) — not _llm_once's actual backend calls, which stay
+    untested for the same reason _fetch_agent_config_files does: mocking urlopen/subprocess
+    would introduce a pattern this file doesn't otherwise use."""
+
+    def test_first_line_returns_first_nonempty_line(self):
+        self.assertEqual(rh._first_line("boom\nmore detail\n", "fallback"), "boom")
+
+    def test_first_line_falls_back_when_empty(self):
+        self.assertEqual(rh._first_line("", "no stderr"), "no stderr")
+        self.assertEqual(rh._first_line(None, "no stderr"), "no stderr")
+
+    def test_llm_fail_writes_backend_and_detail_to_stderr(self):
+        import io
+        import contextlib
+        buf = io.StringIO()
+        with contextlib.redirect_stderr(buf):
+            rh._llm_fail("claude-cli", "exit 1: not logged in")
+        self.assertEqual(buf.getvalue(), "llm[claude-cli] failed: exit 1: not logged in\n")
+
+    def test_llm_still_returns_empty_string_never_raises(self):
+        # The "never raises" contract callers depend on: an unreachable backend and no
+        # fallback configured still returns "", it's just no longer silent about why.
+        # Uses the generic OpenAI-compatible path against a closed local port — refused
+        # instantly by TCP, no real network access, no subprocess spawned (unlike
+        # claude-cli/codex-cli, which would actually invoke those binaries if tested here).
+        import io
+        import contextlib
+        original = rh.CFG["llm"]
+        try:
+            rh.CFG["llm"] = {"backend": "ollama", "base_url": "http://127.0.0.1:1", "fallback": ""}
+            buf = io.StringIO()
+            with contextlib.redirect_stderr(buf):
+                out = rh.llm("system", "prompt", timeout=2)
+            self.assertEqual(out, "")
+            self.assertIn("llm[ollama] failed:", buf.getvalue())
+        finally:
+            rh.CFG["llm"] = original
+
+
 if __name__ == "__main__":
     unittest.main()
