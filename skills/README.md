@@ -1,15 +1,45 @@
-# RepoHunter as a Skill (the reuse reflex for your agent)
+# RepoHunter skills (the reuse reflex for your agent)
 
-The [MCP server](../MCP-INSTALL.md) gives your agent the **tools**. A **Skill** gives it the
+The [MCP server](../MCP-INSTALL.md) gives your agent the **tools**. A **skill** gives it the
 **instinct** — it teaches the agent to reach for RepoHunter on its own, *before* it installs a
 dependency or clones a repo, instead of only when you ask.
 
-`repohunter/SKILL.md` is the skill. It's plain Markdown with frontmatter — portable across agents.
+Two skills ship here, both plain Markdown with frontmatter, portable across agents:
+
+| Skill | What it does |
+|---|---|
+| `repohunter/` | The reflex. Check a repo before adopting it — real stats, resource fit, GO/MAYBE/SKIP. |
+| `repo-intake/` | The full gate. Scan → triage → evaluate → fit-map → INTEGRATE / CHERRY-PICK / LOGIC-GATHER / SKIP, run by a party of specialist agents. Includes the party spec. |
+
+## The one-command install (Claude Code)
+
+This repo is its own plugin marketplace, so both skills **and** the MCP server install together:
+
+```
+/plugin marketplace add meetziggy/repohunter
+/plugin install repohunter
+```
+
+That is the whole setup. Skills arrive namespaced as `/repohunter:repohunter` and
+`/repohunter:repo-intake`; the MCP server is wired from the bundled `.mcp.json`.
+
+## Or install the skills alone
+
+From a clone or an sdist:
+
+```
+repohunter install-skill            # -> ~/.claude/skills/
+repohunter install-skill ./somewhere-else
+```
+
+> Two skill stores exist and they do **not** sync. `~/.claude/skills/` serves Claude Code;
+> a chat profile store is separate. Installing to one does not make the skill appear in the
+> other — upload the `.skill` bundle from the release page for that.
 
 ## Claude Code / Claude Desktop (Agent Skills)
-Copy the folder into your skills directory:
+Prefer the plugin install above. To do it by hand:
 ```
-mkdir -p ~/.claude/skills && cp -r skills/repohunter ~/.claude/skills/
+mkdir -p ~/.claude/skills && cp -r skills/repohunter skills/repo-intake ~/.claude/skills/
 ```
 Then add the tools once: `claude mcp add repohunter -- uvx repohunter-mcp`. The agent now checks a
 repo before adopting it, without being told to.
