@@ -5,8 +5,8 @@ on:
     branches: [main]
     paths:
       - "site/**"
-      - "wrangler.toml"
       - ".github/workflows/deploy-pages.yml"
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -18,21 +18,34 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Requires CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID as repo secrets.
-      # Neither exists yet as of this PR — that needs repo-admin access, which
-      # the account that opened this PR does not have. Until they're added,
-      # this job fails at this step with a clear "missing secret" error
-      # rather than silently doing nothing; that's intentional so the gap is
-      # visible instead of assumed-working.
+      # Check the secrets BEFORE invoking the deploy action, so a missing
+      # credential reports itself by name. The previous version put this
+      # explanation in a comment and let the action fail on its own, which
+      # produced "Unable to resolve action" and sent three separate debugging
+      # sessions after the wrong cause.
+      - name: Require Cloudflare credentials
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          missing=""
+          [ -z "$CF_API_TOKEN" ]  && missing="$missing CLOUDFLARE_API_TOKEN"
+          [ -z "$CF_ACCOUNT_ID" ] && missing="$missing CLOUDFLARE_ACCOUNT_ID"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository secret(s):$missing — a repo admin must add them under Settings → Secrets and variables → Actions. Until then this workflow cannot deploy."
+            exit 1
+          fi
+
+      # cloudflare/pages-action was retired and its repository now 404s, which
+      # is why every run of the previous workflow died in ~6 seconds at action
+      # resolution, before a single secret was read. wrangler-action is the
+      # supported replacement.
       - name: Publish to Cloudflare Pages
-        id: deploy
-        uses: cloudflare/pages-action@v1
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: repohunter
-          directory: site
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          command: pages deploy site --project-name=repohunter
 
       - name: Smoke check
         run: python3 scripts/smoke_check_site.py
