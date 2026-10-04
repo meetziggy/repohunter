@@ -6,11 +6,11 @@ When to use it: before writing a feature that open source may already provide, b
 
 ## Install
 
-- Claude Code (MCP server): `claude mcp add repohunter -- uvx --from git+https://github.com/meetziggy/repohunter repohunter-mcp`
+- Claude Code (MCP server): `claude mcp add repohunter -- uvx --from git+https://github.com/meetziggy/repohunter@v0.2.1 repohunter-mcp`
 - Claude Code (plugin: server plus the skill that tells the agent when to use it): `/plugin marketplace add meetziggy/repohunter` then `/plugin install repohunter`
-- Codex: `codex mcp add repohunter -- uvx --from git+https://github.com/meetziggy/repohunter repohunter-mcp`
-- Any MCP client (Cursor, VS Code, Claude Desktop, Windsurf, Zed, Cline): stdio server, command `uvx`, args `["--from", "git+https://github.com/meetziggy/repohunter", "repohunter-mcp"]`
-- CLI, no install: `uvx --from git+https://github.com/meetziggy/repohunter repohunter scan rtk-ai/rtk` (swap in any owner/repo or GitHub URL)
+- Codex: `codex mcp add repohunter -- uvx --from git+https://github.com/meetziggy/repohunter@v0.2.1 repohunter-mcp`
+- Any MCP client (Cursor, VS Code, Claude Desktop, Windsurf, Zed, Cline): stdio server, command `uvx`, args `["--from", "git+https://github.com/meetziggy/repohunter@v0.2.1", "repohunter-mcp"]`
+- CLI, no install: `uvx --from git+https://github.com/meetziggy/repohunter@v0.2.1 repohunter scan rtk-ai/rtk` (swap in any owner/repo or GitHub URL)
 
 Requires [uv](https://docs.astral.sh/uv/). Not yet published on PyPI. An optional `GITHUB_TOKEN` raises rate limits; it stays on the user's machine.
 

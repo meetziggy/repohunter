@@ -281,7 +281,7 @@
           <button class="copy primary" type="button" data-copy="installCmd">Copy</button>
         </div>
         <div class="openrow" id="openRow" hidden><a class="btn ghost sm" id="openLink" href="#">Open in Cursor</a><span id="openNote">One click; your client asks you to confirm. Or paste the config below.</span></div>
-<pre id="installCmd">claude mcp add repohunter -- uvx --from git+https://github.com/meetziggy/repohunter repohunter-mcp</pre>
+<pre id="installCmd">claude mcp add repohunter -- uvx --from git+https://github.com/meetziggy/repohunter@v0.2.1 repohunter-mcp</pre>
       </div>
       <p class="needs">Needs <a href="https://docs.astral.sh/uv/getting-started/installation/">uv</a>. Python standard library only; runs on your machine.</p>
       <div class="alt">
@@ -385,14 +385,14 @@
   "mcpServers": {
     "repohunter": {
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/meetziggy/repohunter", "repohunter-mcp"]
+      "args": ["--from", "git+https://github.com/meetziggy/repohunter@v0.2.1", "repohunter-mcp"]
     }
   }
 }</pre></div>
       <div class="way"><div><h3>CLI</h3>
-        <p>Runs with no install. Swap in any <code>owner/repo</code> or GitHub URL. To keep the command around: <code>uv tool install git+https://github.com/meetziggy/repohunter</code></p>
+        <p>Runs with no install. Swap in any <code>owner/repo</code> or GitHub URL. To keep the command around: <code>uv tool install git+https://github.com/meetziggy/repohunter@v0.2.1</code></p>
         <a class="more" href="https://github.com/meetziggy/repohunter#readme">README</a></div>
-<pre>uvx --from git+https://github.com/meetziggy/repohunter repohunter scan rtk-ai/rtk</pre></div>
+<pre>uvx --from git+https://github.com/meetziggy/repohunter@v0.2.1 repohunter scan rtk-ai/rtk</pre></div>
     </div>
   </section>
 
@@ -470,7 +470,7 @@
   var sel=document.getElementById('client'), pre=document.getElementById('installCmd'),
       row=document.getElementById('openRow'), link=document.getElementById('openLink');
   if(!sel) return;
-  var GIT='git+https://github.com/meetziggy/repohunter', args=['--from',GIT,'repohunter-mcp'];
+  var GIT='git+https://github.com/meetziggy/repohunter@v0.2.1', args=['--from',GIT,'repohunter-mcp'];
   var server={command:'uvx',args:args};
   var json='{\n  "mcpServers": {\n    "repohunter": {\n      "command": "uvx",\n      "args": ["--from", "'+GIT+'", "repohunter-mcp"]\n    }\n  }\n}';
   var C={
