@@ -298,6 +298,177 @@ def _days_since(iso):
         return 9999
 
 
+# ── GitHub Trending Search ──────────────────────────────────────────────────────
+def search_trending(topic=None, language=None, since="daily", limit=20):
+    """Search GitHub for trending repositories by topic/language/time period.
+    Uses GitHub search API with topic/language filters and sort by stars/updated."""
+    parts = []
+    if topic:
+        parts.append(f"topic:{topic}")
+    if language:
+        parts.append(f"language:{language}")
+    parts.append("stars:>10")  # minimum stars to filter noise
+    
+    query = "+".join(parts)
+    # Sort by stars for "trending" feel, or by updated for recency
+    sort = "stars" if since in ("monthly", "yearly") else "updated"
+    
+    # Don't double-encode: gh() puts the path directly in the URL
+    path = f"/search/repositories?q={query}&sort={sort}&order=desc&per_page={limit}"
+    try:
+        data = gh(path)
+        repos = []
+        for d in data.get("items", []):
+            repos.append({
+                "name": d.get("full_name"),
+                "url": d.get("html_url"),
+                "description": (d.get("description") or "").strip(),
+                "language": d.get("language") or "",
+                "stars": d.get("stargazers_count", 0),
+                "forks": d.get("forks_count", 0),
+                "topics": d.get("topics", []) or [],
+                "pushed": (d.get("pushed_at") or "")[:10],
+                "created": (d.get("created_at") or "")[:10],
+                "license": (d.get("license") or {}).get("spdx_id") or "—",
+            })
+        return {"query": query, "since": since, "total": data.get("total_count", 0), "repos": repos}
+    except Exception as e:
+        return {"error": str(e), "query": query, "since": since, "repos": []}
+
+
+# ── Report Generation ───────────────────────────────────────────────────────────
+def generate_report(data, format="markdown", title=None):
+    """Generate a report from repo data in various formats."""
+    title = title or "RepoHunter Report"
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(NOW))
+    
+    if format == "json":
+        return json.dumps({
+            "title": title,
+            "generated_at": timestamp,
+            "data": data
+        }, indent=2)
+    
+    elif format == "markdown":
+        lines = [f"# {title}", f"\n*Generated: {timestamp} UTC*\n"]
+        if isinstance(data, dict) and "repos" in data:
+            lines.append(f"**Query:** {data.get('query', 'N/A')}  ")
+            lines.append(f"**Period:** {data.get('since', 'N/A')}  ")
+            lines.append(f"**Total matches:** {data.get('total', 0)}\n")
+            lines.append("| Repo | ⭐ | Language | Pushed | Description |")
+            lines.append("|------|-----|----------|--------|-------------|")
+            for r in data["repos"]:
+                desc = (r.get("description") or "").replace("|", "\\|")[:100]
+                lines.append(f"| [{r['name']}]({r['url']}) | {r['stars']} | {r['language'] or '—'} | {r['pushed']} | {desc} |")
+        elif isinstance(data, list):
+            lines.append("| Repo | ⭐ | Language | Pushed | Description |")
+            lines.append("|------|-----|----------|--------|-------------|")
+            for r in data:
+                desc = (r.get("description") or "").replace("|", "\\|")[:100]
+                lines.append(f"| [{r['name']}]({r['url']}) | {r.get('stars', 0)} | {r.get('language', '—')} | {r.get('pushed', '—')} | {desc} |")
+        elif isinstance(data, dict) and "repo" in data:
+            r = data
+            lines.append(f"## {r.get('repo', 'Unknown')}")
+            lines.append(f"\n**URL:** {r.get('url', 'N/A')}")
+            lines.append(f"**Language:** {r.get('language', '—')}")
+            lines.append(f"**Stars:** {r.get('stars', 0)}")
+            lines.append(f"**License:** {r.get('license', '—')}")
+            lines.append(f"**Last Push:** {r.get('last_push', '—')}")
+            lines.append(f"**Description:** {r.get('description', '—')}")
+            if "scores" in r:
+                s = r["scores"]
+                lines.append("\n### Scores")
+                lines.append(f"- **Overall:** {s.get('overall', 'N/A')}/100")
+                lines.append(f"- **Relevance:** {s.get('relevance', 'N/A')}/100")
+                lines.append(f"- **Popularity:** {s.get('popularity', 'N/A')}/100")
+                lines.append(f"- **Freshness:** {s.get('freshness', 'N/A')}/100")
+                lines.append(f"- **Health:** {s.get('health', 'N/A')}/100")
+                lines.append(f"- **Maturity:** {s.get('maturity', 'N/A')}/100")
+                lines.append(f"\n**Verdict:** {r.get('verdict', 'N/A')}")
+            if "resource_fit" in r:
+                rf = r["resource_fit"]
+                lines.append(f"\n### Resource Fit: {rf.get('verdict', 'N/A')}")
+                lines.append(f"- **RAM Need:** {rf.get('ram_need', 'N/A')}")
+                lines.append(f"- **GPU:** {'Yes' if rf.get('gpu') else 'No'}")
+                lines.append(f"- **Note:** {rf.get('note', 'N/A')}")
+        else:
+            lines.append("```json")
+            lines.append(json.dumps(data, indent=2))
+            lines.append("```")
+        return "\n".join(lines)
+    
+    elif format == "html":
+        html = [
+            "<!DOCTYPE html>", "<html><head>",
+            f"<title>{title}</title>",
+            "<meta charset='utf-8'>",
+            "<style>",
+            "body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:1000px;margin:2rem auto;padding:0 1rem;line-height:1.6}",
+            "table{border-collapse:collapse;width:100%}",
+            "th,td{border:1px solid #ddd;padding:0.5rem;text-align:left}",
+            "th{background:#f5f5f5}",
+            "a{color:#0366d6;text-decoration:none}", "a:hover{text-decoration:underline}",
+            ".meta{color:#666;font-size:0.9rem}", ".badge{display:inline-block;padding:0.15rem 0.5rem;border-radius:3px;font-size:0.8rem}",
+            ".badge-go{background:#28a745;color:#fff}", ".badge-maybe{background:#ffc107;color:#000}", ".badge-skip{background:#dc3545;color:#fff}",
+            ".badge-heavy{background:#6f42c1;color:#fff}", ".badge-easy{background:#28a745;color:#fff}", ".badge-headroom{background:#fd7e14;color:#fff}",
+            "</style>", "</head><body>",
+            f"<h1>{title}</h1>", f"<p class='meta'>Generated: {timestamp} UTC</p>"
+        ]
+        if isinstance(data, dict) and "repos" in data:
+            html.append(f"<p><strong>Query:</strong> {data.get('query', 'N/A')}</p>")
+            html.append(f"<p><strong>Period:</strong> {data.get('since', 'N/A')}</p>")
+            html.append(f"<p><strong>Total matches:</strong> {data.get('total', 0)}</p>")
+            html.append("<table><thead><tr><th>Repo</th><th>⭐</th><th>Language</th><th>Pushed</th><th>Description</th></tr></thead><tbody>")
+            for r in data["repos"]:
+                desc = (r.get("description") or "")[:150]
+                html.append(f"<tr><td><a href='{r['url']}'>{r['name']}</a></td><td>{r['stars']}</td><td>{r['language'] or '—'}</td><td>{r['pushed']}</td><td>{desc}</td></tr>")
+            html.append("</tbody></table>")
+        elif isinstance(data, list):
+            html.append("<table><thead><tr><th>Repo</th><th>⭐</th><th>Language</th><th>Pushed</th><th>Description</th></tr></thead><tbody>")
+            for r in data:
+                desc = (r.get("description") or "")[:150]
+                html.append(f"<tr><td><a href='{r['url']}'>{r['name']}</a></td><td>{r.get('stars', 0)}</td><td>{r.get('language', '—')}</td><td>{r.get('pushed', '—')}</td><td>{desc}</td></tr>")
+            html.append("</tbody></table>")
+        elif isinstance(data, dict) and "repo" in data:
+            r = data
+            html.append(f"<h2>{r.get('repo', 'Unknown')}</h2>")
+            html.append(f"<p><strong>URL:</strong> <a href='{r.get('url', '#')}'>{r.get('url', 'N/A')}</a></p>")
+            html.append(f"<p><strong>Language:</strong> {r.get('language', '—')}</p>")
+            html.append(f"<p><strong>Stars:</strong> {r.get('stars', 0)}</p>")
+            html.append(f"<p><strong>License:</strong> {r.get('license', '—')}</p>")
+            html.append(f"<p><strong>Last Push:</strong> {r.get('last_push', '—')}</p>")
+            html.append(f"<p><strong>Description:</strong> {r.get('description', '—')}</p>")
+            if "scores" in r:
+                s = r["scores"]
+                html.append("<h3>Scores</h3><ul>")
+                html.append(f"<li><strong>Overall:</strong> {s.get('overall', 'N/A')}/100</li>")
+                html.append(f"<li><strong>Relevance:</strong> {s.get('relevance', 'N/A')}/100</li>")
+                html.append(f"<li><strong>Popularity:</strong> {s.get('popularity', 'N/A')}/100</li>")
+                html.append(f"<li><strong>Freshness:</strong> {s.get('freshness', 'N/A')}/100</li>")
+                html.append(f"<li><strong>Health:</strong> {s.get('health', 'N/A')}/100</li>")
+                html.append(f"<li><strong>Maturity:</strong> {s.get('maturity', 'N/A')}/100</li>")
+                html.append("</ul>")
+                v = r.get('verdict', 'N/A')
+                badge_class = "badge-go" if v == "GO" else "badge-maybe" if v == "MAYBE" else "badge-skip"
+                html.append(f"<p><strong>Verdict:</strong> <span class='badge {badge_class}'>{v}</span></p>")
+            if "resource_fit" in r:
+                rf = r["resource_fit"]
+                v = rf.get('verdict', 'N/A')
+                badge_class = "badge-heavy" if v == "heavy" else "badge-easy" if v == "runs easily" else "badge-headroom"
+                html.append(f"<h3>Resource Fit</h3>")
+                html.append(f"<p><strong>Verdict:</strong> <span class='badge {badge_class}'>{v}</span></p>")
+                html.append(f"<p><strong>RAM Need:</strong> {rf.get('ram_need', 'N/A')}</p>")
+                html.append(f"<p><strong>GPU:</strong> {'Yes' if rf.get('gpu') else 'No'}</p>")
+                html.append(f"<p><strong>Note:</strong> {rf.get('note', 'N/A')}</p>")
+        else:
+            html.append("<pre>" + json.dumps(data, indent=2) + "</pre>")
+        html.append("</body></html>")
+        return "\n".join(html)
+    
+    else:
+        return f"Unknown format: {format}. Supported: markdown, json, html"
+
+
 def score(meta, why=""):
     kws = CFG["project"].get("relevance_keywords", [])
     text = " ".join([meta.get("desc", ""), why, " ".join(meta.get("topics", [])),
@@ -1128,6 +1299,49 @@ def profiles_mode():
     return 0
 
 
+def trending_mode(argv):
+    """Search GitHub for trending repositories."""
+    import argparse
+    ap = argparse.ArgumentParser(prog="repohunter trending", add_help=False)
+    ap.add_argument("--topic", "-t", help="GitHub topic (e.g., machine-learning, llm, rag)")
+    ap.add_argument("--language", "-l", help="Programming language (e.g., python, rust)")
+    ap.add_argument("--since", choices=["daily", "weekly", "monthly", "yearly"], default="monthly")
+    ap.add_argument("--limit", type=int, default=20)
+    ap.add_argument("--format", choices=["markdown", "json", "html"], default="markdown")
+    ap.add_argument("--output", "-o", help="Output file (default: stdout)")
+    args = ap.parse_args(argv)
+    result = search_trending(args.topic, args.language, args.since, args.limit)
+    report = generate_report(result, args.format, f"Trending: {args.topic or 'all'} ({args.since})")
+    if args.output:
+        open(args.output, "w").write(report)
+        print(f"Written to {args.output}")
+    else:
+        print(report)
+    return 0
+
+
+def report_mode(argv):
+    """Generate a report from JSON data (stdin or file)."""
+    import argparse, sys
+    ap = argparse.ArgumentParser(prog="repohunter report", add_help=False)
+    ap.add_argument("input", nargs="?", default="-", help="Input JSON file or - for stdin")
+    ap.add_argument("--format", choices=["markdown", "json", "html"], default="markdown")
+    ap.add_argument("--output", "-o", help="Output file (default: stdout)")
+    ap.add_argument("--title", help="Report title")
+    args = ap.parse_args(argv)
+    if args.input == "-":
+        data = json.load(sys.stdin)
+    else:
+        data = json.load(open(args.input))
+    report = generate_report(data, args.format, args.title or "RepoHunter Report")
+    if args.output:
+        open(args.output, "w").write(report)
+        print(f"Written to {args.output}")
+    else:
+        print(report)
+    return 0
+
+
 USAGE = """RepoHunter — reuse, don't reinvent.
 
   repohunter refresh                     build the store from your config.json seed
@@ -1137,12 +1351,27 @@ USAGE = """RepoHunter — reuse, don't reinvent.
   repohunter ingest-video <youtube-url>  mine a video for the repos it recommends
   repohunter scan <owner/repo> [--json]  safety scan only: prompt-injection, hidden
                                          text, piped installs, leaked secrets
+  repohunter trending [topic]            search trending GitHub repos (topic, language, since)
+  repohunter report <file|->             generate report from JSON (stdin or file) in md/json/html
   repohunter serve                       serve the UI + API on http://127.0.0.1:<port>
   repohunter profiles                    list the project lenses in your config
 
+Trending options:
+  --topic, -t <name>   GitHub topic (e.g., machine-learning, llm, rag, agents)
+  --language <lang>    Programming language (e.g., python, rust, typescript)
+  --since <period>     daily, weekly, monthly, yearly (default: monthly)
+  --limit <n>          Number of results (default: 20)
+  --format <fmt>       markdown, json, html (default: markdown)
+  --output <file>      Write to file instead of stdout
+
+Report options:
+  --format <fmt>       markdown, json, html (default: markdown)
+  --output <file>      Write to file instead of stdout
+  --title <title>      Report title
+
 Global:
-  --profile <name>                       evaluate against a named profile from config.json
-                                         (or set REPOHUNTER_PROFILE)
+  --profile <name>     evaluate against a named profile from config.json
+                       (or set REPOHUNTER_PROFILE)
 """
 
 
@@ -1164,13 +1393,15 @@ def main(argv=None):
             known = ", ".join(profile_names(CFG)) or "(none defined)"
             sys.stderr.write("error: unknown profile '%s'. Known profiles: %s\n" % (want, known))
             return 2
-    needs = {"evaluate": 1, "plan": 1, "ingest-video": 1, "decide": 2, "scan": 1}
+
+    needs = {"evaluate": 1, "plan": 1, "ingest-video": 1, "decide": 2, "scan": 1, "trending": 0, "report": 0}
     if cmd in needs and len(a) < needs[cmd]:
         sys.stderr.write("error: '%s' needs %d argument(s).\n\n%s" % (cmd, needs[cmd], USAGE))
         return 2
     fn = {"evaluate": lambda: evaluate(a[0]), "plan": lambda: plan_mode(a[0]),
           "decide": lambda: decide_mode(a[0], a[1]), "ingest-video": lambda: ingest_video(a[0]),
           "scan": lambda: scan_mode(a[0], as_json="--json" in a),
+          "trending": lambda: trending_mode(a), "report": lambda: report_mode(a),
           "serve": serve, "refresh": refresh, "profiles": profiles_mode}.get(cmd)
     if fn is None:
         sys.stderr.write("error: unknown command '%s'.\n\n%s" % (cmd, USAGE))
