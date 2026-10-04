@@ -54,7 +54,7 @@
   /* hero */
   .hero{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:56px;align-items:start;padding:64px 0 72px}
   h1{font-size:clamp(34px,4.4vw,54px);line-height:1.06;letter-spacing:-.03em;margin:0 0 20px;font-weight:800;text-wrap:balance}
-  h1 em{font-style:normal;color:var(--lime)}
+  h1 em{font-style:italic;color:inherit}
   .lede{color:var(--soft);font-size:18px;line-height:1.55;margin:0 0 30px;max-width:46ch}
   .install{background:var(--bg2);border:1px solid var(--line);border-radius:14px;overflow:hidden}
   .install .bar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}
@@ -62,6 +62,9 @@
   .copy{background:transparent;border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:5px 12px;font:600 13px/1.4 inherit;cursor:pointer;transition:border-color .15s,background .15s}
   .copy:hover{border-color:var(--lime)}
   .copy.done{border-color:var(--lime);color:var(--lime)}
+  .copy.primary{background:var(--lime);border-color:var(--lime);color:#08101f;font-weight:700;padding:6px 16px}
+  .copy.primary:hover{filter:brightness(1.06)}
+  .copy.primary.done{background:transparent;color:var(--lime)}
   .alt{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:16px;font-size:14.5px}
   .alt a{color:var(--soft)}
   .alt a b{color:var(--text)}
@@ -113,6 +116,8 @@
   .btn{border-radius:12px;padding:13px 22px;font:700 15px/1.2 inherit;border:0;cursor:pointer;transition:filter .15s,transform .15s}
   .btn.primary{background:var(--lime);color:#08101f}
   .btn.primary:hover{filter:brightness(1.06);transform:translateY(-1px);text-decoration:none}
+  .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line2)}
+  .btn.ghost:hover{border-color:var(--lime)}
   .try-ex{margin-top:12px;font-size:14px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
   .try-ex button{background:var(--bg2);border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 11px;font:13px var(--mono);cursor:pointer;min-height:34px}
   .try-ex button:hover{border-color:var(--line2);color:var(--text)}
@@ -127,6 +132,8 @@
   .tile .facts{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:13px;color:var(--soft);margin-bottom:12px}
   .tile .facts .k{color:var(--muted)}
   .tile .score{font:800 13px var(--mono);color:var(--text)}
+  .tile .qr{color:var(--muted);font-size:12.5px}
+  .tile .facts{font-variant-numeric:tabular-nums}
   .tile .why{font-size:13.5px;color:var(--text);margin:0 0 12px}
   .tile.loading .desc{color:var(--cyan)}
   .agentbtn{width:100%;background:var(--bg2);border:1px solid var(--line);color:var(--cyan);border-radius:10px;padding:9px 12px;font:600 13px/1.3 inherit;cursor:pointer;transition:border-color .15s}
@@ -149,6 +156,13 @@
   .teams .cta{display:inline-block;margin-top:8px}
 
   /* faq */
+  .faqd summary{list-style:none;cursor:pointer}
+  .faqd summary::-webkit-details-marker{display:none}
+  .faqd summary h2{display:inline}
+  .faqd summary .sub{margin:12px 0 0}
+  .faqd summary .sub::after{content:" Read it";color:var(--cyan)}
+  .faqd[open] summary .sub::after{content:""}
+  .faqd[open] summary{margin-bottom:24px}
   .faq{columns:2 340px;column-gap:56px}
   .faq p{margin:0 0 18px;color:var(--soft);font-size:15.5px;break-inside:avoid}
   .faq p b{color:var(--text)}
@@ -182,6 +196,10 @@
     .try{flex-direction:column}
     section{padding:56px 0}
     .call .out{grid-template-columns:1fr;gap:0}
+    .call .sig{white-space:normal;overflow-wrap:anywhere}
+    .install pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px}
+    footer{flex-direction:column;align-items:flex-start;gap:10px}
+    footer .spacer{display:none}
     .call .out .k{margin-top:6px}
   }
   @media(prefers-reduced-motion:reduce){
@@ -198,9 +216,9 @@
     <a class="brand" href="/"><img src="logo.svg" alt="" width="30" height="30">RepoHunter</a>
     <span class="spacer"></span>
     <div class="links">
-      <a href="#install">Install</a>
+      <a class="hide-sm" href="#install">Install</a>
       <a href="https://github.com/meetziggy/repohunter#readme">Docs</a>
-      <a class="hide-sm" href="/learn">Learn</a>
+      <a href="/learn">Learn</a>
       <a href="https://github.com/meetziggy/repohunter">GitHub</a>
     </div>
   </nav>
@@ -212,7 +230,7 @@
         can you ship its license, does a safety scan find anything, and will it run on your machine.
         Your agent calls it as a tool; you can run it from the terminal.</p>
       <div class="install">
-        <div class="bar"><span>In Claude Code</span><button class="copy" type="button" data-copy="plugin">Copy</button></div>
+        <div class="bar"><span>In Claude Code</span><button class="copy primary" type="button" data-copy="plugin">Copy</button></div>
 <pre id="plugin">/plugin marketplace add meetziggy/repohunter
 /plugin install repohunter</pre>
       </div>
@@ -345,7 +363,9 @@ repohunter evaluate owner/repo</pre></div>
   </section>
 
   <section id="faq">
-    <h2>Why use RepoHunter instead of ChatGPT or Claude Code?</h2>
+    <details class="faqd">
+    <summary><h2>Why use RepoHunter instead of ChatGPT or Claude Code?</h2>
+      <p class="sub">Use your assistant to reason and build; use RepoHunter for an adoption decision someone else can review. The full answer, including what we don't claim yet:</p></summary>
     <div class="faq">
       <p><b>Use a general AI assistant to reason, explain, and help you build.</b> Use RepoHunter when
         you need an open-source adoption decision tied to inspectable repository evidence, a
@@ -362,6 +382,7 @@ repohunter evaluate owner/repo</pre></div>
         completeness, and repeated-run consistency. Until then, the measured benefit is still an open question;
         the immediate value is a more reproducible, reviewable decision process.</p>
     </div>
+    </details>
   </section>
 
   <section id="badge">
@@ -369,14 +390,14 @@ repohunter evaluate owner/repo</pre></div>
       <div>
         <h2>Maintain a repo? Add the badge.</h2>
         <p class="sub">A live verdict for your README, computed from current GitHub data. You can embed it; you can't edit what it says.</p>
-        <div class="row"><input id="bg_repo" aria-label="Your repo" value="ollama/ollama" spellcheck="false" autocomplete="off"><button id="bg_go" class="btn primary" type="button">Preview</button></div>
+        <div class="row"><input id="bg_repo" aria-label="Your repo" value="ollama/ollama" spellcheck="false" autocomplete="off"><button id="bg_go" class="btn ghost" type="button">Preview</button></div>
         <div class="md"><code id="bg_md">[![RepoHunter](https://img.repohunter.dev/badge/ollama/ollama.svg)](https://repohunter.dev/r/ollama/ollama)</code><button id="bg_copy" class="copy" type="button">Copy</button></div>
         <p class="note">Shareable report: <a id="bg_report" href="/r/ollama/ollama">repohunter.dev/r/ollama/ollama</a>.
           The badge scores public GitHub data; it is not a safety rating. Run <code>repohunter scan</code> for that.</p>
       </div>
       <div class="prev">
-        <img id="bg_badge" src="sample-badge.svg" alt="RepoHunter badge preview" height="22" style="height:22px;align-self:flex-start">
-        <img id="bg_card" class="card" src="sample-card.svg" alt="RepoHunter report card preview">
+        <img id="bg_badge" src="https://img.repohunter.dev/badge/ollama/ollama.svg" alt="RepoHunter badge preview" height="22" style="height:22px;align-self:flex-start">
+        <img id="bg_card" class="card" src="https://img.repohunter.dev/card/ollama/ollama.svg" loading="lazy" alt="RepoHunter report card preview">
       </div>
     </div>
   </section>
@@ -493,7 +514,7 @@ repohunter evaluate owner/repo</pre></div>
       +'<span class="v v-'+v+'">'+v+'</span></div>'
       +'<div class="desc">'+(esc((d.description||'').slice(0,120))||'—')+'</div>'
       +'<p class="why">'+esc(s.why)+'</p>'
-      +'<div class="facts"><span class="k">score</span><span class="score">'+s.overall+'/100</span>'
+      +'<div class="facts"><span class="k">score</span><span><span class="score">'+s.overall+'/100</span> <span class="qr">quick read · no project fit</span></span>'
       +'<span class="k">license</span><span>'+esc(spdx)+'</span>'
       +'<span class="k">last push</span><span>'+esc((d.pushed_at||'').slice(0,10)||'—')+(d.archived?' · archived':'')+'</span>'
       +'<span class="k">stars</span><span>'+num(d.stargazers_count||0)+' · '+esc(d.language||'—')+'</span>'
@@ -540,7 +561,7 @@ repohunter evaluate owner/repo</pre></div>
 
 <script>
 /* Badge previewer — type a repo, get a live badge + card + copy-paste README markdown.
-   Points at the img.repohunter.dev worker; the prefilled sample uses local SVGs so it's never empty. */
+   Points at the img.repohunter.dev worker, so even the prefilled preview is live data. */
 (function(){
   var repo=document.getElementById('bg_repo'), go=document.getElementById('bg_go'),
       badge=document.getElementById('bg_badge'), card=document.getElementById('bg_card'),
