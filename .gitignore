@@ -35,3 +35,7 @@ MONETIZATION_STRATEGY.md
 PRESALE_PAGE.md
 DOSSIER_TEMPLATE.md
 _killtests/
+
+# Local Graphify knowledge graph (reproducible via `graphify build`)
+graphify-out/
+.pr/

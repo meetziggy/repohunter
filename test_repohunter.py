@@ -430,6 +430,30 @@ class Profiles(unittest.TestCase):
         self.assertEqual(rh.main(["evaluate", "a/b", "--profile", "definitely-not-real"]), 2)
 
 
+class HtmlReport(unittest.TestCase):
+    """Repo descriptions are attacker-controlled; the HTML report must not render them as markup."""
+    EVIL = "<img src=x onerror=alert(1)>"
+
+    def _render(self, data):
+        return rh.generate_report(data, "html", title=self.EVIL)
+
+    def test_trending_table_escapes_and_drops_non_https_links(self):
+        out = self._render({"query": "q", "since": "daily", "total": 1, "repos": [
+            {"name": "a/b", "url": "javascript:alert(1)", "stars": 11, "language": None,
+             "pushed": "2026-10-04", "description": self.EVIL}]})
+        self.assertNotIn("<img", out)
+        self.assertIn("href='#'", out)
+        self.assertIn("Content-Security-Policy", out)
+
+    def test_single_repo_and_fallback_escape(self):
+        out = self._render({"repo": self.EVIL, "url": "https://github.com/a/b", "description": self.EVIL,
+                            "resource_fit": {"verdict": "heavy", "note": self.EVIL}})
+        self.assertNotIn("<img", out)
+        self.assertIn("href='https://github.com/a/b'", out)
+        out = self._render({"x": "</pre><script>alert(1)</script>"})
+        self.assertNotIn("<script>", out)
+
+
 class DossierWithoutLLM(unittest.TestCase):
     """With no working LLM, the verdict used to be a hard-coded MAYBE — and that placeholder
     was cached, so configuring an LLM later still served it."""

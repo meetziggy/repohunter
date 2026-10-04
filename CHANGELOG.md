@@ -9,6 +9,23 @@ All notable changes to RepoHunter are documented here. Format follows
 - Green **"compute saved ≈ energy ≈ CO₂ avoided"** estimate on adoptions _(planned)_
 - Port the visual store (walkthrough + Map) fully into the standalone build
 
+## [0.3.0] — 2026-10-04
+### Added
+- **`repohunter trending`** — search GitHub by topic/language over a daily/weekly/monthly/yearly
+  window; markdown, JSON, or HTML output
+- **`repohunter report`** — render a report from JSON (stdin or file) as markdown, JSON, or HTML
+- **Research tools** (source checkout only) — `research_topic`, `research_papers`, `research_book`
+  MCP tools backed by `skills/research-hunter/` (arXiv, OpenAlex, Open Library, Project Gutenberg)
+- **PyPI publishing** via Trusted Publishing on each GitHub release
+
+### Fixed
+- MCP server no longer lists the research tools in a pip/uvx install, where they can't run
+- README hero image uses an absolute URL so it renders on PyPI
+- Research tools no longer send queries through a third-party proxy, cap `limit` at 50, and
+  mark their results untrusted
+- HTML reports escape every value, only link `https://` URLs, and carry a no-script CSP — a
+  repo description could otherwise inject script into `trending --format html` output
+
 ## [0.2.0] — 2026-09-22
 ### Added
 - **License/resale-risk gate** — every dossier and `evaluate` now carries a license read

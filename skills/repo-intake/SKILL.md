@@ -50,8 +50,8 @@ is not an automatic SKIP. Classes that are usually benign — verify each, then 
 
 - A UTF-8 BOM at byte 0 is an editor artifact.
 - `AKIAIOSFODNN7EXAMPLE` and similar are documentation placeholders.
-- "send it as the `X-API-Key` header" inside a repo's own auth docs is the repo
-  describing itself. Read the surrounding lines to confirm — and do **not** teach the
+- A repo's own auth docs explaining which request header carries its key are the
+  repo describing itself. Read the surrounding lines to confirm — and do **not** teach the
   scanner to auto-clear this class, because real exfiltration instructions can be
   dressed as auth docs.
 - Test fixtures containing injection strings are usually *defensive* tests. A repo that
