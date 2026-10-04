@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import contextlib
 import fcntl
+from html import escape as _html_escape
 import json
 import math
 import os
@@ -337,6 +338,17 @@ def search_trending(topic=None, language=None, since="daily", limit=20):
 
 
 # ── Report Generation ───────────────────────────────────────────────────────────
+def _h(v):
+    """HTML-escape one value for generate_report — repo text is attacker-controlled."""
+    return _html_escape(str(v), quote=True)
+
+
+def _url(v):
+    """Only https links make it into an href; anything else becomes a dead link."""
+    v = str(v or "")
+    return _h(v) if v.startswith("https://") else "#"
+
+
 def generate_report(data, format="markdown", title=None):
     """Generate a report from repo data in various formats."""
     title = title or "RepoHunter Report"
@@ -400,8 +412,10 @@ def generate_report(data, format="markdown", title=None):
     elif format == "html":
         html = [
             "<!DOCTYPE html>", "<html><head>",
-            f"<title>{title}</title>",
+            f"<title>{_h(title)}</title>",
             "<meta charset='utf-8'>",
+            # Repo descriptions are attacker-controlled: escape everything, and block script anyway.
+            "<meta http-equiv='Content-Security-Policy' content=\"default-src 'none'; style-src 'unsafe-inline'\">",
             "<style>",
             "body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:1000px;margin:2rem auto;padding:0 1rem;line-height:1.6}",
             "table{border-collapse:collapse;width:100%}",
@@ -412,56 +426,56 @@ def generate_report(data, format="markdown", title=None):
             ".badge-go{background:#28a745;color:#fff}", ".badge-maybe{background:#ffc107;color:#000}", ".badge-skip{background:#dc3545;color:#fff}",
             ".badge-heavy{background:#6f42c1;color:#fff}", ".badge-easy{background:#28a745;color:#fff}", ".badge-headroom{background:#fd7e14;color:#fff}",
             "</style>", "</head><body>",
-            f"<h1>{title}</h1>", f"<p class='meta'>Generated: {timestamp} UTC</p>"
+            f"<h1>{_h(title)}</h1>", f"<p class='meta'>Generated: {timestamp} UTC</p>"
         ]
         if isinstance(data, dict) and "repos" in data:
-            html.append(f"<p><strong>Query:</strong> {data.get('query', 'N/A')}</p>")
-            html.append(f"<p><strong>Period:</strong> {data.get('since', 'N/A')}</p>")
-            html.append(f"<p><strong>Total matches:</strong> {data.get('total', 0)}</p>")
+            html.append(f"<p><strong>Query:</strong> {_h(data.get('query', 'N/A'))}</p>")
+            html.append(f"<p><strong>Period:</strong> {_h(data.get('since', 'N/A'))}</p>")
+            html.append(f"<p><strong>Total matches:</strong> {_h(data.get('total', 0))}</p>")
             html.append("<table><thead><tr><th>Repo</th><th>⭐</th><th>Language</th><th>Pushed</th><th>Description</th></tr></thead><tbody>")
             for r in data["repos"]:
                 desc = (r.get("description") or "")[:150]
-                html.append(f"<tr><td><a href='{r['url']}'>{r['name']}</a></td><td>{r['stars']}</td><td>{r['language'] or '—'}</td><td>{r['pushed']}</td><td>{desc}</td></tr>")
+                html.append(f"<tr><td><a href='{_url(r['url'])}'>{_h(r['name'])}</a></td><td>{_h(r['stars'])}</td><td>{_h(r['language'] or '—')}</td><td>{_h(r['pushed'])}</td><td>{_h(desc)}</td></tr>")
             html.append("</tbody></table>")
         elif isinstance(data, list):
             html.append("<table><thead><tr><th>Repo</th><th>⭐</th><th>Language</th><th>Pushed</th><th>Description</th></tr></thead><tbody>")
             for r in data:
                 desc = (r.get("description") or "")[:150]
-                html.append(f"<tr><td><a href='{r['url']}'>{r['name']}</a></td><td>{r.get('stars', 0)}</td><td>{r.get('language', '—')}</td><td>{r.get('pushed', '—')}</td><td>{desc}</td></tr>")
+                html.append(f"<tr><td><a href='{_url(r['url'])}'>{_h(r['name'])}</a></td><td>{_h(r.get('stars', 0))}</td><td>{_h(r.get('language', '—'))}</td><td>{_h(r.get('pushed', '—'))}</td><td>{_h(desc)}</td></tr>")
             html.append("</tbody></table>")
         elif isinstance(data, dict) and "repo" in data:
             r = data
-            html.append(f"<h2>{r.get('repo', 'Unknown')}</h2>")
-            html.append(f"<p><strong>URL:</strong> <a href='{r.get('url', '#')}'>{r.get('url', 'N/A')}</a></p>")
-            html.append(f"<p><strong>Language:</strong> {r.get('language', '—')}</p>")
-            html.append(f"<p><strong>Stars:</strong> {r.get('stars', 0)}</p>")
-            html.append(f"<p><strong>License:</strong> {r.get('license', '—')}</p>")
-            html.append(f"<p><strong>Last Push:</strong> {r.get('last_push', '—')}</p>")
-            html.append(f"<p><strong>Description:</strong> {r.get('description', '—')}</p>")
+            html.append(f"<h2>{_h(r.get('repo', 'Unknown'))}</h2>")
+            html.append(f"<p><strong>URL:</strong> <a href='{_url(r.get('url', '#'))}'>{_h(r.get('url', 'N/A'))}</a></p>")
+            html.append(f"<p><strong>Language:</strong> {_h(r.get('language', '—'))}</p>")
+            html.append(f"<p><strong>Stars:</strong> {_h(r.get('stars', 0))}</p>")
+            html.append(f"<p><strong>License:</strong> {_h(r.get('license', '—'))}</p>")
+            html.append(f"<p><strong>Last Push:</strong> {_h(r.get('last_push', '—'))}</p>")
+            html.append(f"<p><strong>Description:</strong> {_h(r.get('description', '—'))}</p>")
             if "scores" in r:
                 s = r["scores"]
                 html.append("<h3>Scores</h3><ul>")
-                html.append(f"<li><strong>Overall:</strong> {s.get('overall', 'N/A')}/100</li>")
-                html.append(f"<li><strong>Relevance:</strong> {s.get('relevance', 'N/A')}/100</li>")
-                html.append(f"<li><strong>Popularity:</strong> {s.get('popularity', 'N/A')}/100</li>")
-                html.append(f"<li><strong>Freshness:</strong> {s.get('freshness', 'N/A')}/100</li>")
-                html.append(f"<li><strong>Health:</strong> {s.get('health', 'N/A')}/100</li>")
-                html.append(f"<li><strong>Maturity:</strong> {s.get('maturity', 'N/A')}/100</li>")
+                html.append(f"<li><strong>Overall:</strong> {_h(s.get('overall', 'N/A'))}/100</li>")
+                html.append(f"<li><strong>Relevance:</strong> {_h(s.get('relevance', 'N/A'))}/100</li>")
+                html.append(f"<li><strong>Popularity:</strong> {_h(s.get('popularity', 'N/A'))}/100</li>")
+                html.append(f"<li><strong>Freshness:</strong> {_h(s.get('freshness', 'N/A'))}/100</li>")
+                html.append(f"<li><strong>Health:</strong> {_h(s.get('health', 'N/A'))}/100</li>")
+                html.append(f"<li><strong>Maturity:</strong> {_h(s.get('maturity', 'N/A'))}/100</li>")
                 html.append("</ul>")
                 v = r.get('verdict', 'N/A')
                 badge_class = "badge-go" if v == "GO" else "badge-maybe" if v == "MAYBE" else "badge-skip"
-                html.append(f"<p><strong>Verdict:</strong> <span class='badge {badge_class}'>{v}</span></p>")
+                html.append(f"<p><strong>Verdict:</strong> <span class='badge {badge_class}'>{_h(v)}</span></p>")
             if "resource_fit" in r:
                 rf = r["resource_fit"]
                 v = rf.get('verdict', 'N/A')
                 badge_class = "badge-heavy" if v == "heavy" else "badge-easy" if v == "runs easily" else "badge-headroom"
                 html.append(f"<h3>Resource Fit</h3>")
-                html.append(f"<p><strong>Verdict:</strong> <span class='badge {badge_class}'>{v}</span></p>")
-                html.append(f"<p><strong>RAM Need:</strong> {rf.get('ram_need', 'N/A')}</p>")
-                html.append(f"<p><strong>GPU:</strong> {'Yes' if rf.get('gpu') else 'No'}</p>")
-                html.append(f"<p><strong>Note:</strong> {rf.get('note', 'N/A')}</p>")
+                html.append(f"<p><strong>Verdict:</strong> <span class='badge {badge_class}'>{_h(v)}</span></p>")
+                html.append(f"<p><strong>RAM Need:</strong> {_h(rf.get('ram_need', 'N/A'))}</p>")
+                html.append(f"<p><strong>GPU:</strong> {_h('Yes' if rf.get('gpu') else 'No')}</p>")
+                html.append(f"<p><strong>Note:</strong> {_h(rf.get('note', 'N/A'))}</p>")
         else:
-            html.append("<pre>" + json.dumps(data, indent=2) + "</pre>")
+            html.append("<pre>" + _h(json.dumps(data, indent=2)) + "</pre>")
         html.append("</body></html>")
         return "\n".join(html)
     
