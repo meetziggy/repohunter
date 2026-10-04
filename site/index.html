@@ -716,7 +716,7 @@ try{
     var age=days(d.created_at), mat=Math.min(100,(age>365?20:5)+Math.min(50,Math.round(Math.log10(stars+1)*12)));
     var overall=Math.round(pop*0.3+fresh*0.25+health*0.25+mat*0.2);
     var verdict = d.archived?'SKIP': overall>=70?'GO': overall>=48?'MAYBE':'SKIP';
-    return {pop:pop,fresh:fresh,health:health,overall:overall,verdict:verdict,fit:fit(d)};
+    return {pop:pop,fresh:fresh,health:health,mat:mat,overall:overall,verdict:verdict,fit:fit(d)};
   }
   function esc(s){return (s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
   function num(n){return n>=1000?(n/1000).toFixed(1).replace(/\.0$/,'')+'k':String(n);}
@@ -724,7 +724,7 @@ try{
   // so RepoHunter can't become a prompt-injection vector into someone else's agent.
   function promptFor(d,s){
     var repo=d.full_name||(((d.owner||{}).login||'')+'/'+(d.name||'')), url=d.html_url||('https://github.com/'+repo);
-    var lic=((d.license||{}).spdx_id)||'unknown', pushed=(d.pushed_at||'').slice(0,10)||'unknown';
+    var spdx=((d.license||{}).spdx_id)||'', lic=!spdx?'none found':spdx==='NOASSERTION'?"NOASSERTION (GitHub couldn't identify it; read the LICENSE file(s))":spdx, pushed=(d.pushed_at||'').slice(0,10)||'unknown';
     return "I'm evaluating whether to reuse the open-source repo "+repo+" ("+url+").\n\n"
       +"RepoHunter's read — a transparent heuristic over public GitHub data, NOT a security audit:\n"
       +"• Verdict: "+s.verdict+"   • Score: "+s.overall+"/100\n"
@@ -759,6 +759,9 @@ try{
       +'<div class="tfoot"><div class="spin"></div><div class="chips"><span class="chip2">working…</span></div></div>'; return el; }
   function evalRepo(input, prepend){
     var raw=(input||'').trim();
+    // A pasted github.com URL anywhere in the text wins (e.g. a copied agent prompt).
+    var u=raw.match(/(?:https?:\/\/)?(?:www\.)?github\.com[\/:]([\w.\-]+\/[\w.\-]+)/i);
+    if(u) raw=u[1].replace(/\.git$/i,'').replace(/\.+$/,'');
     var slug=raw.replace(/^git@github\.com:/i,'').replace(/^https?:\/\/(www\.)?github\.com\//i,'').replace(/^github\.com\//i,'')
       .replace(/[?#].*$/,'').replace(/\.git$/,'').replace(/\/+$/,'').trim();
     var m=slug.match(/^([\w.\-]+\/[\w.\-]+)/);
