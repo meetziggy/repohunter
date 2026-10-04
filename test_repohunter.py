@@ -1,4 +1,5 @@
 """Smoke + unit tests for RepoHunter's pure logic (no network, stdlib only)."""
+import os
 import unittest
 import repohunter as rh
 
@@ -138,19 +139,39 @@ class SafetyScan(unittest.TestCase):
         rh.apply_safety(meta3)
         self.assertEqual(meta3["dossier"]["verdict"], "SKIP")
 
+    def _scan_reading_nothing(self, gh_error):
+        orig = rh._fetch_text_files, rh._fetch_agent_config_files, rh.gh
+        rh._fetch_text_files = lambda slug: []
+        rh._fetch_agent_config_files = lambda slug, **kw: []
+        def gh(path, want_headers=False):
+            raise gh_error
+        rh.gh = gh
+        try:
+            return rh.safety_scan("who/ever")
+        finally:
+            rh._fetch_text_files, rh._fetch_agent_config_files, rh.gh = orig
+
     def test_zero_files_is_unknown_not_clean(self):
         """A rate-limited fetch reads zero files. Calling that 'clean' is a false clean —
         it is indistinguishable from a repo that was actually checked."""
-        orig_top, orig_agent = rh._fetch_text_files, rh._fetch_agent_config_files
-        rh._fetch_text_files = lambda slug: []
-        rh._fetch_agent_config_files = lambda slug, **kw: []
-        try:
-            s = rh.safety_scan("who/ever")
-        finally:
-            rh._fetch_text_files, rh._fetch_agent_config_files = orig_top, orig_agent
+        s = self._scan_reading_nothing(OSError("network down"))
         self.assertEqual(s["level"], "unknown")
         self.assertEqual(s["files_scanned"], 0)
         self.assertIn("NOT a clean result", s["note"])
+
+    def test_zero_files_names_the_reason(self):
+        """A missing repo used to be reported as a likely rate limit."""
+        import urllib.error
+        def err(code):
+            return urllib.error.HTTPError("https://api.github.com/repos/who/ever", code, "x", {}, None)
+        missing = self._scan_reading_nothing(err(404))
+        self.assertIn("Repo not found", missing["note"])
+        self.assertNotIn("rate limit", missing["note"])
+        limited = self._scan_reading_nothing(err(403))
+        self.assertIn("rate limit", limited["note"])
+        for s in (missing, limited):
+            self.assertEqual(s["level"], "unknown")
+            self.assertIn("NOT a clean result", s["note"])
 
     def test_unknown_scan_caps_a_go(self):
         meta = {"dossier": {"verdict": "GO", "recommendation": "adopt"},
@@ -337,6 +358,18 @@ class LicenseGate(unittest.TestCase):
         self.assertEqual(meta["dossier"]["verdict"], "MAYBE")
         self.assertIn("LICENSE", meta["dossier"]["recommendation"])
 
+    def test_unidentified_license_caps_a_go(self):
+        meta = {"dossier": {"verdict": "GO", "recommendation": "adopt it"},
+                "commercial": {"verdict": "caution", "license": "NOASSERTION", "reason": "unclassified"}}
+        rh.apply_license(meta)
+        self.assertEqual(meta["dossier"]["verdict"], "MAYBE")
+
+    def test_weak_copyleft_caution_keeps_a_go(self):
+        meta = {"dossier": {"verdict": "GO", "recommendation": "adopt it"},
+                "commercial": {"verdict": "caution", "license": "MPL-2.0", "reason": "file-level"}}
+        rh.apply_license(meta)
+        self.assertEqual(meta["dossier"]["verdict"], "GO")
+
     def test_clear_license_changes_nothing(self):
         meta = {"dossier": {"verdict": "GO", "recommendation": "adopt it"},
                 "commercial": {"verdict": "clear", "license": "MIT", "reason": "permissive"}}
@@ -419,6 +452,35 @@ class HtmlReport(unittest.TestCase):
         self.assertIn("href='https://github.com/a/b'", out)
         out = self._render({"x": "</pre><script>alert(1)</script>"})
         self.assertNotIn("<script>", out)
+
+
+class DossierWithoutLLM(unittest.TestCase):
+    """With no working LLM, the verdict used to be a hard-coded MAYBE — and that placeholder
+    was cached, so configuring an LLM later still served it."""
+
+    def _dossier(self, meta):
+        import tempfile
+        orig_llm, orig_cache = rh.llm, rh.CACHE
+        rh.llm = lambda *a, **kw: ""
+        rh.CACHE = tempfile.mkdtemp()
+        try:
+            specs = {"chip": "x", "cores": 1, "ram_gb": 8, "disk_free": "1G", "os": "test"}
+            d = rh.make_dossier(meta, specs)
+            cached = os.path.exists(rh._cache(meta["id"], "dossier"))
+        finally:
+            rh.llm, rh.CACHE = orig_llm, orig_cache
+        return d, cached
+
+    def test_verdict_comes_from_scores_and_is_not_cached(self):
+        d, cached = self._dossier({"id": "a/b", "scores": {"overall": 80}})
+        self.assertEqual(d["verdict"], "GO")
+        self.assertTrue(d["scores_only"])
+        self.assertFalse(cached)
+
+    def test_archived_is_skip_and_weak_scores_are_skip(self):
+        self.assertEqual(self._dossier({"id": "a/c", "archived": True, "scores": {"overall": 90}})[0]["verdict"], "SKIP")
+        self.assertEqual(self._dossier({"id": "a/d", "scores": {"overall": 50}})[0]["verdict"], "MAYBE")
+        self.assertEqual(self._dossier({"id": "a/e", "scores": {"overall": 20}})[0]["verdict"], "SKIP")
 
 
 if __name__ == "__main__":

@@ -99,6 +99,8 @@ def score(m, keywords=None):
     overall = int(rel * 0.4 + pop * 0.18 + fresh * 0.17 + health * 0.13 + mat * 0.12) if kws \
         else int(pop * 0.3 + fresh * 0.25 + health * 0.25 + mat * 0.2)
     verdict = "SKIP" if m.get("archived") else "GO" if overall >= 68 else "MAYBE" if overall >= 45 else "SKIP"
+    if verdict == "GO" and (not spdx or spdx == "NOASSERTION"):
+        verdict = "MAYBE"  # an unidentified license is never a GO: you can't know you may ship it
     out = {"popularity": pop, "freshness": fresh, "health": health, "maturity": mat, "overall": overall, "verdict": verdict}
     if kws:
         out["relevance"] = rel

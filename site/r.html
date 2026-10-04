@@ -73,7 +73,9 @@ function slug(){
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function bar(label,v){return '<div class="bar"><div class="t"><span>'+label+'</span><span>'+v+'</span></div><div class="track"><div class="fill" style="width:'+Math.max(0,Math.min(100,v))+'%"></div></div></div>';}
 function lookupBox(){return '<div class="lookup"><input id="lk" placeholder="Evaluate another repo — owner/name" spellcheck="false"><button class="btn primary" onclick="goLk()">Report ↵</button></div>';}
-function goLk(){var v=(document.getElementById("lk").value||"").replace(/.*github\.com\//,"").replace(/^\/+|\/+$/g,"").trim(); if(/^[\w.\-]+\/[\w.\-]+$/.test(v)) location.href="/r/"+v;}
+function goLk(){var el=document.getElementById("lk"), raw=(el.value||"").trim(),
+  u=raw.match(/github\.com[\/:]([\w.\-]+\/[\w.\-]+)/i), v=(u?u[1]:raw).replace(/\.git$/i,"").replace(/\.+$/,"").replace(/^\/+|\/+$/g,"");
+  if(/^[\w.\-]+\/[\w.\-]+$/.test(v)) location.href="/r/"+v; else { el.value=""; el.placeholder="Couldn’t read that — try owner/name or a github.com URL"; }}
 function render(d){
   var s=d.scores, v=d.verdict;
   document.title="RepoHunter: "+v+" "+s.overall+" · "+d.repo;

@@ -187,9 +187,13 @@ def _llm_fail(backend, detail):
 
 
 # ── Pluggable LLM (OpenAI-compatible; local Ollama by default) ────────────────
+_LLM_HINTED = False
+
+
 def llm(system, prompt, timeout=180):
     """One chat completion → text. Tries llm.backend, then llm.fallback if configured and
     the first attempt came back empty. Never raises."""
+    global _LLM_HINTED
     b = CFG["llm"]
     out = _llm_once((b.get("backend") or "ollama").lower(), b, system, prompt, timeout)
     fb = (b.get("fallback") or "").lower()
@@ -197,6 +201,11 @@ def llm(system, prompt, timeout=180):
         # A subscription-backed CLI can go quiet on a usage cap. Don't let that turn into a
         # silently empty dossier — fall through to the backup backend instead.
         out = _llm_once(fb, b, system, prompt, timeout)
+    if not out and not _LLM_HINTED:
+        _LLM_HINTED = True
+        sys.stderr.write("  (The AI write-up is optional and was skipped. Scores, license and the "
+                         "safety scan don't need it. To enable it, set \"llm\" in config.json: "
+                         "https://github.com/meetziggy/repohunter#quickstart)\n")
     return out
 
 
@@ -754,6 +763,23 @@ def _fetch_text_files(slug, cap=8):
     return files
 
 
+def _why_unread(slug):
+    """Name the actual reason a scan read nothing, instead of guessing."""
+    try:
+        gh("/repos/%s" % slug)
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            return ("Repo not found: check owner/name. Private repos need a GITHUB_TOKEN that can "
+                    "read them. This is NOT a clean result.")
+        if e.code in (403, 429):
+            return ("GitHub rate limit reached. This is NOT a clean result. Set GITHUB_TOKEN "
+                    "and re-run.")
+    except Exception:
+        pass
+    return ("Scan could not read any files from this repo. This is NOT a clean result. "
+            "Set GITHUB_TOKEN and re-run.")
+
+
 def safety_scan(slug):
     files = _fetch_text_files(slug)
     seen = {n for n, _ in files}
@@ -771,9 +797,7 @@ def safety_scan(slug):
         # Nothing was fetched — almost always a GitHub 403/404 (unauthenticated rate limit),
         # not a repo with no text in it. Reporting "clean" here is a FALSE clean, so don't.
         return {"level": "unknown", "risk": 0, "findings": [], "files_scanned": 0,
-                "note": "Scan could not read any files — likely a GitHub rate limit or a "
-                        "missing/renamed repo. This is NOT a clean result. Set GITHUB_TOKEN "
-                        "and re-run."}
+                "note": _why_unread(slug)}
     return {"level": level, "risk": risk, "findings": findings[:40], "files_scanned": len(files),
             "note": "Heuristic risk assessment, not a certification — a clean scan means these "
                     "checks found nothing, not that the repo is safe."}
@@ -842,6 +866,9 @@ def apply_license(meta):
                                "inside something you sell. " % (lic["license"], lic["reason"])
                                ) + str(d.get("recommendation", ""))
     elif lic["verdict"] == "caution":
+        if d.get("verdict") == "GO" and str(lic["license"]).upper() in ("NOASSERTION", "OTHER"):
+            # You can't know you're allowed to ship a license nobody has identified.
+            d["verdict"] = "MAYBE"
         d["recommendation"] = ("⚠ LICENSE (%s): %s " % (lic["license"], lic["reason"])
                                ) + str(d.get("recommendation", ""))
 
@@ -910,14 +937,25 @@ def make_dossier(meta, specs):
              meta.get("language", ""), meta.get("stars", 0), meta.get("contributors", 0),
              meta.get("latest_release", "—"), ", ".join(meta.get("topics", [])[:10])))
     out = llm(DOSSIER_SYSTEM, q, timeout=180)
-    d = _json_from(out) or {"verdict": "MAYBE", "what": meta.get("desc", ""),
-                            "recommendation": out[:400] or "No LLM configured — scores only. "
-                            "Set an LLM backend in config.json for the full dossier."}
+    d = _json_from(out)
+    if not d:
+        # No usable LLM answer: decide from the scores, and don't cache it, so configuring
+        # an LLM later produces the real dossier instead of this placeholder.
+        return {"verdict": _score_verdict(meta), "what": meta.get("desc", ""), "scores_only": True,
+                "recommendation": out[:400] or "Scores only (no AI write-up). Set an LLM backend "
+                "in config.json for the full dossier."}
     try:
         json.dump(d, open(cp, "w"), indent=2)
     except Exception:
         pass
     return d
+
+
+def _score_verdict(meta):
+    """GO / MAYBE / SKIP from the heuristic alone — the same thresholds the MCP server uses."""
+    overall = (meta.get("scores") or {}).get("overall", 0)
+    return "SKIP" if meta.get("archived") else "GO" if overall >= 68 else \
+        "MAYBE" if overall >= 45 else "SKIP"
 
 
 def make_plan(meta, specs):
@@ -1075,10 +1113,18 @@ def evaluate(slug):
         print("could not resolve %s" % slug); return 1
     with store_txn(specs) as store:
         store["repos"] = [x for x in store["repos"] if x.get("id") != r["id"]] + [r]
-    lic = r.get("commercial") or {}
-    tag = "" if lic.get("verdict") in ("clear", "n/a", None) else \
-        "  [license: %s — %s]" % (lic.get("license"), lic.get("verdict").upper())
-    print("→ evaluated %s (%s)%s" % (r["id"], r.get("dossier", {}).get("verdict", "?"), tag))
+    d, lic, sc = r.get("dossier") or {}, r.get("commercial") or {}, r.get("scores") or {}
+    safety, fit = r.get("safety") or {}, r.get("resource_fit") or {}
+    print("%s  %s  %s/100" % (r["id"], d.get("verdict", "?"), sc.get("overall", "?")))
+    print("  maintenance  %s" % ("ARCHIVED" if r.get("archived") else
+                                 "last push %s" % (r.get("pushed") or "?")[:10]))
+    print("  license      %s (%s)" % (lic.get("license", "?"), lic.get("verdict", "?")))
+    print("  safety       %s, %s file(s) scanned" % (str(safety.get("level", "?")).upper(),
+                                                   safety.get("files_scanned", 0)))
+    print("  fit          %s" % (fit.get("verdict") or "?"))
+    if d.get("recommendation"):
+        print("  → %s" % str(d["recommendation"])[:300])
+    print("  (saved to %s; `repohunter plan %s` drafts the integration)" % (OUT, r["id"]))
     return 0
 
 
