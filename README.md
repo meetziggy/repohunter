@@ -6,14 +6,13 @@
   <img src="https://img.shields.io/badge/AI-pluggable%20(Ollama%20%2F%20your%20key)-a78bfa" alt="pluggable AI">
   <img src="https://img.shields.io/badge/install-uvx%20%2F%20pipx-2b6cb0" alt="installable via uvx or pipx">
   <img src="https://img.shields.io/badge/MCP-server%20%2B%20Claude%20Code%20plugin-f5a623" alt="MCP server and Claude Code plugin">
-  <img src="https://img.shields.io/badge/maintained%20by-Ziggy%20%F0%9F%A4%96-0b1220" alt="maintained by Ziggy">
 </p>
 
 <p align="center"><b>Reuse, don't reinvent.</b> Find great open-source code, see how it'd fit <i>your</i> project and <i>your</i> hardware, what you'd gain, and what integrating it costs — then adopt it, on your terms.</p>
 
 <p align="center">
   <i>Built on open source. Kept open source. Given back.</i><br>
-  <sub>Created and architected by <b>Brian Gorzelic</b>, implemented by <b>Ziggy</b> (his AI) under his direction — Chris Gorzelic contributed testing and product feedback. Now owned &amp; maintained autonomously by the agent, in the open.</sub>
+  <sub>Built by <b>Brian Gorzelic</b> with AI assistance (his agent, Ziggy), under his direction. Brian owns the project and is accountable for every release. Chris Gorzelic contributed testing and product feedback.</sub>
 </p>
 
 ---
@@ -82,7 +81,7 @@ _(An automated builder that runs the plan and opens the PR for you is on the roa
   OpenAI / OpenRouter via config. Your call, your keys.
 - **Built on open source, released to everyone** — MIT. RepoHunter is the reuse-first idea applied to
   itself: assembled from community repos + open APIs, and given back.
-- **Agent-maintained** — Ziggy triages, patches, and ships this repo end-to-end, with Brian steering.
+- **AI-assisted, human-owned** — Ziggy drafts fixes and features; Brian reviews them and owns what ships.
 - **Fewer tokens, smaller bill, less carbon** — every token an AI generates burns real energy, and
   regenerating code that already exists is redundant compute for zero new value. Adopting proven code
   means you skip the compute, the API bill, and the energy behind it. The greenest code is the code
@@ -94,13 +93,13 @@ _(An automated builder that runs the plan and opens the PR for you is on the roa
 **Fastest — no clone, one command:**
 
 ```bash
-uvx --from git+https://github.com/meetziggy/repohunter repohunter scan <owner/repo>
+uvx --from git+https://github.com/meetziggy/repohunter@v0.2.1 repohunter scan <owner/repo>
 ```
 
 **To keep using it — install it properly:**
 
 ```bash
-uv tool install git+https://github.com/meetziggy/repohunter   # or: pipx install git+https://...
+uv tool install git+https://github.com/meetziggy/repohunter@v0.2.1   # or: pipx install git+https://...
 repohunter profiles                                            # confirm it's on your PATH
 ```
 
@@ -135,7 +134,7 @@ Add `--profile <name>` to any command to evaluate against a different configured
 `config.json` to switch between what you're juggling.
 
 **As an MCP server or Claude Code plugin, instead of the CLI:** see
-[`MCP-INSTALL.md`](MCP-INSTALL.md) — `uvx --from git+https://github.com/meetziggy/repohunter repohunter-mcp`, or `/plugin install repohunter` in
+[`MCP-INSTALL.md`](MCP-INSTALL.md) — `uvx --from git+https://github.com/meetziggy/repohunter@v0.2.1 repohunter-mcp`, or `/plugin install repohunter` in
 Claude Code. Same engine, wired into your agent instead of your terminal.
 
 ## Roadmap
@@ -159,4 +158,4 @@ _(That's the only "sponsor" button you'll find here.)_
 
 ---
 
-<p align="center"><sub>MIT © 2026 Brian Gorzelic · built on open source, given back · maintained by Ziggy 🤖</sub></p>
+<p align="center"><sub>MIT © 2026 Brian Gorzelic · built on open source, given back</sub></p>

@@ -25,7 +25,7 @@
       "command": "uvx",
       "args": [
         "--from",
-        "git+https://github.com/meetziggy/repohunter",
+        "git+https://github.com/meetziggy/repohunter@v0.2.1",
         "repohunter-mcp"
       ]
     }

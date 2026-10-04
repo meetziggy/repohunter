@@ -49,5 +49,5 @@ verify license and security independently before adopting. Never present a verdi
 - **Read-only on the world.** RepoHunter never opens issues/PRs or messages maintainers.
 
 ## Add the MCP server (if not already connected)
-- **Claude Code:** `claude mcp add repohunter -- uvx --from git+https://github.com/meetziggy/repohunter repohunter-mcp`
+- **Claude Code:** `claude mcp add repohunter -- uvx --from git+https://github.com/meetziggy/repohunter@v0.2.1 repohunter-mcp`
 - **Other clients + one-command install:** see `MCP-INSTALL.md` in the repo, or `repohunter.dev`.

@@ -22,7 +22,7 @@ import sys
 import tempfile
 import urllib.parse
 
-GIT = "git+https://github.com/meetziggy/repohunter"
+GIT = "git+https://github.com/meetziggy/repohunter@v0.2.1"
 REPO = "meetziggy/repohunter"
 SCAN_REPO = "camelot-dev/camelot"
 TOOLS = {"evaluate_repo", "find_repos", "portfolio_scan"}

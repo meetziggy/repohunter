@@ -9,10 +9,15 @@ executes repo code, or stores your data.
 - **The score is a transparent heuristic, not a security audit.** It does **not** detect malware,
   supply-chain compromise, or vulnerabilities. A `GO` means "popular, active, licensed" — not "safe."
   Always verify license and security independently before adopting anything.
-- **We do not (yet) scan for prompt injection or malicious content.** A repo's README or description
-  is attacker-controlled text. RepoHunter treats it as **untrusted data** and minimizes how much of it
-  we pass on. We will only add a "safety" claim after we've validated it and red-teamed ourselves in
-  public — not before.
+- **The safety scan is pattern matching, and it is not validated.** `repohunter scan` (CLI only; the
+  MCP tool does not run it) looks for prompt-injection phrasing, hidden zero-width or bidi text, piped
+  installs, base64-decoded shell and leaked secrets in a repo's top-level text and agent config files.
+  It has known misses (for example `bash <(curl …)`, `curl … | python3`, paraphrased injections, and
+  install hooks in package manifests) and known noise (vendor-documented `curl | sh` installers). A
+  clean scan means these checks found nothing — it is not a safety claim. We will not make one until
+  the scan has been red-teamed against an external corpus with published recall and precision.
+- **A repo's README or description is attacker-controlled text.** RepoHunter treats it as **untrusted
+  data** and minimizes how much of it we pass on.
 - **The MCP server runs locally.** Your `GITHUB_TOKEN` (if set) stays on your machine and is sent only
   to `api.github.com`. RepoHunter never transmits or stores it.
 
@@ -23,6 +28,10 @@ RepoHunter returns facts about repos. Some fields (e.g. a repo's description) or
 instructions** — same as any content fetched from the open web. Our generated "recommendation prompt"
 deliberately contains **only RepoHunter's own computed facts** (verdict, scores, URL) and never embeds
 a repo's free-text description, so RepoHunter cannot be used as an injection vector into your agent.
+
+## Who is accountable
+Brian Gorzelic owns RepoHunter and is accountable for its releases and security fixes. Code may be
+drafted with AI assistance; it ships under his name.
 
 ## Reporting a vulnerability
 Please **do not** open a public issue for security problems. Instead, use GitHub's
