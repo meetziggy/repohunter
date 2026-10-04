@@ -21,7 +21,7 @@ try:
 except Exception:
     bookhunter = None
 
-UA = "ResearchHunter/0.1 (+https://github.com/repohunter)"
+UA = "ResearchHunter/0.1 (+https://repohunter.dev)"
 TIMEOUT = 15
 CACHE_DIR = os.path.expanduser("~/.researchhunter/cache")
 
@@ -169,15 +169,9 @@ def books_search(q: str, limit: int = 15) -> List[Cite]:
 
 
 def web_search(q: str, limit: int = 10) -> List[Cite]:
-    results: List[Cite] = []
+    # A link only — fetching it through a third-party proxy sent every query off-box and the
+    # response was never used.
     qs = urllib.parse.quote_plus(q)
-    url = f"https://r.jina.ai/http://www.google.com/search?q={qs}&num={limit}"
-    try:
-        text = _http_get_text(url)
-    except Exception:
-        text = None
-    if not text:
-        return results
     return [
         Cite(
             id="web:1",
@@ -186,7 +180,7 @@ def web_search(q: str, limit: int = 10) -> List[Cite]:
             url=f"https://www.google.com/search?q={qs}",
             year=None,
             authors=[],
-            source="jina",
+            source="google",
         )
     ]
 
