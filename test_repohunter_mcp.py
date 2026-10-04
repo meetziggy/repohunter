@@ -52,5 +52,26 @@ class EvidenceContract(unittest.TestCase):
         self.assertIn("does not imply", out["_note"].lower())
 
 
+class ResearchTools(unittest.TestCase):
+    def test_research_module_loads_and_dataclasses_work(self):
+        from dataclasses import asdict
+        mod = mcp._rh()
+        cite = mod.Cite(id="x", title="t", type="paper", url="u", year=None, authors=[], source="s")
+        self.assertEqual(asdict(cite)["title"], "t")
+
+    def test_limit_is_clamped(self):
+        self.assertEqual(mcp._limit({"limit": "9999"}, 30), 50)
+        self.assertEqual(mcp._limit({"limit": 0}, 30), 30)
+        self.assertEqual(mcp._limit({"limit": "x"}, 30), 30)
+
+    def test_cache_key_separates_source_sets(self):
+        mod = mcp._rh()
+        self.assertNotEqual(mod._cache_key("q", "wide", 20, "110"), mod._cache_key("q", "wide", 20, "010"))
+
+    def test_results_marked_untrusted(self):
+        out = mcp._research(lambda: {"success": True})
+        self.assertIn("UNTRUSTED", out["_untrusted"])
+
+
 if __name__ == "__main__":
     unittest.main()

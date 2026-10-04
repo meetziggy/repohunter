@@ -26,8 +26,8 @@ TIMEOUT = 15
 CACHE_DIR = os.path.expanduser("~/.researchhunter/cache")
 
 
-def _cache_key(q: str, mode: str, limit: int) -> str:
-    h = hashlib.sha256(f"{q}|{mode}|{limit}".encode()).hexdigest()[:16]
+def _cache_key(q: str, mode: str, limit: int, sources: str = "") -> str:
+    h = hashlib.sha256(f"{q}|{mode}|{limit}|{sources}".encode()).hexdigest()[:16]
     return h
 
 
@@ -198,7 +198,9 @@ def research_topic(
         return {"success": False, "error": "empty query"}
     q = q.strip()
     mode = mode if mode in ("quick", "wide", "deep") else "wide"
-    k = _cache_key(q, mode, limit)
+    # The source flags are part of the key: research_papers and research_topic can share
+    # q/mode/limit, and must not serve each other's cached results.
+    k = _cache_key(q, mode, limit, f"{include_books:d}{include_papers:d}{include_web:d}")
     if use_cache:
         c = _load_cache(k)
         if c is not None:
