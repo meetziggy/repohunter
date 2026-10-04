@@ -138,19 +138,39 @@ class SafetyScan(unittest.TestCase):
         rh.apply_safety(meta3)
         self.assertEqual(meta3["dossier"]["verdict"], "SKIP")
 
+    def _scan_reading_nothing(self, gh_error):
+        orig = rh._fetch_text_files, rh._fetch_agent_config_files, rh.gh
+        rh._fetch_text_files = lambda slug: []
+        rh._fetch_agent_config_files = lambda slug, **kw: []
+        def gh(path, want_headers=False):
+            raise gh_error
+        rh.gh = gh
+        try:
+            return rh.safety_scan("who/ever")
+        finally:
+            rh._fetch_text_files, rh._fetch_agent_config_files, rh.gh = orig
+
     def test_zero_files_is_unknown_not_clean(self):
         """A rate-limited fetch reads zero files. Calling that 'clean' is a false clean —
         it is indistinguishable from a repo that was actually checked."""
-        orig_top, orig_agent = rh._fetch_text_files, rh._fetch_agent_config_files
-        rh._fetch_text_files = lambda slug: []
-        rh._fetch_agent_config_files = lambda slug, **kw: []
-        try:
-            s = rh.safety_scan("who/ever")
-        finally:
-            rh._fetch_text_files, rh._fetch_agent_config_files = orig_top, orig_agent
+        s = self._scan_reading_nothing(OSError("network down"))
         self.assertEqual(s["level"], "unknown")
         self.assertEqual(s["files_scanned"], 0)
         self.assertIn("NOT a clean result", s["note"])
+
+    def test_zero_files_names_the_reason(self):
+        """A missing repo used to be reported as a likely rate limit."""
+        import urllib.error
+        def err(code):
+            return urllib.error.HTTPError("https://api.github.com/repos/who/ever", code, "x", {}, None)
+        missing = self._scan_reading_nothing(err(404))
+        self.assertIn("Repo not found", missing["note"])
+        self.assertNotIn("rate limit", missing["note"])
+        limited = self._scan_reading_nothing(err(403))
+        self.assertIn("rate limit", limited["note"])
+        for s in (missing, limited):
+            self.assertEqual(s["level"], "unknown")
+            self.assertIn("NOT a clean result", s["note"])
 
     def test_unknown_scan_caps_a_go(self):
         meta = {"dossier": {"verdict": "GO", "recommendation": "adopt"},

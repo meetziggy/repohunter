@@ -569,6 +569,23 @@ def _fetch_text_files(slug, cap=8):
     return files
 
 
+def _why_unread(slug):
+    """Name the actual reason a scan read nothing, instead of guessing."""
+    try:
+        gh("/repos/%s" % slug)
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            return ("Repo not found: check owner/name. Private repos need a GITHUB_TOKEN that can "
+                    "read them. This is NOT a clean result.")
+        if e.code in (403, 429):
+            return ("GitHub rate limit reached. This is NOT a clean result. Set GITHUB_TOKEN "
+                    "and re-run.")
+    except Exception:
+        pass
+    return ("Scan could not read any files from this repo. This is NOT a clean result. "
+            "Set GITHUB_TOKEN and re-run.")
+
+
 def safety_scan(slug):
     files = _fetch_text_files(slug)
     seen = {n for n, _ in files}
@@ -586,9 +603,7 @@ def safety_scan(slug):
         # Nothing was fetched — almost always a GitHub 403/404 (unauthenticated rate limit),
         # not a repo with no text in it. Reporting "clean" here is a FALSE clean, so don't.
         return {"level": "unknown", "risk": 0, "findings": [], "files_scanned": 0,
-                "note": "Scan could not read any files — likely a GitHub rate limit or a "
-                        "missing/renamed repo. This is NOT a clean result. Set GITHUB_TOKEN "
-                        "and re-run."}
+                "note": _why_unread(slug)}
     return {"level": level, "risk": risk, "findings": findings[:40], "files_scanned": len(files),
             "note": "Heuristic risk assessment, not a certification — a clean scan means these "
                     "checks found nothing, not that the repo is safe."}
