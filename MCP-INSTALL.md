@@ -25,7 +25,7 @@ Everything below is for wiring the server up by hand, or for other agents.
 ## The command
 
 ```
-uvx --from git+https://github.com/meetziggy/repohunter repohunter-mcp
+uvx --from git+https://github.com/meetziggy/repohunter@v0.2.1 repohunter-mcp
 ```
 
 Or run it straight from a clone (works today):
@@ -45,7 +45,7 @@ The config block is the same everywhere — just the file it goes in differs.
   "mcpServers": {
     "repohunter": {
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/meetziggy/repohunter", "repohunter-mcp"],
+      "args": ["--from", "git+https://github.com/meetziggy/repohunter@v0.2.1", "repohunter-mcp"],
       "env": { "GITHUB_TOKEN": "" }
     }
   }
@@ -59,7 +59,7 @@ From a clone instead, swap the command:
 
 Where that block goes, per client:
 - **Claude Desktop** — Settings → Developer → Edit Config (`claude_desktop_config.json`).
-- **Claude Code** — `claude mcp add repohunter -- uvx --from git+https://github.com/meetziggy/repohunter repohunter-mcp`, or a project `.mcp.json`.
+- **Claude Code** — `claude mcp add repohunter -- uvx --from git+https://github.com/meetziggy/repohunter@v0.2.1 repohunter-mcp`, or a project `.mcp.json`.
 - **Cursor** — Settings → MCP → Add, or `.cursor/mcp.json`.
 - **Cline / Roo** — the MCP Servers panel → Configure.
 - **Windsurf** — Settings → Cascade → MCP (`mcp_config.json`).
@@ -84,7 +84,7 @@ isolation (or found it via the Docker MCP Catalog):
 ```
 docker build -t repohunter-mcp .
 ```
-Then point your client at `docker run -i --rm repohunter-mcp` instead of `uvx --from git+https://github.com/meetziggy/repohunter repohunter-mcp`. MCP
+Then point your client at `docker run -i --rm repohunter-mcp` instead of `uvx --from git+https://github.com/meetziggy/repohunter@v0.2.1 repohunter-mcp`. MCP
 speaks over stdio, so there are no ports to expose.
 
 ## Give your agent the *reflex*, not just the tools

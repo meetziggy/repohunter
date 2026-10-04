@@ -93,13 +93,13 @@ _(An automated builder that runs the plan and opens the PR for you is on the roa
 **Fastest — no clone, one command:**
 
 ```bash
-uvx --from git+https://github.com/meetziggy/repohunter repohunter scan <owner/repo>
+uvx --from git+https://github.com/meetziggy/repohunter@v0.2.1 repohunter scan <owner/repo>
 ```
 
 **To keep using it — install it properly:**
 
 ```bash
-uv tool install git+https://github.com/meetziggy/repohunter   # or: pipx install git+https://...
+uv tool install git+https://github.com/meetziggy/repohunter@v0.2.1   # or: pipx install git+https://...
 repohunter profiles                                            # confirm it's on your PATH
 ```
 
@@ -134,7 +134,7 @@ Add `--profile <name>` to any command to evaluate against a different configured
 `config.json` to switch between what you're juggling.
 
 **As an MCP server or Claude Code plugin, instead of the CLI:** see
-[`MCP-INSTALL.md`](MCP-INSTALL.md) — `uvx --from git+https://github.com/meetziggy/repohunter repohunter-mcp`, or `/plugin install repohunter` in
+[`MCP-INSTALL.md`](MCP-INSTALL.md) — `uvx --from git+https://github.com/meetziggy/repohunter@v0.2.1 repohunter-mcp`, or `/plugin install repohunter` in
 Claude Code. Same engine, wired into your agent instead of your terminal.
 
 ## Roadmap

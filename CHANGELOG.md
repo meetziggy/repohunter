@@ -9,6 +9,18 @@ All notable changes to RepoHunter are documented here. Format follows
 - Green **"compute saved ≈ energy ≈ CO₂ avoided"** estimate on adoptions _(planned)_
 - Port the visual store (walkthrough + Map) fully into the standalone build
 
+## [0.2.1] — 2026-10-04
+### Fixed
+- Claude Code plugin started its MCP server from an unpublished PyPI name, so it failed for
+  every user and the name could have been squatted; it now starts from this tagged release (#26)
+- Every documented install command is pinned to a release tag instead of the main branch
+- `scan` says "repo not found" instead of guessing a rate limit (#23)
+- `evaluate` without an LLM: verdict from the scores, not a hard-coded MAYBE, and no stale cache (#24)
+- An unidentified license is never a GO in the MCP server and the badge service (#25)
+- README and SECURITY.md name a human owner and describe the safety scan as unvalidated (#27)
+### Added
+- `scripts/verify_install.py`: tests every published install method in a sandbox (#26)
+
 ## [0.2.0] — 2026-09-22
 ### Added
 - **License/resale-risk gate** — every dossier and `evaluate` now carries a license read
