@@ -58,8 +58,23 @@
   h1 em{font-style:italic;color:inherit}
   .lede{color:var(--soft);font-size:18px;line-height:1.55;margin:0 0 30px;max-width:46ch}
   .install{background:var(--bg2);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-  .install .bar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}
-  .install pre{margin:0;padding:16px 16px 18px;font-size:14px;line-height:1.75;color:var(--text);white-space:pre;overflow-x:auto}
+  .install .bar{display:flex;align-items:center;gap:10px;padding:10px 12px 10px 14px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}
+  .install .bar .spacer{flex:1}
+  .pick{position:relative;display:inline-flex}
+  .pick::after{content:"";position:absolute;right:11px;top:50%;width:7px;height:7px;border-right:1.5px solid var(--soft);border-bottom:1.5px solid var(--soft);transform:translateY(-70%) rotate(45deg);pointer-events:none}
+  .pick select{appearance:none;-webkit-appearance:none;background:var(--card);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:6px 30px 6px 10px;font:600 13px/1.4 var(--sans);cursor:pointer}
+  .pick select:hover{border-color:var(--lime)}
+  .install pre{margin:0;padding:16px 16px 18px;font-size:14px;line-height:1.7;color:var(--text);white-space:pre-wrap;overflow-wrap:anywhere}
+  .openrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 16px 0;font-size:13px;color:var(--muted)}
+  .openrow[hidden]{display:none}
+  .btn.sm{padding:8px 14px;font-size:14px;border-radius:10px}
+  .btn.ghost.sm{border-color:var(--lime);color:var(--text)}
+  .needs{margin:12px 0 0;font-size:14px;color:var(--muted)}
+  .needs a{color:var(--soft);text-decoration:underline;text-decoration-color:var(--line2)}
+  /* every code block gets a copy button */
+  .codebox{position:relative}
+  .codebox .copy{position:absolute;top:8px;right:8px;background:var(--bg2)}
+  .codebox pre{padding-right:78px !important}
   .copy{background:transparent;border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:5px 12px;font:600 13px/1.4 var(--sans);cursor:pointer;transition:border-color .15s,background .15s}
   .copy:hover{border-color:var(--lime)}
   .copy.done{border-color:var(--lime);color:var(--lime)}
@@ -198,7 +213,10 @@
     section{padding:56px 0}
     .call .out{grid-template-columns:1fr;gap:0}
     .call .sig{white-space:normal;overflow-wrap:normal}
-    .install pre{font-size:11.5px;padding:14px 12px 16px}
+    .install pre{font-size:13px}
+    .install .bar{padding:8px 8px 8px 10px;gap:8px}
+    .install .bar label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+    .pick select{padding:6px 28px 6px 9px}
     footer{flex-direction:column;align-items:flex-start;gap:10px}
     footer .spacer{display:none}
     .call .out .k{margin-top:6px}
@@ -231,10 +249,23 @@
         can you ship its license, does a safety scan find anything, and will it run on your machine.
         Your agent calls it as a tool; you can run it from the terminal.</p>
       <div class="install">
-        <div class="bar"><span>In Claude Code</span><button class="copy primary" type="button" data-copy="plugin">Copy</button></div>
-<pre id="plugin">/plugin marketplace add meetziggy/repohunter
-/plugin install repohunter</pre>
+        <div class="bar">
+          <label for="client">Install in</label>
+          <span class="pick"><select id="client">
+            <option value="claude">Claude Code</option>
+            <option value="cursor">Cursor</option>
+            <option value="vscode">VS Code</option>
+            <option value="codex">Codex</option>
+            <option value="json">Claude Desktop &amp; others</option>
+            <option value="cli">Terminal (no agent)</option>
+          </select></span>
+          <span class="spacer"></span>
+          <button class="copy primary" type="button" data-copy="installCmd">Copy</button>
+        </div>
+        <div class="openrow" id="openRow" hidden><a class="btn ghost sm" id="openLink" href="#">Open in Cursor</a><span id="openNote">One click; your client asks you to confirm. Or paste the config below.</span></div>
+<pre id="installCmd">claude mcp add repohunter -- uvx --from git+https://github.com/meetziggy/repohunter repohunter-mcp</pre>
       </div>
+      <p class="needs">Needs <a href="https://docs.astral.sh/uv/getting-started/installation/">uv</a>. Python standard library only; runs on your machine.</p>
       <div class="alt">
         <a href="#install"><b>Other agents</b> (MCP) &amp; CLI</a>
         <a href="#try"><b>Try a repo</b> in your browser</a>
@@ -327,20 +358,26 @@
     <p class="sub">Python, standard library only. Runs on your machine; your GitHub token never leaves it.</p>
     <div class="ways">
       <div class="way"><div><h3>Claude Code plugin</h3>
-        <p>Installs the MCP server and the skill that tells your agent when to use it.</p></div>
+        <p>The MCP server plus the skill that tells your agent when to use it. Paste into Claude Code.</p></div>
 <pre>/plugin marketplace add meetziggy/repohunter
 /plugin install repohunter</pre></div>
       <div class="way"><div><h3>Any MCP client</h3>
-        <p>Cursor, Claude Desktop, Codex and others: point the client at the server.</p>
-        <a class="more" href="https://github.com/meetziggy/repohunter/blob/main/MCP-INSTALL.md">Per-client setup</a></div>
-<pre>uv tool install git+https://github.com/meetziggy/repohunter
-<span class="c"># then in your client's MCP config:</span>
-"repohunter": { "command": "repohunter-mcp" }</pre></div>
+        <p>Claude Desktop, Windsurf, Zed, Cline and others: add this to the client's MCP config.</p>
+        <a class="more" href="https://github.com/meetziggy/repohunter/blob/main/MCP-INSTALL.md">Where each client keeps its config</a></div>
+<pre>{
+  "mcpServers": {
+    "repohunter": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/meetziggy/repohunter", "repohunter-mcp"]
+    }
+  }
+}</pre></div>
       <div class="way"><div><h3>CLI</h3>
-        <p>Scan or evaluate from the terminal, or run the local store UI.</p>
+        <p>Run it once with no install, or install it to keep the <code>repohunter</code> command.</p>
         <a class="more" href="https://github.com/meetziggy/repohunter#readme">README</a></div>
-<pre>uv tool install git+https://github.com/meetziggy/repohunter
-repohunter scan owner/repo
+<pre>uvx --from git+https://github.com/meetziggy/repohunter repohunter scan owner/repo
+
+uv tool install git+https://github.com/meetziggy/repohunter
 repohunter evaluate owner/repo</pre></div>
     </div>
   </section>
@@ -414,8 +451,45 @@ repohunter evaluate owner/repo</pre></div>
 </div>
 
 <script>
-/* Copy buttons for install blocks. */
+/* Client picker: one-liner per AI client, plus one-click install links where the client supports them. */
 (function(){
+  var sel=document.getElementById('client'), pre=document.getElementById('installCmd'),
+      row=document.getElementById('openRow'), link=document.getElementById('openLink');
+  if(!sel) return;
+  var GIT='git+https://github.com/meetziggy/repohunter', args=['--from',GIT,'repohunter-mcp'];
+  var server={command:'uvx',args:args};
+  var json='{\n  "mcpServers": {\n    "repohunter": {\n      "command": "uvx",\n      "args": ["--from", "'+GIT+'", "repohunter-mcp"]\n    }\n  }\n}';
+  var C={
+    claude:{cmd:'claude mcp add repohunter -- uvx --from '+GIT+' repohunter-mcp'},
+    codex:{cmd:'codex mcp add repohunter -- uvx --from '+GIT+' repohunter-mcp'},
+    cursor:{cmd:json, open:'Open in Cursor',
+      href:'cursor://anysphere.cursor-deeplink/mcp/install?name=repohunter&config='+encodeURIComponent(btoa(JSON.stringify(server)))},
+    vscode:{cmd:json, open:'Open in VS Code',
+      href:'vscode:mcp/install?'+encodeURIComponent(JSON.stringify({name:'repohunter',command:'uvx',args:args}))},
+    json:{cmd:json},
+    cli:{cmd:'uvx --from '+GIT+' repohunter scan owner/repo'}
+  };
+  function show(k){
+    var c=C[k]||C.claude; pre.textContent=c.cmd;
+    if(c.href){ link.href=c.href; link.textContent=c.open; row.hidden=false; } else row.hidden=true;
+    try{ localStorage.setItem('rh-client',k); }catch(e){}
+  }
+  sel.addEventListener('change',function(){ show(sel.value); });
+  var saved=null; try{ saved=localStorage.getItem('rh-client'); }catch(e){}
+  if(saved&&C[saved]){ sel.value=saved; show(saved); }
+})();
+</script>
+
+<script>
+/* Copy buttons: the hero's labelled one, plus one on every other code block. */
+(function(){
+  Array.prototype.forEach.call(document.querySelectorAll('.way pre'),function(pre,i){
+    if(!pre.id) pre.id='code'+i;
+    var box=document.createElement('div'); box.className='codebox';
+    pre.parentNode.insertBefore(box,pre); box.appendChild(pre);
+    var b=document.createElement('button'); b.type='button'; b.className='copy'; b.textContent='Copy';
+    b.setAttribute('data-copy',pre.id); b.setAttribute('aria-label','Copy code'); box.appendChild(b);
+  });
   Array.prototype.forEach.call(document.querySelectorAll('[data-copy]'),function(b){
     b.addEventListener('click',function(){
       var t=(document.getElementById(b.getAttribute('data-copy'))||{}).textContent||'';
