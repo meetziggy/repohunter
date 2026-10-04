@@ -11,7 +11,7 @@
       "name": "repohunter",
       "displayName": "RepoHunter",
       "description": "Scan, evaluate and fit-map any repo before you adopt it. Ships the evaluation tools (MCP) and the reflex to use them (skills).",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "source": "./",
       "author": { "name": "Brian Gorzelic", "url": "https://repohunter.dev" },
       "repository": "https://github.com/meetziggy/repohunter",
