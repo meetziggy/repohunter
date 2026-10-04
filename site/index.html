@@ -3,24 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RepoHunter — check a repo before your AI agent installs it</title>
-<meta name="description" content="RepoHunter checks any GitHub repo before you or your AI agent adopt it: GO / MAYBE / SKIP with the reasons — maintenance, license, a safety scan, and whether it runs on your machine. CLI, MCP server and Claude Code plugin. MIT.">
+<title>RepoHunter — before your AI builds it, check what already exists</title>
+<meta name="description" content="Before your AI builds it, check what already exists. RepoHunter finds maintained open source your agent can reuse instead of regenerating, and tells you if it's safe to install: GO / MAYBE / SKIP with the reasons. Claude Code, Cursor, Codex, any MCP client. MIT.">
 <link rel="icon" type="image/svg+xml" href="/logo.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="theme-color" content="#070b16">
 <link rel="canonical" href="https://repohunter.dev/">
-<meta property="og:title" content="RepoHunter — check a repo before your AI agent installs it">
-<meta property="og:description" content="GO / MAYBE / SKIP for any GitHub repo, with the reasons: maintenance, license, safety scan, hardware fit. CLI, MCP server, Claude Code plugin.">
+<meta property="og:title" content="RepoHunter — before your AI builds it, check what already exists">
+<meta property="og:description" content="Your agent finds the maintained open-source version before it writes its own, and checks it is safe to install: GO / MAYBE / SKIP with the reasons. Claude Code, Cursor, Codex, any MCP client.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://repohunter.dev/">
 <meta property="og:image" content="https://repohunter.dev/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="RepoHunter — check a repo before your AI agent installs it">
-<meta name="twitter:description" content="GO / MAYBE / SKIP for any GitHub repo, with the reasons. CLI, MCP server, Claude Code plugin.">
+<meta name="twitter:title" content="RepoHunter — before your AI builds it, check what already exists">
+<meta name="twitter:description" content="Your agent checks what already exists before it writes its own, and whether it is safe to install.">
 <meta name="twitter:image" content="https://repohunter.dev/og.png">
 <script type="application/ld+json">
 {
@@ -126,7 +126,7 @@
   .v-MAYBE{background:rgba(251,191,36,.14);color:var(--amber)}
   .v-SKIP{background:rgba(251,113,133,.15);color:var(--red)}
   .v-CLEAN{background:rgba(52,211,153,.14);color:var(--green)}
-  .bad{color:var(--red)}.ok{color:var(--green)}
+  .bad{color:var(--red)}.ok{color:var(--green)}.warn{color:var(--amber)}
   .provenance{padding:10px 18px 14px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
 
   /* sections */
@@ -261,10 +261,11 @@
 
   <header class="hero">
     <div>
-      <h1>Check a repo <em>before</em> your AI agent installs it.</h1>
-      <p class="lede">RepoHunter gives any GitHub repo a GO, MAYBE or SKIP, with the reasons: is it maintained,
-        can you ship its license, does a safety scan find anything, and will it run on your machine.
-        Your agent calls it as a tool; you can run it from the terminal.</p>
+      <h1>Before your AI builds it, check what <em>already exists</em>.</h1>
+      <p class="lede">Every feature your agent writes from scratch costs tokens, time and new bugs.
+        RepoHunter lets it find the maintained open-source version first, and tells you if it's safe
+        to install: GO, MAYBE or SKIP, with the reasons. It runs inside Claude Code, Cursor, Codex
+        and any MCP client.</p>
       <div class="install">
         <div class="bar">
           <label for="client">Install in</label>
@@ -289,41 +290,40 @@
       </div>
     </div>
 
-    <div class="session" aria-label="Example: an AI agent checks a dependency with RepoHunter before installing it">
+    <div class="session" aria-label="Example: an AI agent checks for existing tools with RepoHunter instead of writing its own">
       <div class="top"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
-        <span class="ttl">invoice-service · agent session</span>
+        <span class="ttl">my-app · agent session</span>
         <button class="replay" type="button" id="replay" hidden>Replay</button></div>
       <div class="log" id="log">
         <div class="turn user"><div class="who">You</div>
-          <p>Add table extraction for the PDF invoices.</p></div>
+          <p>My Claude Code bill keeps climbing. Should we write a hook that trims long command output, or does something already do it?</p></div>
         <div class="turn agent"><div class="who">Agent</div>
-          <p>I'll use Camelot. Checking it before I install anything.</p></div>
+          <p>Checking what exists before writing anything.</p></div>
         <div class="turn"><div class="call">
-          <div class="sig">repohunter.evaluate_repo<span>(</span><wbr>"atlanhq/camelot"<span>)</span></div>
+          <div class="sig">repohunter.evaluate_repo<span>(</span><wbr>"rtk-ai/rtk"<span>)</span></div>
           <div class="out">
-            <span class="k">verdict</span><span><span class="v v-SKIP">SKIP</span> 41/100</span>
-            <span class="k">status</span><span class="bad">archived · last push 2023-01-05</span>
-            <span class="k">license</span><span class="bad">NOASSERTION</span>
-            <span class="k">stars</span><span>3,708</span>
-          </div></div></div>
-        <div class="turn agent"><div class="who">Agent</div>
-          <p>That repo is archived. Development moved to <code>camelot-dev/camelot</code>. Checking that one.</p></div>
-        <div class="turn"><div class="call">
-          <div class="sig">repohunter.evaluate_repo<span>(</span><wbr>"camelot-dev/camelot"<span>)</span></div>
-          <div class="out">
-            <span class="k">verdict</span><span><span class="v v-MAYBE">MAYBE</span> 63/100</span>
-            <span class="k">status</span><span class="ok">maintained · last push 2026-09-19</span>
-            <span class="k">license</span><span class="ok">MIT</span>
-            <span class="k">fit</span><span>runs easily · ordinary app resources</span>
+            <span class="k">verdict</span><span><span class="v v-GO">GO</span> 89/100</span>
+            <span class="k">status</span><span class="ok">maintained · last push 2026-10-03</span>
+            <span class="k">license</span><span class="ok">Apache-2.0</span>
+            <span class="k">fit</span><span>runs easily · compiled, small footprint</span>
           </div></div></div>
         <div class="turn"><div class="call">
-          <div class="sig">$ repohunter scan camelot-dev/camelot</div>
+          <div class="sig">$ repohunter scan rtk-ai/rtk</div>
           <div class="out">
-            <span class="k">safety</span><span><span class="v v-CLEAN">CLEAN</span> 0/100 · 4 files scanned</span>
+            <span class="k">safety</span><span><span class="v v-MAYBE">MEDIUM</span> 30/100 · 8 files scanned</span>
+            <span class="k">finding</span><span class="warn">README installs with curl | sh (piped script)</span>
+          </div></div></div>
+        <div class="turn"><div class="call">
+          <div class="sig">repohunter.evaluate_repo<span>(</span><wbr>"mksglu/context-mode"<span>)</span></div>
+          <div class="out">
+            <span class="k">verdict</span><span><span class="v v-MAYBE">MAYBE</span> 84/100</span>
+            <span class="k">status</span><span class="ok">maintained · last push 2026-10-04</span>
+            <span class="k">license</span><span class="warn">NOASSERTION · GitHub can't identify it</span>
           </div></div></div>
         <div class="turn agent"><div class="who">Agent</div>
-          <p>Going with <code>camelot-dev/camelot</code>: maintained, MIT, scan clean. It's a MAYBE, not a GO,
-            so I'll pin the version and add a test on a sample invoice before wiring it in.</p></div>
+          <p>No need to write one: <code>rtk</code> already does this. I'll install it with <code>brew install rtk</code>,
+            their recommended route, instead of piping a script into your shell. <code>context-mode</code>'s LICENSE is the
+            Elastic License 2.0, which is source-available, not open source: fine for you, but read it before you ship it inside a product.</p></div>
       </div>
       <div class="provenance">Tool output is real, captured 2026-10-04. The conversation lines are illustrative.</div>
     </div>
@@ -364,9 +364,9 @@
       <button class="btn primary" id="tryGo" type="button">Check repo</button>
     </div>
     <div class="try-ex">Examples:
-      <button type="button" data-r="atlanhq/camelot">atlanhq/camelot</button>
-      <button type="button" data-r="camelot-dev/camelot">camelot-dev/camelot</button>
-      <button type="button" data-r="ollama/ollama">ollama/ollama</button></div>
+      <button type="button" data-r="rtk-ai/rtk">rtk-ai/rtk</button>
+      <button type="button" data-r="mksglu/context-mode">mksglu/context-mode</button>
+      <button type="button" data-r="ccusage/ccusage">ccusage/ccusage</button></div>
     <div class="tiles" id="tiles" aria-live="polite"></div>
   </section>
 
@@ -392,7 +392,7 @@
       <div class="way"><div><h3>CLI</h3>
         <p>Runs with no install. Swap in any <code>owner/repo</code> or GitHub URL. To keep the command around: <code>uv tool install git+https://github.com/meetziggy/repohunter</code></p>
         <a class="more" href="https://github.com/meetziggy/repohunter#readme">README</a></div>
-<pre>uvx --from git+https://github.com/meetziggy/repohunter repohunter scan camelot-dev/camelot</pre></div>
+<pre>uvx --from git+https://github.com/meetziggy/repohunter repohunter scan rtk-ai/rtk</pre></div>
     </div>
   </section>
 
@@ -481,7 +481,7 @@
     vscode:{cmd:json, open:'Open in VS Code',
       href:'vscode:mcp/install?'+encodeURIComponent(JSON.stringify({name:'repohunter',command:'uvx',args:args}))},
     json:{cmd:json},
-    cli:{cmd:'uvx --from '+GIT+' repohunter scan camelot-dev/camelot'}
+    cli:{cmd:'uvx --from '+GIT+' repohunter scan rtk-ai/rtk'}
   };
   function show(k){
     var c=C[k]||C.claude; pre.textContent=c.cmd;
@@ -640,7 +640,7 @@
   Array.prototype.forEach.call(document.querySelectorAll('.try-ex button'),function(b){ b.onclick=function(){ evalRepo(b.getAttribute('data-r'),true); }; });
   // Load the examples only when the section is near the viewport — every check spends the visitor's GitHub quota.
   var seeded=false;
-  function seed(){ if(seeded) return; seeded=true; ['atlanhq/camelot','camelot-dev/camelot','ollama/ollama'].forEach(function(s){ evalRepo(s,false); }); }
+  function seed(){ if(seeded) return; seeded=true; ['rtk-ai/rtk','mksglu/context-mode','ccusage/ccusage'].forEach(function(s){ evalRepo(s,false); }); }
   if('IntersectionObserver' in window){
     var io=new IntersectionObserver(function(es){ if(es[0].isIntersecting){ io.disconnect(); seed(); } },{rootMargin:'200px'});
     io.observe(tiles);

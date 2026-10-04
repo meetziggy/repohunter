@@ -1,8 +1,8 @@
 # RepoHunter
 
-> RepoHunter checks a GitHub repo before you or your AI agent adopt it. It returns GO, MAYBE or SKIP with the reasons: whether the repo is maintained or archived, what its license allows (including resale), a heuristic safety scan of its text and agent config files, and whether it runs on your machine. It runs locally as an MCP server, a Claude Code plugin, and a CLI. Python standard library only, MIT licensed.
+> Before your AI builds something, RepoHunter checks what already exists. It helps an agent find a maintained open-source repo to reuse instead of regenerating it (saving tokens and time), and checks a candidate before adoption. It returns GO, MAYBE or SKIP with the reasons: whether the repo is maintained or archived, what its license allows (including resale), a heuristic safety scan of its text and agent config files, and whether it runs on your machine. It runs locally as an MCP server, a Claude Code plugin, and a CLI. Python standard library only, MIT licensed.
 
-When to use it: before adding a dependency, cloning a tool, or installing a skill or MCP server. Agents should call `evaluate_repo` on a candidate before installing it and treat the verdict as guidance, not a guarantee.
+When to use it: before writing a feature that open source may already provide, before adding a dependency, cloning a tool, or installing a skill or MCP server. Agents should call `evaluate_repo` on a candidate before installing it and treat the verdict as guidance, not a guarantee.
 
 ## Install
 
@@ -10,7 +10,7 @@ When to use it: before adding a dependency, cloning a tool, or installing a skil
 - Claude Code (plugin: server plus the skill that tells the agent when to use it): `/plugin marketplace add meetziggy/repohunter` then `/plugin install repohunter`
 - Codex: `codex mcp add repohunter -- uvx --from git+https://github.com/meetziggy/repohunter repohunter-mcp`
 - Any MCP client (Cursor, VS Code, Claude Desktop, Windsurf, Zed, Cline): stdio server, command `uvx`, args `["--from", "git+https://github.com/meetziggy/repohunter", "repohunter-mcp"]`
-- CLI, no install: `uvx --from git+https://github.com/meetziggy/repohunter repohunter scan camelot-dev/camelot` (swap in any owner/repo or GitHub URL)
+- CLI, no install: `uvx --from git+https://github.com/meetziggy/repohunter repohunter scan rtk-ai/rtk` (swap in any owner/repo or GitHub URL)
 
 Requires [uv](https://docs.astral.sh/uv/). Not yet published on PyPI. An optional `GITHUB_TOKEN` raises rate limits; it stays on the user's machine.
 
