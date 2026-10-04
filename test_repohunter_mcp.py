@@ -52,5 +52,19 @@ class EvidenceContract(unittest.TestCase):
         self.assertIn("does not imply", out["_note"].lower())
 
 
+class UnidentifiedLicense(unittest.TestCase):
+    def _repo(self, spdx):
+        return {"stargazers_count": 250000, "pushed_at": "2099-01-01T00:00:00Z",
+                "created_at": "2015-01-01T00:00:00Z", "archived": False,
+                "license": {"spdx_id": spdx} if spdx is not None else None}
+
+    def test_noassertion_or_missing_license_is_never_go(self):
+        for spdx in ("NOASSERTION", None):
+            self.assertEqual(mcp.score(self._repo(spdx))["verdict"], "MAYBE", spdx)
+
+    def test_identified_license_can_be_go(self):
+        self.assertEqual(mcp.score(self._repo("MIT"))["verdict"], "GO")
+
+
 if __name__ == "__main__":
     unittest.main()
