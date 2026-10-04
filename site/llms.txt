@@ -1,0 +1,46 @@
+# RepoHunter
+
+> RepoHunter checks a GitHub repo before you or your AI agent adopt it. It returns GO, MAYBE or SKIP with the reasons: whether the repo is maintained or archived, what its license allows (including resale), a heuristic safety scan of its text and agent config files, and whether it runs on your machine. It runs locally as an MCP server, a Claude Code plugin, and a CLI. Python standard library only, MIT licensed.
+
+When to use it: before adding a dependency, cloning a tool, or installing a skill or MCP server. Agents should call `evaluate_repo` on a candidate before installing it and treat the verdict as guidance, not a guarantee.
+
+## Install
+
+- Claude Code (MCP server): `claude mcp add repohunter -- uvx --from git+https://github.com/meetziggy/repohunter repohunter-mcp`
+- Claude Code (plugin: server plus the skill that tells the agent when to use it): `/plugin marketplace add meetziggy/repohunter` then `/plugin install repohunter`
+- Codex: `codex mcp add repohunter -- uvx --from git+https://github.com/meetziggy/repohunter repohunter-mcp`
+- Any MCP client (Cursor, VS Code, Claude Desktop, Windsurf, Zed, Cline): stdio server, command `uvx`, args `["--from", "git+https://github.com/meetziggy/repohunter", "repohunter-mcp"]`
+- CLI, no install: `uvx --from git+https://github.com/meetziggy/repohunter repohunter scan owner/repo`
+
+Requires [uv](https://docs.astral.sh/uv/). Not yet published on PyPI. An optional `GITHUB_TOKEN` raises rate limits; it stays on the user's machine.
+
+## MCP tools
+
+- `evaluate_repo(repo, project?)`: should I reuse this repo? Real GitHub stats, a score breakdown, hardware fit, and a GO / MAYBE / SKIP verdict. Pass `project` for a relevance read.
+- `find_repos(query)`: reuse candidates for a need, from live GitHub search, ranked.
+- `portfolio_scan(user)`: facts-only summary of a GitHub user's or org's public work.
+
+Results carry an `evidence` block (sources, method, limits) and mark repo-authored text as untrusted. The safety scan runs in the CLI (`repohunter scan owner/repo`).
+
+## Limits
+
+- Scores are a transparent heuristic over public GitHub data: guidance, not a guarantee, and not a security audit.
+- The safety scan is heuristic: a clean result means these checks found nothing, not that a repo is safe.
+- The license read states facts and a call; it is not legal advice.
+
+## Links
+
+- [Homepage](https://repohunter.dev/): what it is, a live agent transcript, install
+- [README and docs](https://github.com/meetziggy/repohunter#readme)
+- [MCP install guide, per client](https://github.com/meetziggy/repohunter/blob/main/MCP-INSTALL.md)
+- [Source code](https://github.com/meetziggy/repohunter) (MIT)
+- [Per-repo report](https://repohunter.dev/r/ollama/ollama): `https://repohunter.dev/r/<owner>/<repo>`, a shareable live verdict
+- [Teams: dependency and agent supply-chain audit](mailto:bgorzelic@gmail.com?subject=RepoHunter%20audit)
+
+## Optional
+
+- [The Reuse-First Path](https://repohunter.dev/learn): plain-English guides for people new to building with AI
+- [What is MCP?](https://repohunter.dev/what-is-mcp)
+- [Work with an AI coding agent safely](https://repohunter.dev/ai-agent-safely)
+- [Supply-chain security basics](https://repohunter.dev/supply-chain-basics)
+- [How to tell if an open-source repo is any good](https://repohunter.dev/is-this-repo-good)
