@@ -390,12 +390,9 @@
   }
 }</pre></div>
       <div class="way"><div><h3>CLI</h3>
-        <p>Run it once with no install, or install it to keep the <code>repohunter</code> command.</p>
+        <p>Runs with no install. Swap in any <code>owner/repo</code> or GitHub URL. To keep the command around: <code>uv tool install git+https://github.com/meetziggy/repohunter</code></p>
         <a class="more" href="https://github.com/meetziggy/repohunter#readme">README</a></div>
-<pre>uvx --from git+https://github.com/meetziggy/repohunter repohunter scan owner/repo
-
-uv tool install git+https://github.com/meetziggy/repohunter
-repohunter evaluate owner/repo</pre></div>
+<pre>uvx --from git+https://github.com/meetziggy/repohunter repohunter scan camelot-dev/camelot</pre></div>
     </div>
   </section>
 
@@ -484,7 +481,7 @@ repohunter evaluate owner/repo</pre></div>
     vscode:{cmd:json, open:'Open in VS Code',
       href:'vscode:mcp/install?'+encodeURIComponent(JSON.stringify({name:'repohunter',command:'uvx',args:args}))},
     json:{cmd:json},
-    cli:{cmd:'uvx --from '+GIT+' repohunter scan owner/repo'}
+    cli:{cmd:'uvx --from '+GIT+' repohunter scan camelot-dev/camelot'}
   };
   function show(k){
     var c=C[k]||C.claude; pre.textContent=c.cmd;
