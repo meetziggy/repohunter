@@ -196,8 +196,8 @@
     .try{flex-direction:column}
     section{padding:56px 0}
     .call .out{grid-template-columns:1fr;gap:0}
-    .call .sig{white-space:normal;overflow-wrap:anywhere}
-    .install pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px}
+    .call .sig{white-space:normal;overflow-wrap:normal}
+    .install pre{font-size:11.5px;padding:14px 12px 16px}
     footer{flex-direction:column;align-items:flex-start;gap:10px}
     footer .spacer{display:none}
     .call .out .k{margin-top:6px}
@@ -250,7 +250,7 @@
         <div class="turn agent"><div class="who">Agent</div>
           <p>I'll use Camelot. Checking it before I install anything.</p></div>
         <div class="turn"><div class="call">
-          <div class="sig">repohunter.evaluate_repo<span>(</span>"atlanhq/camelot"<span>)</span></div>
+          <div class="sig">repohunter.evaluate_repo<span>(</span><wbr>"atlanhq/camelot"<span>)</span></div>
           <div class="out">
             <span class="k">verdict</span><span><span class="v v-SKIP">SKIP</span> 41/100</span>
             <span class="k">status</span><span class="bad">archived · last push 2023-01-05</span>
@@ -260,7 +260,7 @@
         <div class="turn agent"><div class="who">Agent</div>
           <p>That repo is archived. Development moved to <code>camelot-dev/camelot</code>. Checking that one.</p></div>
         <div class="turn"><div class="call">
-          <div class="sig">repohunter.evaluate_repo<span>(</span>"camelot-dev/camelot"<span>)</span></div>
+          <div class="sig">repohunter.evaluate_repo<span>(</span><wbr>"camelot-dev/camelot"<span>)</span></div>
           <div class="out">
             <span class="k">verdict</span><span><span class="v v-MAYBE">MAYBE</span> 63/100</span>
             <span class="k">status</span><span class="ok">maintained · last push 2026-09-19</span>
@@ -365,7 +365,7 @@ repohunter evaluate owner/repo</pre></div>
   <section id="faq">
     <details class="faqd">
     <summary><h2>Why use RepoHunter instead of ChatGPT or Claude Code?</h2>
-      <p class="sub">Use your assistant to reason and build; use RepoHunter for an adoption decision someone else can review. The full answer, including what we don't claim yet:</p></summary>
+      <p class="sub">Use your assistant to reason and build; use RepoHunter for an adoption decision someone else can review. The full answer, including what isn't proven yet:</p></summary>
     <div class="faq">
       <p><b>Use a general AI assistant to reason, explain, and help you build.</b> Use RepoHunter when
         you need an open-source adoption decision tied to inspectable repository evidence, a
