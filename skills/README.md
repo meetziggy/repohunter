@@ -41,7 +41,7 @@ Prefer the plugin install above. To do it by hand:
 ```
 mkdir -p ~/.claude/skills && cp -r skills/repohunter skills/repo-intake ~/.claude/skills/
 ```
-Then add the tools once: `claude mcp add repohunter -- uvx repohunter-mcp`. The agent now checks a
+Then add the tools once: `claude mcp add repohunter -- uvx --from git+https://github.com/meetziggy/repohunter repohunter-mcp`. The agent now checks a
 repo before adopting it, without being told to.
 
 ## Codex CLI
@@ -49,7 +49,7 @@ Codex reads project guidance from `AGENTS.md` and connects MCP servers via `~/.c
 ```toml
 [mcp_servers.repohunter]
 command = "uvx"
-args = ["repohunter-mcp"]
+args = ["--from", "git+https://github.com/meetziggy/repohunter", "repohunter-mcp"]
 ```
 Paste the "When to reach for it" section of `repohunter/SKILL.md` into your `AGENTS.md` so Codex
 knows to use it before adopting dependencies.
@@ -57,7 +57,7 @@ knows to use it before adopting dependencies.
 ## Gemini CLI
 Gemini reads context from `GEMINI.md` and supports MCP servers in `~/.gemini/settings.json`:
 ```json
-{ "mcpServers": { "repohunter": { "command": "uvx", "args": ["repohunter-mcp"] } } }
+{ "mcpServers": { "repohunter": { "command": "uvx", "args": ["--from", "git+https://github.com/meetziggy/repohunter", "repohunter-mcp"] } } }
 ```
 Add the skill's guidance to your `GEMINI.md`.
 
