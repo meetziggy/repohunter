@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RepoHunter — before your AI builds it, check what already exists</title>
-<meta name="description" content="Before your AI builds it, check what already exists. RepoHunter finds maintained open source your agent can reuse instead of regenerating, and tells you if it's safe to install: GO / MAYBE / SKIP with the reasons. Claude Code, Cursor, Codex, any MCP client. MIT.">
+<meta name="description" content="Before your AI builds it, check what already exists. RepoHunter finds maintained open source your agent can reuse instead of regenerating, and flags what to check before you install: GO / MAYBE / SKIP with the reasons. Claude Code, Cursor, Codex, any MCP client. MIT.">
 <link rel="icon" type="image/svg+xml" href="/logo.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
@@ -12,7 +12,7 @@
 <meta name="theme-color" content="#070b16">
 <link rel="canonical" href="https://repohunter.dev/">
 <meta property="og:title" content="RepoHunter — before your AI builds it, check what already exists">
-<meta property="og:description" content="Your agent finds the maintained open-source version before it writes its own, and checks it is safe to install: GO / MAYBE / SKIP with the reasons. Claude Code, Cursor, Codex, any MCP client.">
+<meta property="og:description" content="Your agent finds the maintained open-source version before it writes its own, and flags what to check before installing: GO / MAYBE / SKIP with the reasons. Claude Code, Cursor, Codex, any MCP client.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://repohunter.dev/">
 <meta property="og:image" content="https://repohunter.dev/og.png">
@@ -20,7 +20,7 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="RepoHunter — before your AI builds it, check what already exists">
-<meta name="twitter:description" content="Your agent checks what already exists before it writes its own, and whether it is safe to install.">
+<meta name="twitter:description" content="Your agent checks what already exists before it writes its own, and what to check before installing it.">
 <meta name="twitter:image" content="https://repohunter.dev/og.png">
 <script type="application/ld+json">
 {
@@ -263,8 +263,8 @@
     <div>
       <h1>Before your AI builds it, check what <em>already exists</em>.</h1>
       <p class="lede">Every feature your agent writes from scratch costs tokens, time and new bugs.
-        RepoHunter lets it find the maintained open-source version first, and tells you if it's safe
-        to install: GO, MAYBE or SKIP, with the reasons. It runs inside Claude Code, Cursor, Codex
+        RepoHunter lets it find the maintained open-source version first, and flags what to check
+        before you install: GO, MAYBE or SKIP, with the reasons. It runs inside Claude Code, Cursor, Codex
         and any MCP client.</p>
       <div class="install">
         <div class="bar">
@@ -357,8 +357,8 @@
   <section id="try">
     <h2>Try any repo, no install</h2>
     <p class="sub">The quick read, from public GitHub data, scored in your browser. It doesn't know your project,
-      so its verdict can be higher than the agent tool's, which also scores fit. The license read and safety scan
-      run in the CLI and the agent tool.</p>
+      so its verdict can be higher than the agent tool's, which also scores fit. The resale-license read and the
+      safety scan run in the CLI.</p>
     <div class="try">
       <input id="tryInput" aria-label="GitHub repo" placeholder="owner/name or github.com URL" spellcheck="false" autocomplete="off">
       <button class="btn primary" id="tryGo" type="button">Check repo</button>

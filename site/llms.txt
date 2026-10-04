@@ -1,6 +1,6 @@
 # RepoHunter
 
-> Before your AI builds something, RepoHunter checks what already exists. It helps an agent find a maintained open-source repo to reuse instead of regenerating it (saving tokens and time), and checks a candidate before adoption. It returns GO, MAYBE or SKIP with the reasons: whether the repo is maintained or archived, what its license allows (including resale), a heuristic safety scan of its text and agent config files, and whether it runs on your machine. It runs locally as an MCP server, a Claude Code plugin, and a CLI. Python standard library only, MIT licensed.
+> Before your AI builds something, RepoHunter checks what already exists. It helps an agent find a maintained open-source repo to reuse instead of regenerating it (saving tokens and time), and checks a candidate before adoption. It returns GO, MAYBE or SKIP with the reasons: whether the repo is maintained or archived, whether its license is identified, and whether it runs on your machine. The CLI adds a resale-license read and a pattern-based safety scan of the repo's text and agent config files; the MCP tool does not run those yet. It runs locally as an MCP server, a Claude Code plugin, and a CLI. Python standard library only, MIT licensed.
 
 When to use it: before writing a feature that open source may already provide, before adding a dependency, cloning a tool, or installing a skill or MCP server. Agents should call `evaluate_repo` on a candidate before installing it and treat the verdict as guidance, not a guarantee.
 
