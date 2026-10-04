@@ -199,7 +199,47 @@ def skill_portfolio_scan(args):
             "_note": ("Public repository facts and patterns only — not an assessment of a person, "
                       "their competence, character, identity, or suitability for employment. Public "
                       "availability does not imply endorsement or consent to broader profiling."),
-            "_untrusted": NOTE_UNTRUSTED}
+             "_untrusted": NOTE_UNTRUSTED}
+
+
+def _rh():
+    """Lazily import research_hunter from skills/research-hunter/ (not on the default path)."""
+    import importlib.util
+    p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "skills", "research-hunter", "research_hunter.py")
+    spec = importlib.util.spec_from_file_location("research_hunter", p)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def skill_research_topic(args):
+    q = (args.get("query") or "").strip()
+    if not q:
+        return {"error": "pass a 'query'"}
+    try:
+        return _rh().research_topic(q, mode=args.get("mode") or "wide", limit=int(args.get("limit") or 30))
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def skill_research_papers(args):
+    q = (args.get("query") or "").strip()
+    if not q:
+        return {"error": "pass a 'query'"}
+    try:
+        return _rh().research_papers(q)
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def skill_research_book(args):
+    q = (args.get("query") or "").strip()
+    if not q:
+        return {"error": "pass a 'query'"}
+    try:
+        return _rh().research_book(q)
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 
 SKILLS = {
@@ -221,7 +261,31 @@ SKILLS = {
         {"type": "object", "properties": {
             "user": {"type": "string", "description": "a GitHub username or org"}},
          "required": ["user"]}),
+    "research_topic": (skill_research_topic,
+        "Books + papers + web research for an ambiguous question, with synthesis and citations. "
+        "Modes: quick, wide (default), deep.",
+        {"type": "object", "properties": {
+            "query": {"type": "string", "description": "the question or topic"},
+            "mode": {"type": "string", "enum": ["quick", "wide", "deep"], "description": "depth (default wide)"}},
+         "required": ["query"]}),
+    "research_papers": (skill_research_papers,
+        "Papers only (arXiv + OpenAlex) for a technical question, with citations.",
+        {"type": "object", "properties": {
+            "query": {"type": "string"}},
+         "required": ["query"]}),
+    "research_book": (skill_research_book,
+        "Legal-first book lookup (Open Library / Project Gutenberg).",
+        {"type": "object", "properties": {
+            "query": {"type": "string"}},
+         "required": ["query"]}),
 }
+
+# The research tools live in skills/research-hunter/, which only exists in a source
+# checkout — don't advertise tools a pip/uvx install can't run.
+if not os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                   "skills", "research-hunter", "research_hunter.py")):
+    for _name in ("research_topic", "research_papers", "research_book"):
+        SKILLS.pop(_name)
 
 
 # ── MCP stdio transport (newline-delimited JSON-RPC 2.0) ───────────────────────

@@ -1,4 +1,4 @@
-<p align="center"><img src="site/og.png" alt="RepoHunter — reuse, don't reinvent" width="760"></p>
+<p align="center"><img src="https://repohunter.dev/og.png" alt="RepoHunter — reuse, don't reinvent" width="760"></p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/license-MIT-b8ff3c" alt="MIT">

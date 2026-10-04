@@ -1,0 +1,21 @@
+name: Publish to PyPI
+
+# Trusted Publishing: PyPI trusts this workflow directly, so no API token is stored anywhere.
+# One-time setup on pypi.org: add a (pending) publisher for this repo + `publish.yml` + env `pypi`.
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Build
+        run: uv build
+      - name: Publish
+        run: uv publish --trusted-publishing always
