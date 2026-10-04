@@ -21,6 +21,8 @@ All notable changes to RepoHunter are documented here. Format follows
 ### Fixed
 - MCP server no longer lists the research tools in a pip/uvx install, where they can't run
 - README hero image uses an absolute URL so it renders on PyPI
+- Research tools no longer send queries through a third-party proxy, cap `limit` at 50, and
+  mark their results untrusted
 
 ## [0.2.0] — 2026-09-22
 ### Added
