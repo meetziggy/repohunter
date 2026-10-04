@@ -33,7 +33,9 @@ function score(m) {
   const age = days(m.created_at);
   const mat = Math.min(100, (age > 365 ? 20 : 5) + Math.min(50, Math.round(Math.log10(stars + 1) * 12)));
   const overall = Math.round(pop * 0.3 + fresh * 0.25 + health * 0.25 + mat * 0.2);
-  const verdict = m.archived ? "SKIP" : overall >= 68 ? "GO" : overall >= 45 ? "MAYBE" : "SKIP";
+  let verdict = m.archived ? "SKIP" : overall >= 68 ? "GO" : overall >= 45 ? "MAYBE" : "SKIP";
+  // A license nobody has identified is never a GO: you can't know you're allowed to ship it.
+  if (verdict === "GO" && (!spdx || spdx === "NOASSERTION")) verdict = "MAYBE";
   return { pop, fresh, health, mat, overall, verdict };
 }
 

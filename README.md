@@ -135,7 +135,7 @@ Add `--profile <name>` to any command to evaluate against a different configured
 `config.json` to switch between what you're juggling.
 
 **As an MCP server or Claude Code plugin, instead of the CLI:** see
-[`MCP-INSTALL.md`](MCP-INSTALL.md) — `uvx repohunter-mcp`, or `/plugin install repohunter` in
+[`MCP-INSTALL.md`](MCP-INSTALL.md) — `uvx --from git+https://github.com/meetziggy/repohunter repohunter-mcp`, or `/plugin install repohunter` in
 Claude Code. Same engine, wired into your agent instead of your terminal.
 
 ## Roadmap
