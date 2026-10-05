@@ -89,17 +89,60 @@ td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 ol.habits { padding-left: 0; list-style: none; counter-reset: h; display: grid; gap: 14px; }
 ol.habits li { counter-increment: h; display: grid; grid-template-columns: 40px minmax(0,1fr); gap: 4px 12px; }
 ol.habits li::before { content: counter(h, decimal-leading-zero); font-family: var(--mono); color: var(--lime); font-weight: 700; padding-top: 2px; }
-ol.habits strong { display: block; }
+ol.habits strong { display: block; grid-column: 2; }
+ol.habits span { grid-column: 2; }
 ol.habits span { color: var(--soft); }
 .term { background: var(--raised); border: 1px solid var(--hair); border-radius: 12px; padding: 18px 20px; font-family: var(--mono); font-size: 14px; line-height: 1.7; color: var(--soft); overflow-x: auto; position: relative; }
 .term .p { color: var(--lime); user-select: none; }
 .copy { position: absolute; top: 10px; right: 10px; background: var(--card); color: var(--soft); border: 1px solid var(--hair-strong); border-radius: 6px; font: 12px var(--mono); padding: 4px 9px; cursor: pointer; }
-.cta { margin-top: 72px; background: radial-gradient(600px 240px at 20% 0%, rgba(184,255,60,.14), transparent 70%), var(--raised); border: 1px solid var(--hair-strong); border-radius: 20px; padding: 36px 28px; display: grid; gap: 18px; }
+.cta { margin-top: 72px; background: radial-gradient(600px 240px at 20% 0%, rgba(184,255,60,.14), transparent 70%), var(--raised); border: 1px solid var(--hair-strong); border-radius: 20px; padding: 36px 28px; display: grid; grid-template-columns: minmax(0,1fr); gap: 18px; }
+.cta code { overflow-wrap: anywhere; }
 .cta .big { font-size: clamp(32px, 6vw, 52px); font-weight: 800; letter-spacing: -0.04em; line-height: 1.05; }
 .btn { display: inline-block; background: var(--lime); color: var(--on-lime); font-weight: 800; text-decoration: none; padding: 12px 20px; border-radius: 10px; }
 .sources { font-size: 14px; color: var(--muted); }
 .sources li { margin-bottom: 6px; overflow-wrap: anywhere; }
 footer { margin-top: 64px; padding-top: 22px; border-top: 1px solid var(--hair); font-family: var(--mono); font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+.lanes { margin: 8px 0 0; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 16px; }
+.lane { background: var(--raised); border: 1px solid var(--hair); border-radius: 16px; padding: 20px; display: grid; gap: 14px; align-content: start; }
+.lane-h { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.who { font-weight: 700; font-size: 16px; display: inline-flex; align-items: center; gap: 8px; }
+.who::before { content: ""; width: 10px; height: 10px; border-radius: 3px; }
+.who.b::before { background: var(--scratch); } .who.r::before { background: var(--reuse); }
+.tot { font-size: 34px; font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.tot small { font-size: 14px; font-weight: 400; color: var(--muted); letter-spacing: 0; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; counter-reset: st; }
+.steps li { counter-increment: st; display: grid; grid-template-columns: 24px minmax(0,1fr); align-items: center; gap: 10px; font-size: 15px; color: var(--soft); }
+.steps li::before { content: counter(st); font-family: var(--mono); font-size: 12px; color: var(--muted); border: 1px solid var(--hair-strong); border-radius: 6px; text-align: center; line-height: 22px; }
+.steps li.good, .steps li.bad { grid-template-columns: 24px 16px minmax(0,1fr); }
+.steps li.good { color: var(--text); } .steps li.good .ic { color: var(--go); }
+.steps li.bad { color: var(--text); } .steps li.bad .ic { color: var(--skip); }
+.ic { width: 16px; height: 16px; }
+.cost { display: flex; height: 28px; gap: 2px; }
+.seg { display: flex; align-items: center; padding: 0 8px; font: 700 12px var(--mono); color: #08101f; white-space: nowrap; overflow: hidden; }
+.seg:first-child { border-radius: 6px 0 0 6px; } .seg:last-child { border-radius: 0 6px 6px 0; } .seg:only-child { border-radius: 6px; }
+.seg.b { background: var(--scratch); } .seg.r { background: var(--reuse); }
+.seg.f { background: repeating-linear-gradient(45deg, var(--scratch) 0 5px, rgba(59,130,246,.38) 5px 10px); }
+.seg.f em { font-style: normal; background: var(--raised); color: var(--text); padding: 1px 6px; border-radius: 4px; }
+.lanes figcaption { grid-column: 1 / -1; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+h2.first { margin-top: 48px; }
+.stack { margin: 8px 0 22px; display: grid; gap: 4px; }
+.layer { border: 1px solid var(--hair); border-radius: 10px; padding: 12px 14px; font-size: 15px; color: var(--soft); background: var(--raised); }
+.layer b { display: block; font-weight: 700; color: var(--text); margin-top: 2px; }
+.layer.tools { padding: 26px 14px; border-color: var(--hair-strong); background: var(--card); }
+.layer.hist { padding: 18px 14px; }
+.layer.you { width: 34%; font-size: 14px; border-color: var(--lime); color: var(--text); }
+.mult { font-family: var(--mono); font-size: 13px; color: var(--lime); margin-top: 6px; }
+.stack figcaption { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+@media (max-width: 720px) { .lanes { grid-template-columns: minmax(0,1fr); } .layer.you { width: 60%; } }
+.howflow { margin: 8px 0 22px; display: grid; grid-template-columns: minmax(0,1fr) 28px minmax(0,1.2fr) 28px minmax(0,1fr); gap: 8px; align-items: stretch; }
+.hf { background: var(--raised); border: 1px solid var(--hair); border-radius: 12px; padding: 14px; }
+.hf.mid { background: var(--card); border-color: var(--hair-strong); }
+.hf h3 { margin: 0 0 8px; font-size: 13px; color: var(--muted); font-weight: 700; }
+.hf p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text); }
+.hf b { font-family: var(--mono); font-size: 12px; padding: 1px 7px; border-radius: 6px; }
+.hf b.g { background: rgba(184,255,60,.14); color: var(--lime); } .hf b.m { background: rgba(251,191,36,.14); color: var(--maybe); } .hf b.s { background: rgba(251,113,133,.15); color: var(--skip); }
+.hfa { width: 28px; height: 28px; align-self: center; }
+@media (max-width: 720px) { .howflow { grid-template-columns: minmax(0,1fr); } .hfa { transform: rotate(90deg); justify-self: center; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
@@ -111,15 +154,34 @@ footer { margin-top: 64px; padding-top: 22px; border-top: 1px solid var(--hair);
     <span class="kicker">Field Notes 01 · October 4, 2026 · Brian Gorzelic</span>
     <h1>I tried to prove my tool saves&nbsp;tokens.</h1>
     <p class="lede col">On small jobs, it didn't. On a real component, building it yourself cost about <span class="hl">twice the tokens</span> of reusing a library, and the scratch version still did less.</p>
-    <div class="teaser" aria-label="Markdown renderer, median tokens: built then fixed 56.0k, reused a library 28.6k">
-      <div><span class="n">56.0k</span><span class="l">tokens · built, then fixed</span></div>
-      <div class="vs">vs</div>
-      <div><span class="n hl">28.6k</span><span class="l">tokens · reused a library</span></div>
-      <span class="cap">Markdown renderer · median of 3 runs each · same model, harness and tests</span>
-    </div>
+    <figure class="lanes" aria-label="The experiment. Agent builds it: writes it (33.8k tokens), passes the test, fails 10 to 11 of 16 unseen cases, fix costs 22.2k more, 56.0k total. Agent reuses a library: asks RepoHunter, vets and installs markdown-it, passes the test, passes 16 of 16 unseen cases, 28.6k total.">
+      <div class="lane">
+        <div class="lane-h"><span class="who b">Agent builds it</span><span class="tot">56.0k <small>tokens</small></span></div>
+        <ol class="steps">
+          <li>Writes a renderer from scratch</li>
+          <li class="good"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2"/></svg>Passes the feature test</li>
+          <li class="bad"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="2"/></svg>Unseen everyday cases: 5–6 / 16</li>
+          <li>Pays again to fix it</li>
+        </ol>
+        <div class="cost"><span class="seg b" style="width:60.4%">build 33.8k</span><span class="seg f" style="width:39.6%"><em>fix 22.2k</em></span></div>
+      </div>
+      <div class="lane">
+        <div class="lane-h"><span class="who r">Agent reuses a library</span><span class="tot hl">28.6k <small>tokens</small></span></div>
+        <ol class="steps">
+          <li>Asks RepoHunter what exists</li>
+          <li>Vets and installs markdown-it</li>
+          <li class="good"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2"/></svg>Passes the feature test</li>
+          <li class="good"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2"/></svg>Unseen everyday cases: 16 / 16</li>
+        </ol>
+        <div class="cost"><span class="seg r" style="width:51.1%">reuse 28.6k</span></div>
+      </div>
+      <figcaption>Markdown renderer · median of 3 runs per arm · same model, harness and tests · bars drawn to scale</figcaption>
+    </figure>
   </header>
 
   <div class="col">
+    <h2 class="first">The architecture question</h2>
+    <p>Build or reuse is one of the oldest decisions in system design. AI agents changed its cost model. Generating code is now cheap at the moment you ask for it, so the cost moved downstream: into the cases nobody tested, the fixes that follow, and the context every agent carries on every call. The question isn't "can the agent write it?" anymore. It's "what does it cost to own what it wrote?"</p>
     <p>I built RepoHunter to stop AI agents from rewriting code that already exists as maintained open source. The pitch writes itself: reuse instead of regenerate, save tokens. I had never measured it. So I did, and I'm publishing the results, including the parts that didn't go my way.</p>
     <p>I ran out of money for AI subscriptions this year. One terminal running about 20 agents, each with around six subagents, emptied a $200 plan in roughly six hours (before weekly caps existed). Since then I've treated tokens like a budget, and this is what I've learned about where they actually go.</p>
 
@@ -184,12 +246,20 @@ footer { margin-top: 64px; padding-top: 22px; border-top: 1px solid var(--hair);
       <p>Every token count and the method are in the <a href="01-token-test.json">raw data</a>, so you can check my math.</p>
     </div>
 
-    <h2>Where tokens actually go</h2>
+    <h2>Where tokens actually go: fixed cost per turn</h2>
+    <figure class="stack" aria-label="What one agent turn re-sends: the system prompt, every loaded tool and skill description (about 38,000 tokens on my setup, an estimate), the conversation so far, and finally your prompt, the smallest part. Multiplied by every subagent.">
+      <div class="layer sys">System prompt</div>
+      <div class="layer tools">Every loaded tool, skill and MCP description <b>≈ 38k tokens on my setup (estimate)</b></div>
+      <div class="layer hist">The conversation so far</div>
+      <div class="layer you">Your prompt</div>
+      <div class="mult">× every turn, × every subagent</div>
+      <figcaption>What one agent turn re-sends. Illustration; only the 38k estimate is measured.</figcaption>
+    </figure>
     <p>The prompt you type is the smallest part of the bill. Every turn re-sends the conversation history, the system prompt, and the description of every tool, skill and MCP server your harness has loaded.</p>
     <p>On my machine, 40 synced plugins added roughly <strong>38,000 tokens of skill descriptions to every session</strong>. 39 of them had never been used. <span class="tag e">ESTIMATE · /doctor · SEP 29</span> Others have measured the same effect with a logging proxy: about 33k tokens before the first prompt in one harness versus about 7k in another. <span class="tag t">THIRD-PARTY</span></p>
     <p>That fixed cost multiplies with agents. With 20 agents running six subagents each, the same catalog loads up to 120 times before any work starts. Caching helps, but it's a discount, not an exemption: cached tokens still count toward your limits.</p>
 
-    <h2>Six habits that shrink the bill</h2>
+    <h2>Six rules I design agent setups around</h2>
     <ol class="habits">
       <li><strong>Start a new session when the job changes.</strong><span>Old history rides along on every turn of the new job.</span></li>
       <li><strong>Carry the result, not the route.</strong><span>Feed the accepted output forward. Drop the drafts, corrections and dead ends.</span></li>
@@ -212,11 +282,12 @@ footer { margin-top: 64px; padding-top: 22px; border-top: 1px solid var(--hair);
       </tbody></table></div>
 
     <h2>Free tokens aren't free</h2>
+    <p><em>Context: this was my first week running free models, in a harness I had only just started testing. These are first-week numbers, not a tuned setup.</em></p>
     <p>I benchmarked free coding models with hidden tests on September 28. <span class="tag m">MEASURED</span> The best free lanes passed every task, and most of them log your code or may train on it. For private code, my only free options were the zero-retention lanes, and those were the least reliable. Rate limits capped batches at about 6 to 9 tasks before cost ever did.</p>
     <p>The hidden cost is review. In one batch of 10 free agents, 5 branches were ready to merge. The rest needed review, rewrote docs they were asked to extend, or never committed. Your hour reviewing them is the real bill.</p>
 
-    <h2>Harness fixes that save whole runs</h2>
-    <p>The most expensive token is the one spent on a run you throw away. These cost nothing:</p>
+    <h2>Guardrails that save whole runs</h2>
+    <p>The most expensive token is the one spent on a run you throw away. Each failure from that first week is now a rule the harness enforces, and none of them costs a token:</p>
     <ul>
       <li><strong>Word tasks so they can't destroy work.</strong> "Extend X.md", never "write X.md", when X exists. Two agents replaced existing docs wholesale.</li>
       <li><strong>Every task names a file, a test command and "commit".</strong> Uncommitted agent work is easy to lose.</li>
@@ -226,6 +297,14 @@ footer { margin-top: 64px; padding-top: 22px; border-top: 1px solid var(--hair);
     </ul>
 
     <h2>Where RepoHunter fits</h2>
+    <figure class="howflow" aria-label="How RepoHunter works: your agent is about to write a feature, install agent tooling, or add a dependency; RepoHunter checks whether it already exists, whether it is maintained, whether you can ship its license, whether anything in it looks risky, and whether it runs on your machine; you get GO, reuse it; MAYBE, check first; or SKIP, build or pick another.">
+      <div class="hf"><h3>Your agent is about to…</h3><p>write a feature<br>install a plugin, skill or MCP server<br>add a dependency you'll ship</p></div>
+      <svg class="hfa" viewBox="0 0 28 28" aria-hidden="true"><path d="M4 14h18M16 8l6 6-6 6" fill="none" stroke="#2e4064" stroke-width="2"/></svg>
+      <div class="hf mid"><h3>RepoHunter checks</h3><p>Does it already exist?<br>Maintained, or archived?<br>Can you ship its license?<br>Anything risky in it? (CLI)<br>Runs on your machine?</p></div>
+      <svg class="hfa" viewBox="0 0 28 28" aria-hidden="true"><path d="M4 14h18M16 8l6 6-6 6" fill="none" stroke="#2e4064" stroke-width="2"/></svg>
+      <div class="hf"><h3>You get</h3><p><b class="g">GO</b> reuse it<br><b class="m">MAYBE</b> check first<br><b class="s">SKIP</b> build or pick another</p></div>
+    </figure>
+    
     <p>RepoHunter is a reuse gate. Before your agent writes a component from scratch, it checks whether a maintained open-source repo already does the job, and flags what to check before you adopt it: real GitHub data, maintenance, license and resale risk, and (in the CLI) a pattern-based safety scan for prompt injection, piped installs and leaked secrets. You get <strong>GO</strong>, <strong>MAYBE</strong> or <strong>SKIP</strong> with the reasons.</p>
     <p>It practices what this piece preaches. Fully loaded, its three tools and two skills add <strong>1,038 tokens</strong> to a session, and Claude Code can defer them until a task needs them. <span class="tag m">MEASURED · OCT 4</span></p>
     <p>In all 10 reuse runs, the library the agent chose came straight from RepoHunter's search results and was then vetted (2 GO, 8 MAYBE): docx, Papa Parse, pdfkit or jsPDF, and markdown-it. Search, vetting and integration together still came in at about half the tokens of building and fixing a real component.</p>
