@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Field Notes 01 · RepoHunter</title>
+<meta name="description" content="I tried to prove my tool saves tokens. On small jobs it didn't. On real components, building it yourself cost about 2× the tokens. 23 agent runs, real token counts, raw data included.">
+<link rel="canonical" href="https://repohunter.dev/field-notes/01-token-optimization">
+<meta property="og:type" content="article">
+<meta property="og:title" content="I tried to prove my tool saves tokens.">
+<meta property="og:description" content="On small jobs it didn't. On real components, the build-it-yourself bill came twice. 23 agent runs, real token counts.">
+<meta property="og:url" content="https://repohunter.dev/field-notes/01-token-optimization">
+<meta property="og:image" content="https://repohunter.dev/field-notes/01-og.png">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+/* Layout: one 68ch reading column on the RepoHunter terminal-navy ground; charts and tables break out to 860px. Single dark theme, matching repohunter.dev. */
+:root {
+  --ground: #070b16; --raised: #0b1220; --card: #111a2b; --hair: #22304a; --hair-strong: #2e4064;
+  --text: #e6edf7; --soft: #c9d5ea; --muted: #94a5c2;
+  --lime: #b8ff3c; --on-lime: #08101f; --cyan: #38bdf8;
+  --scratch: #3b82f6; --reuse: #65a30d; /* validated categorical pair on #0b1220 */
+  --go: #34d399; --maybe: #fbbf24; --skip: #fb7185;
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--ground); color: var(--text); font: 17px/1.65 var(--sans); -webkit-font-smoothing: antialiased; }
+a { color: var(--lime); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--lime); outline-offset: 3px; border-radius: 4px; }
+.wrap { max-width: 860px; margin: 0 auto; padding-inline: 20px; padding-block: 0 96px; }
+.col { max-width: 68ch; }
+nav { display: flex; justify-content: space-between; align-items: center; padding-block: 22px; border-bottom: 1px solid var(--hair); font-family: var(--mono); font-size: 13px; color: var(--muted); }
+nav a { color: var(--text); text-decoration: none; font-weight: 700; display: inline-flex; gap: 10px; align-items: center; }
+nav i { width: 12px; height: 12px; border-radius: 3px; background: var(--lime); }
+header.hero { padding-block: 64px 40px; display: grid; gap: 20px; }
+.kicker { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+h1 { font-size: clamp(40px, 7vw, 68px); line-height: 1.02; letter-spacing: -0.04em; font-weight: 800; margin: 0; text-wrap: balance; }
+h2 { font-size: clamp(28px, 4vw, 38px); line-height: 1.1; letter-spacing: -0.03em; font-weight: 800; margin: 72px 0 16px; text-wrap: balance; }
+h3 { font-size: 19px; margin: 32px 0 8px; }
+.lede { font-size: 21px; line-height: 1.5; color: var(--soft); margin: 0; }
+.hl { color: var(--lime); }
+p { margin: 0 0 18px; }
+.teaser { display: flex; flex-wrap: wrap; gap: 16px 40px; align-items: flex-end; background: var(--raised); border: 1px solid var(--hair); border-radius: 16px; padding: 28px; margin-top: 12px; }
+.teaser .n { font-size: clamp(48px, 9vw, 76px); font-weight: 800; letter-spacing: -0.05em; line-height: .9; font-variant-numeric: tabular-nums; display: block; }
+.teaser .l { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+.teaser .vs { font-family: var(--mono); color: var(--muted); padding-bottom: 22px; }
+.teaser .cap { flex-basis: 100%; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.figure { margin: 28px 0 8px; background: var(--raised); border: 1px solid var(--hair); border-radius: 16px; padding: 24px; }
+.figure h3 { margin: 0 0 4px; font-size: 16px; }
+.figure .sub { font-size: 14px; color: var(--muted); margin-bottom: 18px; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 14px; color: var(--soft); margin-bottom: 18px; }
+.legend span { display: inline-flex; gap: 8px; align-items: center; }
+.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.sw.s { background: var(--scratch); } .sw.r { background: var(--reuse); }
+.sw.f { background: repeating-linear-gradient(45deg, var(--scratch) 0 3px, rgba(59,130,246,.35) 3px 6px); }
+.grp { display: grid; gap: 6px; margin-bottom: 16px; }
+.grp-l { font-size: 15px; font-weight: 700; }
+.row { display: grid; grid-template-columns: minmax(0,1fr) 64px; gap: 12px; align-items: center; }
+.track { height: 22px; display: flex; gap: 2px; position: relative; }
+.bar { height: 100%; border-radius: 0 4px 4px 0; position: relative; cursor: default; }
+.bar.s { background: var(--scratch); } .bar.r { background: var(--reuse); }
+.bar.f { background: repeating-linear-gradient(45deg, var(--scratch) 0 5px, rgba(59,130,246,.38) 5px 10px); }
+.bar.flat { border-radius: 0; }
+.bar:hover, .bar:focus-visible { filter: brightness(1.18); outline: none; }
+.v { font-family: var(--mono); font-size: 14px; text-align: right; font-variant-numeric: tabular-nums; }
+.tip { position: fixed; pointer-events: none; background: var(--card); border: 1px solid var(--hair-strong); color: var(--text); font-size: 13px; padding: 8px 10px; border-radius: 8px; z-index: 10; max-width: 260px; }
+.axis { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+details.data { margin-top: 14px; font-size: 14px; }
+details.data summary { cursor: pointer; color: var(--soft); }
+.tbl { overflow-x: auto; margin: 12px 0 0; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 520px; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--hair); vertical-align: top; }
+th { font-family: var(--mono); font-size: 12px; color: var(--muted); font-weight: 700; }
+td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.scores { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 24px 0; }
+.score { background: var(--card); border: 1px solid var(--hair); border-radius: 14px; padding: 22px; }
+.score .n { font-size: 64px; font-weight: 800; letter-spacing: -0.05em; line-height: 1; font-variant-numeric: tabular-nums; }
+.score .n small { font-size: 26px; color: var(--muted); letter-spacing: 0; }
+.score .k { font-size: 14px; color: var(--muted); }
+.score p { font-size: 15px; color: var(--soft); margin: 10px 0 0; }
+.callout { border: 1px solid var(--hair-strong); background: var(--raised); padding: 18px 22px; border-radius: 12px; margin: 28px 0; }
+.callout p:last-child { margin: 0; }
+.tag { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: .02em; padding: 2px 7px; border-radius: 4px; vertical-align: 2px; white-space: nowrap; }
+.tag.m { background: var(--lime); color: var(--on-lime); }
+.tag.e { border: 1px solid var(--hair-strong); color: var(--muted); }
+.tag.t { border: 1px solid var(--cyan); color: var(--cyan); }
+ol.habits { padding-left: 0; list-style: none; counter-reset: h; display: grid; gap: 14px; }
+ol.habits li { counter-increment: h; display: grid; grid-template-columns: 40px minmax(0,1fr); gap: 4px 12px; }
+ol.habits li::before { content: counter(h, decimal-leading-zero); font-family: var(--mono); color: var(--lime); font-weight: 700; padding-top: 2px; }
+ol.habits strong { display: block; }
+ol.habits span { color: var(--soft); }
+.term { background: var(--raised); border: 1px solid var(--hair); border-radius: 12px; padding: 18px 20px; font-family: var(--mono); font-size: 14px; line-height: 1.7; color: var(--soft); overflow-x: auto; position: relative; }
+.term .p { color: var(--lime); user-select: none; }
+.copy { position: absolute; top: 10px; right: 10px; background: var(--card); color: var(--soft); border: 1px solid var(--hair-strong); border-radius: 6px; font: 12px var(--mono); padding: 4px 9px; cursor: pointer; }
+.cta { margin-top: 72px; background: radial-gradient(600px 240px at 20% 0%, rgba(184,255,60,.14), transparent 70%), var(--raised); border: 1px solid var(--hair-strong); border-radius: 20px; padding: 36px 28px; display: grid; gap: 18px; }
+.cta .big { font-size: clamp(32px, 6vw, 52px); font-weight: 800; letter-spacing: -0.04em; line-height: 1.05; }
+.btn { display: inline-block; background: var(--lime); color: var(--on-lime); font-weight: 800; text-decoration: none; padding: 12px 20px; border-radius: 10px; }
+.sources { font-size: 14px; color: var(--muted); }
+.sources li { margin-bottom: 6px; overflow-wrap: anywhere; }
+footer { margin-top: 64px; padding-top: 22px; border-top: 1px solid var(--hair); font-family: var(--mono); font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav><a href="https://repohunter.dev/"><i></i>RepoHunter</a><span>Field Notes · 01</span></nav>
+
+  <header class="hero">
+    <span class="kicker">Field Notes 01 · October 4, 2026 · Brian Gorzelic</span>
+    <h1>I tried to prove my tool saves&nbsp;tokens.</h1>
+    <p class="lede col">On small jobs, it didn't. On a real component, building it yourself cost about <span class="hl">twice the tokens</span> of reusing a library, and the scratch version still did less.</p>
+    <div class="teaser" aria-label="Markdown renderer, median tokens: built then fixed 56.0k, reused a library 28.6k">
+      <div><span class="n">56.0k</span><span class="l">tokens · built, then fixed</span></div>
+      <div class="vs">vs</div>
+      <div><span class="n hl">28.6k</span><span class="l">tokens · reused a library</span></div>
+      <span class="cap">Markdown renderer · median of 3 runs each · same model, harness and tests</span>
+    </div>
+  </header>
+
+  <div class="col">
+    <p>I built RepoHunter to stop AI agents from rewriting code that already exists as maintained open source. The pitch writes itself: reuse instead of regenerate, save tokens. I had never measured it. So I did, and I'm publishing the results, including the parts that didn't go my way.</p>
+    <p>I ran out of money for AI subscriptions this year. One terminal running about 20 agents, each with around six subagents, emptied a $200 plan in roughly six hours (before weekly caps existed). Since then I've treated tokens like a budget, and this is what I've learned about where they actually go.</p>
+
+    <h2>The test</h2>
+    <p>Four everyday jobs an agent gets asked to do: write a Word document, parse CSV files, generate a two-page PDF invoice, and render GitHub-flavored Markdown. Each job ran two ways:</p>
+    <ul>
+      <li><strong>Build:</strong> the agent writes it from scratch with only Node.js built-ins.</li>
+      <li><strong>Reuse:</strong> the agent first asks RepoHunter for a maintained library, checks it, installs it and builds on it. Every token of that search and integration counts.</li>
+    </ul>
+    <p>Same worker model (GPT-5.6 Sol through the Codex CLI), same harness, and the same executed pass/fail test for both arms. Every one of the 23 runs passed its test on the first attempt. Token counts are what the CLI reported. <span class="tag m">MEASURED</span></p>
+  </div>
+
+  <h2>Small jobs: a wash</h2>
+  <div class="col"><p>For the three small jobs, reusing a library saved little or nothing. A frontier agent writes 100 lines of CSV parsing about as cheaply as it finds and wires up a library.</p></div>
+  <div class="figure" data-chart>
+    <h3>Median tokens to a passing build</h3>
+    <div class="sub">2–3 runs per arm · scale 0–56k tokens</div>
+    <div class="legend"><span><i class="sw s"></i>Agent built it</span><span><i class="sw r"></i>Agent reused a library</span></div>
+    <div class="grp"><div class="grp-l">Word document</div>
+      <div class="row"><div class="track"><div class="bar s" tabindex="0" style="width:61.3%" data-tip="Word document · built: median 34.3k (runs 34,479 · 34,206)"></div></div><div class="v">34.3k</div></div>
+      <div class="row"><div class="track"><div class="bar r" tabindex="0" style="width:53.5%" data-tip="Word document · reused (docx): median 30.0k (runs 37,385 · 22,533)"></div></div><div class="v">30.0k</div></div></div>
+    <div class="grp"><div class="grp-l">CSV parser</div>
+      <div class="row"><div class="track"><div class="bar s" tabindex="0" style="width:43.5%" data-tip="CSV parser · built: median 24.3k (runs 18,722 · 29,969)"></div></div><div class="v">24.3k</div></div>
+      <div class="row"><div class="track"><div class="bar r" tabindex="0" style="width:37.6%" data-tip="CSV parser · reused (Papa Parse): median 21.1k (runs 7,955 · 34,191)"></div></div><div class="v">21.1k</div></div></div>
+    <div class="grp"><div class="grp-l">PDF invoice</div>
+      <div class="row"><div class="track"><div class="bar s" tabindex="0" style="width:35.1%" data-tip="PDF invoice · built: median 19.7k (runs 19,651 · 35,161 · 19,662)"></div></div><div class="v">19.7k</div></div>
+      <div class="row"><div class="track"><div class="bar r" tabindex="0" style="width:41.0%" data-tip="PDF invoice · reused (pdfkit / jsPDF): median 22.9k (runs 27,277 · 22,935 · 21,431)"></div></div><div class="v">22.9k</div></div></div>
+    <details class="data"><summary>Show the numbers as a table</summary><div class="tbl"><table>
+      <thead><tr><th>Job</th><th>Built (each run)</th><th>Reused (each run)</th><th>Library chosen</th></tr></thead>
+      <tbody>
+        <tr><td>Word document</td><td class="num">34,479 · 34,206</td><td class="num">37,385 · 22,533</td><td>docx</td></tr>
+        <tr><td>CSV parser</td><td class="num">18,722 · 29,969</td><td class="num">7,955 · 34,191</td><td>Papa Parse</td></tr>
+        <tr><td>PDF invoice</td><td class="num">19,651 · 35,161 · 19,662</td><td class="num">27,277 · 22,935 · 21,431</td><td>jsPDF, pdfkit, pdfkit</td></tr>
+      </tbody></table></div></details>
+  </div>
+  <div class="col"><p>If the job is small and you only need what you asked for, let the agent write it.</p></div>
+
+  <h2>Real components: you pay&nbsp;twice</h2>
+  <div class="col">
+    <p>The Markdown renderer told a different story. Both arms passed the same feature test (tables, code blocks, task lists, footnotes) for similar token counts. Then I ran 16 everyday Markdown cases the agents had never seen.</p>
+  </div>
+  <div class="scores">
+    <div class="score"><span class="k">Agent built it</span><div class="n">5–6<small>/16</small></div><p>No bold, no italics, no links, images or numbered lists. It did exactly what the test asked for.</p></div>
+    <div class="score"><span class="k">Agent reused a library</span><div class="n hl">16<small>/16</small></div><p>All three runs, on the first pass. markdown-it had already done the work.</p></div>
+  </div>
+  <div class="col"><p>So I measured the second bill: what it costs to bring each scratch renderer up to the library's everyday quality, under the same rules. <span class="tag m">MEASURED</span></p></div>
+  <div class="figure" data-chart>
+    <h3>Markdown renderer: total tokens to everyday quality</h3>
+    <div class="sub">Median of 3 runs per arm · scale 0–56k tokens</div>
+    <div class="legend"><span><i class="sw s"></i>Build</span><span><i class="sw f"></i>Fix it later</span><span><i class="sw r"></i>Reuse</span></div>
+    <div class="grp"><div class="grp-l">Agent built it</div>
+      <div class="row"><div class="track"><div class="bar s flat" tabindex="0" style="width:60.4%" data-tip="Build: median 33.8k (runs 6,431 · 33,795 · 34,472)"></div><div class="bar f" tabindex="0" style="width:39.6%" data-tip="Fix for everyday Markdown: median 22.2k (runs 23,101 · 22,178 · 22,216)"></div></div><div class="v">56.0k</div></div></div>
+    <div class="grp"><div class="grp-l">Agent reused a library</div>
+      <div class="row"><div class="track"><div class="bar r" tabindex="0" style="width:51.1%" data-tip="Reuse (markdown-it): median 28.6k (runs 31,481 · 28,589 · 25,971), 16/16 everyday cases"></div></div><div class="v">28.6k</div></div></div>
+    <div class="axis">Built + fixed per run: 29,532 · 55,973 · 56,688. Ratio of medians: 1.96×.</div>
+  </div>
+  <div class="col">
+    <p>Reuse took about <strong>half the tokens</strong>. And even after the fix, the scratch renderers only handle what I tested. The library handles the cases nobody thought to ask for yet.</p>
+    <div class="callout">
+      <p><strong>What I'm not claiming.</strong> This is a field log, not a benchmark: 2–3 runs per arm, one worker model, one machine, four jobs. Small jobs came out roughly even, and the 2× comes from one component type.</p>
+      <p>The build arm was not allowed packages, so this compares <em>a library versus no library</em>. It does not compare RepoHunter against an agent that picks a library on its own. I also chose the 16 everyday cases after reading one scratch renderer, and the fix runs were given those same cases.</p>
+      <p>Every token count and the method are in the <a href="01-token-test.json">raw data</a>, so you can check my math.</p>
+    </div>
+
+    <h2>Where tokens actually go</h2>
+    <p>The prompt you type is the smallest part of the bill. Every turn re-sends the conversation history, the system prompt, and the description of every tool, skill and MCP server your harness has loaded.</p>
+    <p>On my machine, 40 synced plugins added roughly <strong>38,000 tokens of skill descriptions to every session</strong>. 39 of them had never been used. <span class="tag e">ESTIMATE · /doctor · SEP 29</span> Others have measured the same effect with a logging proxy: about 33k tokens before the first prompt in one harness versus about 7k in another. <span class="tag t">THIRD-PARTY</span></p>
+    <p>That fixed cost multiplies with agents. With 20 agents running six subagents each, the same catalog loads up to 120 times before any work starts. Caching helps, but it's a discount, not an exemption: cached tokens still count toward your limits.</p>
+
+    <h2>Six habits that shrink the bill</h2>
+    <ol class="habits">
+      <li><strong>Start a new session when the job changes.</strong><span>Old history rides along on every turn of the new job.</span></li>
+      <li><strong>Carry the result, not the route.</strong><span>Feed the accepted output forward. Drop the drafts, corrections and dead ends.</span></li>
+      <li><strong>Grep, don't read.</strong><span>Pull the lines you need instead of loading a whole large file.</span></li>
+      <li><strong>Keep MCP tools deferred.</strong><span>Load tool schemas only when a task needs them, and turn off what you haven't used in a month.</span></li>
+      <li><strong>Script anything settled.</strong><span>Once a procedure is fixed, a script costs zero tokens per run.</span></li>
+      <li><strong>End every session with a handoff file.</strong><span>Starting from a short handoff instead of an old transcript is the cheapest context there is.</span></li>
+    </ol>
+
+    <h2>Model fit before model price</h2>
+    <p>Routers pick the cheapest chat model. They rarely ask whether the job needs a chat model at all.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Job</th><th>Cheapest thing that works</th></tr></thead>
+      <tbody>
+        <tr><td>Yes/no, classify, score, route, gate</td><td>A decision model, or a small model with structured output</td></tr>
+        <tr><td>A settled, repeatable transform</td><td>A script, with no model at all</td></tr>
+        <tr><td>A bounded code change with tests</td><td>A free or cheap coding model, in its own worktree</td></tr>
+        <tr><td>Design, ambiguous debugging, client-facing writing</td><td>A frontier model</td></tr>
+        <tr><td>A component that already exists as open source</td><td><span class="hl">A library</span>, found and checked before your agent writes it</td></tr>
+      </tbody></table></div>
+
+    <h2>Free tokens aren't free</h2>
+    <p>I benchmarked free coding models with hidden tests on September 28. <span class="tag m">MEASURED</span> The best free lanes passed every task, and most of them log your code or may train on it. For private code, my only free options were the zero-retention lanes, and those were the least reliable. Rate limits capped batches at about 6 to 9 tasks before cost ever did.</p>
+    <p>The hidden cost is review. In one batch of 10 free agents, 5 branches were ready to merge. The rest needed review, rewrote docs they were asked to extend, or never committed. Your hour reviewing them is the real bill.</p>
+
+    <h2>Harness fixes that save whole runs</h2>
+    <p>The most expensive token is the one spent on a run you throw away. These cost nothing:</p>
+    <ul>
+      <li><strong>Word tasks so they can't destroy work.</strong> "Extend X.md", never "write X.md", when X exists. Two agents replaced existing docs wholesale.</li>
+      <li><strong>Every task names a file, a test command and "commit".</strong> Uncommitted agent work is easy to lose.</li>
+      <li><strong>One worktree per agent.</strong> Every free model I tested ignored "don't touch main" while it was on main.</li>
+      <li><strong>Test the merged branch, not just each branch.</strong> Two clean merges once left a NameError behind.</li>
+      <li><strong>Guard spend in code, not in the prompt.</strong> A typo in a model name should fail, not bill.</li>
+    </ul>
+
+    <h2>Where RepoHunter fits</h2>
+    <p>RepoHunter is a reuse gate. Before your agent writes a component from scratch, it checks whether a maintained open-source repo already does the job, and whether that repo is safe to adopt: real GitHub data, license and resale risk, maintenance, and a safety scan for prompt injection, piped installs and leaked secrets. You get <strong>GO</strong>, <strong>MAYBE</strong> or <strong>SKIP</strong> with the reasons.</p>
+    <p>It practices what this piece preaches. Fully loaded, its three tools and two skills add <strong>1,038 tokens</strong> to a session, and Claude Code can defer them until a task needs them. <span class="tag m">MEASURED · OCT 4</span></p>
+    <p>In all 10 reuse runs, the library the agent chose came straight from RepoHunter's search results and was then vetted (2 GO, 8 MAYBE): docx, Papa Parse, pdfkit or jsPDF, and markdown-it. Search, vetting and integration together still came in at about half the tokens of building and fixing a real component.</p>
+  </div>
+
+  <section class="cta" aria-label="Install RepoHunter">
+    <div class="big">Your agent's best line of code is <span class="hl">import</span>.</div>
+    <p class="lede" style="font-size:18px">Free and MIT-licensed. Install it in Claude Code:</p>
+    <div class="term" id="install"><button class="copy" type="button" data-copy="install">Copy</button><span class="p">$ </span>/plugin marketplace add meetziggy/repohunter<br><span class="p">$ </span>/plugin install repohunter</div>
+    <p style="margin:0;font-size:15px;color:var(--soft)">Other agents: <code style="font-family:var(--mono);font-size:13px">uvx --from git+https://github.com/meetziggy/repohunter repohunter-mcp</code></p>
+    <div><a class="btn" href="https://repohunter.dev/">Get RepoHunter</a></div>
+  </section>
+
+  <div class="col">
+    <h2 style="font-size:24px">Sources and data</h2>
+    <ul class="sources">
+      <li>Build-vs-reuse field test, Oct 4 2026: Ringer harness, GPT-5.6 Sol via Codex CLI, executed checks. <a href="01-token-test.json">Raw data (JSON)</a>.</li>
+      <li>RepoHunter carry cost, Oct 4 2026: prompt-token delta for its tool schemas and skill descriptions, measured through OpenRouter on Claude Haiku 4.5.</li>
+      <li>Always-loaded plugin cost: Claude Code /doctor and a plugin audit on the author's machine, Sep 29 2026 (estimate).</li>
+      <li>Free-lane benchmark: three hidden-test tasks per lane, Sep 28 2026; retention terms as read Sep 26 2026 (they change often).</li>
+      <li>10-agent batch outcomes and merge failures: the author's agent workflow logs, Sep 26–28 2026.</li>
+      <li>Harness overhead comparison (33k vs 7k tokens): Systima, measured with a logging proxy, Jul 2026 — <a href="https://systima.ai/blog/claude-code-vs-opencode-token-overhead">systima.ai</a>.</li>
+      <li>$200 plan in about six hours: the author's own usage, before weekly caps were introduced.</li>
+    </ul>
+  </div>
+
+  <footer><span>RepoHunter · Field Notes 01</span><span>Reuse, don't reinvent. · <a href="https://repohunter.dev/">repohunter.dev</a></span></footer>
+</div>
+<div class="tip" id="tip" hidden></div>
+<script>
+(() => {
+  const tip = document.getElementById('tip');
+  const show = (el, x, y) => { tip.textContent = el.dataset.tip; tip.hidden = false; const w = tip.offsetWidth; tip.style.left = Math.min(x + 12, innerWidth - w - 12) + 'px'; tip.style.top = (y + 14) + 'px'; };
+  document.querySelectorAll('[data-tip]').forEach((el) => {
+    el.setAttribute('aria-label', el.dataset.tip);
+    el.addEventListener('mousemove', (e) => show(el, e.clientX, e.clientY));
+    el.addEventListener('mouseleave', () => { tip.hidden = true; });
+    el.addEventListener('focus', () => { const r = el.getBoundingClientRect(); show(el, r.left, r.bottom); });
+    el.addEventListener('blur', () => { tip.hidden = true; });
+  });
+  document.querySelectorAll('[data-copy]').forEach((b) => b.addEventListener('click', () => {
+    const text = '/plugin marketplace add meetziggy/repohunter\n/plugin install repohunter';
+    const done = () => { b.textContent = 'Copied'; setTimeout(() => (b.textContent = 'Copy'), 1500); };
+    try { navigator.clipboard.writeText(text).then(done, () => { getSelection().selectAllChildren(document.getElementById('install')); }); }
+    catch { getSelection().selectAllChildren(document.getElementById('install')); }
+  }));
+})();
+</script>
+</body>
+</html>
