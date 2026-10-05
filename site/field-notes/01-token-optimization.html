@@ -226,7 +226,7 @@ footer { margin-top: 64px; padding-top: 22px; border-top: 1px solid var(--hair);
     </ul>
 
     <h2>Where RepoHunter fits</h2>
-    <p>RepoHunter is a reuse gate. Before your agent writes a component from scratch, it checks whether a maintained open-source repo already does the job, and whether that repo is safe to adopt: real GitHub data, license and resale risk, maintenance, and a safety scan for prompt injection, piped installs and leaked secrets. You get <strong>GO</strong>, <strong>MAYBE</strong> or <strong>SKIP</strong> with the reasons.</p>
+    <p>RepoHunter is a reuse gate. Before your agent writes a component from scratch, it checks whether a maintained open-source repo already does the job, and flags what to check before you adopt it: real GitHub data, maintenance, license and resale risk, and (in the CLI) a pattern-based safety scan for prompt injection, piped installs and leaked secrets. You get <strong>GO</strong>, <strong>MAYBE</strong> or <strong>SKIP</strong> with the reasons.</p>
     <p>It practices what this piece preaches. Fully loaded, its three tools and two skills add <strong>1,038 tokens</strong> to a session, and Claude Code can defer them until a task needs them. <span class="tag m">MEASURED · OCT 4</span></p>
     <p>In all 10 reuse runs, the library the agent chose came straight from RepoHunter's search results and was then vetted (2 GO, 8 MAYBE): docx, Papa Parse, pdfkit or jsPDF, and markdown-it. Search, vetting and integration together still came in at about half the tokens of building and fixing a real component.</p>
   </div>
@@ -235,7 +235,7 @@ footer { margin-top: 64px; padding-top: 22px; border-top: 1px solid var(--hair);
     <div class="big">Your agent's best line of code is <span class="hl">import</span>.</div>
     <p class="lede" style="font-size:18px">Free and MIT-licensed. Install it in Claude Code:</p>
     <div class="term" id="install"><button class="copy" type="button" data-copy="install">Copy</button><span class="p">$ </span>/plugin marketplace add meetziggy/repohunter<br><span class="p">$ </span>/plugin install repohunter</div>
-    <p style="margin:0;font-size:15px;color:var(--soft)">Other agents: <code style="font-family:var(--mono);font-size:13px">uvx --from git+https://github.com/meetziggy/repohunter repohunter-mcp</code></p>
+    <p style="margin:0;font-size:15px;color:var(--soft)">Other agents: <code style="font-family:var(--mono);font-size:13px">uvx --from git+https://github.com/meetziggy/repohunter@v0.2.1 repohunter-mcp</code></p>
     <div><a class="btn" href="https://repohunter.dev/">Get RepoHunter</a></div>
   </section>
 
