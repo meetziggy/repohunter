@@ -123,8 +123,8 @@
     <text x="115" y="514">no server, no</text>
     <text x="115" y="532">account</text>
     <path d="M70 558H160" stroke="#22304a"/>
-    <text x="115" y="590" style="fill:#e6edf7;font-weight:600">Token stays</text>
-    <text x="115" y="610" style="fill:#e6edf7;font-weight:600">on your machine</text>
+    <text x="115" y="590" style="fill:#e6edf7;font-weight:600">GitHub token</text>
+    <text x="115" y="610" style="fill:#e6edf7;font-weight:600">stays local</text>
     <text x="115" y="630">sent only to GitHub</text>
     <path d="M70 656H160" stroke="#22304a"/>
     <text x="115" y="688" style="fill:#e6edf7;font-weight:600">Pinned installs</text>
