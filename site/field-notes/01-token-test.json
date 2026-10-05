@@ -1,0 +1,174 @@
+{
+  "title": "Build vs reuse: tokens to working code (field test)",
+  "date": "2026-10-04",
+  "method": {
+    "harness": "Ringer (executed pass/fail checks; tokens as reported by the worker CLI)",
+    "worker": "GPT-5.6 Sol via Codex CLI, same model and harness for every run",
+    "arms": {
+      "scratch": "Node.js built-ins only, no packages (enforced by the check)",
+      "reuse": "must call RepoHunter (find/evaluate via its MCP server), save the output, install the chosen library"
+    },
+    "acceptance": "same executed check per job for both arms; every run passed on the first attempt",
+    "hidden_test": "16 everyday Markdown cases the agents never saw, run with no model calls",
+    "limits": "2-3 runs per arm, one worker model, one machine; a field log, not a benchmark"
+  },
+  "tokens": {
+    "docx": {
+      "scratch": [
+        34479,
+        34206
+      ],
+      "reuse": [
+        37385,
+        22533
+      ]
+    },
+    "csv": {
+      "scratch": [
+        18722,
+        29969
+      ],
+      "reuse": [
+        7955,
+        34191
+      ]
+    },
+    "pdf": {
+      "scratch": [
+        19651,
+        35161,
+        19662
+      ],
+      "reuse": [
+        27277,
+        22935,
+        21431
+      ]
+    },
+    "md": {
+      "scratch": [
+        6431,
+        33795,
+        34472
+      ],
+      "reuse": [
+        31481,
+        28589,
+        25971
+      ],
+      "fix": [
+        23101,
+        22178,
+        22216
+      ]
+    }
+  },
+  "medians": {
+    "docx": {
+      "scratch": 34342.5,
+      "reuse": 29959.0
+    },
+    "csv": {
+      "scratch": 24345.5,
+      "reuse": 21073.0
+    },
+    "pdf": {
+      "scratch": 19662,
+      "reuse": 22935
+    },
+    "md": {
+      "scratch": 33795,
+      "reuse": 28589,
+      "fix": 22216
+    }
+  },
+  "markdown_full_cost": {
+    "scratch_build_plus_fix": [
+      29532,
+      55973,
+      56688
+    ],
+    "median_scratch_total": 55973,
+    "median_reuse": 28589,
+    "ratio": 1.96
+  },
+  "hidden_markdown_cases": [
+    {
+      "key": "md-scratch-1",
+      "passed": 6,
+      "of": 16,
+      "failed": [
+        "bold",
+        "italic",
+        "bold+italic",
+        "inline link",
+        "image",
+        "ordered list",
+        "blockquote",
+        "bare https autolink",
+        "backslash escape",
+        "thematic break"
+      ]
+    },
+    {
+      "key": "md-scratch-2",
+      "passed": 5,
+      "of": 16,
+      "failed": [
+        "bold",
+        "italic",
+        "bold+italic",
+        "inline link",
+        "image",
+        "ordered list",
+        "blockquote",
+        "code span",
+        "bare https autolink",
+        "backslash escape",
+        "thematic break"
+      ]
+    },
+    {
+      "key": "md-scratch-3",
+      "passed": 6,
+      "of": 16,
+      "failed": [
+        "bold",
+        "italic",
+        "bold+italic",
+        "inline link",
+        "image",
+        "ordered list",
+        "blockquote",
+        "code span",
+        "backslash escape",
+        "thematic break"
+      ]
+    },
+    {
+      "key": "md-reuse-1",
+      "passed": 16,
+      "of": 16,
+      "failed": []
+    },
+    {
+      "key": "md-reuse-2",
+      "passed": 16,
+      "of": 16,
+      "failed": []
+    },
+    {
+      "key": "md-reuse-3",
+      "passed": 16,
+      "of": 16,
+      "failed": []
+    }
+  ],
+  "repohunter_carry_cost_tokens": {
+    "tool_schemas": 816,
+    "skill_descriptions": 222,
+    "total_if_loaded": 1038,
+    "measured": "2026-10-04, OpenRouter anthropic/claude-haiku-4.5 usage.prompt_tokens delta",
+    "note": "Claude Code defers MCP tool schemas by default, so the usual per-session cost is lower"
+  }
+}

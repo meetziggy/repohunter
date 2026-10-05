@@ -1,0 +1,5 @@
+# Everyone is welcome, including AI crawlers and agents.
+User-agent: *
+Allow: /
+
+Sitemap: https://repohunter.dev/sitemap.xml

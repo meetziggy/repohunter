@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Install RepoHunter</title>
+<meta name="description" content="Install RepoHunter in Claude Code, Cursor, VS Code, Codex or any MCP client. One line, pinned to a release.">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#070b16">
+<link rel="canonical" href="https://repohunter.dev/install">
+<meta property="og:title" content="Install RepoHunter">
+<meta property="og:description" content="Install RepoHunter in Claude Code, Cursor, VS Code, Codex or any MCP client. One line, pinned to a release.">
+<meta property="og:image" content="https://repohunter.dev/og.png">
+<link rel="stylesheet" href="/rh.css">
+<style>
+  .head{padding:56px 0 8px}
+  .picker{background:var(--bg2);border:1px solid var(--line);border-radius:14px;overflow:hidden;max-width:760px}
+  .picker .bar{display:flex;align-items:center;gap:10px;padding:10px 12px 10px 14px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}
+  .picker .bar .spacer{flex:1}
+  .picker pre{margin:0;padding:16px;font-size:14px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}
+  .openrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 16px 0;font-size:13px;color:var(--muted)}
+  .openrow[hidden]{display:none}
+  .btn.ghost.sm{border-color:var(--lime)}
+  .picker .caption{padding:0 16px 14px;font-size:13px;color:var(--muted)}
+  .way{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,7fr);gap:32px;padding:26px 0;border-top:1px solid var(--line)}
+  .way h3{margin:0 0 6px;font-size:16px}
+  .way p{margin:0;color:var(--soft);font-size:15px}
+  .way .more{display:inline-block;margin-top:10px;font-size:14px}
+  @media(max-width:920px){.way{grid-template-columns:minmax(0,1fr);gap:12px}}
+</style>
+</head>
+<body>
+<div id="rh-live" aria-live="polite" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)"></div>
+<div class="wrap">
+  <nav aria-label="Main">
+    <a class="brand" href="/"><img src="/logo.svg" alt="" width="30" height="30">RepoHunter</a>
+    <span class="spacer"></span>
+    <form class="navcheck" id="navcheck" role="search"><input aria-label="Check a GitHub repo" placeholder="Check a repo…" spellcheck="false"><button type="submit">Go</button></form>
+    <div class="links">
+      <a href="/install" aria-current="page">Install</a>
+      <a href="/field-notes/01-token-optimization">Field notes</a>
+      <a class="hide-sm" href="/teams">Teams</a>
+      <a href="/learn">Learn</a>
+      <a class="hide-sm" href="https://github.com/meetziggy/repohunter">GitHub</a>
+    </div>
+  </nav>
+  <div class="head">
+    <h1>Install RepoHunter</h1>
+    <p class="sub">Pick your agent. Every command is pinned to the v0.2.1 release, so nothing on the main branch reaches you unreviewed. Needs <a href="https://docs.astral.sh/uv/getting-started/installation/">uv</a>; Python standard library only; your GitHub token never leaves your machine.</p>
+    <div class="picker" data-picker>
+      <div class="bar"><label for="client">Install in</label>
+        <span class="pick"><select id="client">
+          <option value="claude">Claude Code</option><option value="cursor">Cursor</option><option value="vscode">VS Code</option>
+          <option value="codex">Codex</option><option value="json">Claude Desktop &amp; others</option><option value="cli">Terminal (no agent)</option>
+        </select></span><span class="spacer"></span>
+        <button class="copy primary" type="button" data-copy="installCmd">Copy</button></div>
+      <div class="openrow" hidden><a class="btn ghost sm" href="#">Open in Cursor</a><span>One click; your client asks you to confirm. Or paste the config below.</span></div>
+<pre id="installCmd">claude mcp add repohunter -- uvx --from git+https://github.com/meetziggy/repohunter@v0.2.1 repohunter-mcp</pre>
+      <div class="caption" data-next>Your agent can now check what exists before it builds or installs.</div>
+    </div>
+  </div>
+  <section>
+    <h2>Every way to install</h2>
+    <div class="way"><div><h3>Claude Code plugin</h3><p>The MCP server plus the skill that tells your agent when to use it. Paste into Claude Code.</p></div>
+      <div class="codeblock"><div class="cb-bar"><span>Claude Code</span><button class="copy" type="button">Copy</button></div><pre>/plugin marketplace add meetziggy/repohunter&#10;/plugin install repohunter</pre></div></div>
+    <div class="way"><div><h3>Any MCP client</h3><p>Claude Desktop, Windsurf, Zed, Cline and others: add this to the client's MCP config.</p>
+      <a class="more" href="https://github.com/meetziggy/repohunter/blob/main/MCP-INSTALL.md">Where each client keeps its config</a></div>
+      <div class="codeblock"><div class="cb-bar"><span>mcp.json</span><button class="copy" type="button">Copy</button></div><pre>{
+  "mcpServers": {
+    "repohunter": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/meetziggy/repohunter@v0.2.1", "repohunter-mcp"]
+    }
+  }
+}</pre></div></div>
+    <div class="way"><div><h3>CLI</h3><p>Runs once with no install. Swap in any owner/repo or GitHub URL.</p>
+      <a class="more" href="https://github.com/meetziggy/repohunter#readme">README</a></div>
+      <div class="codeblock"><div class="cb-bar"><span>Terminal</span><button class="copy" type="button">Copy</button></div><pre>uvx --from git+https://github.com/meetziggy/repohunter@v0.2.1 repohunter scan rtk-ai/rtk</pre></div></div>
+    <div class="way"><div><h3>Keep the command</h3><p>Installs <code>repohunter</code> and <code>repohunter-mcp</code> on your PATH.</p></div>
+      <div class="codeblock"><div class="cb-bar"><span>Terminal</span><button class="copy" type="button">Copy</button></div><pre>uv tool install git+https://github.com/meetziggy/repohunter@v0.2.1&#10;repohunter evaluate rtk-ai/rtk</pre></div></div>
+    <p class="note">Check every install path yourself: <code>python3 scripts/verify_install.py</code> in a clone runs each one in a throwaway sandbox.</p>
+  </section>
+  <footer>
+    <span>RepoHunter · MIT · built by Brian Gorzelic, AI-assisted</span>
+    <span class="spacer"></span>
+    <a href="/">Home</a><a href="/install">Install</a><a href="/field-notes/01-token-optimization">Field notes</a><a href="/teams">Teams</a><a href="/badge">Badge</a><a href="/about">About</a><a href="/terms">Terms</a><a href="https://github.com/meetziggy/repohunter">GitHub</a>
+  </footer>
+</div>
+<script src="/rh.js"></script>
+
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"03db8d874ff44447832e44f5533aedbd"}'></script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RepoHunter for teams · dependency and agent audit</title>
+<meta name="description" content="A person reviews what your team's agents depend on and load, with a written keep / replace / pin report.">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#070b16">
+<link rel="canonical" href="https://repohunter.dev/teams">
+<meta property="og:title" content="RepoHunter for teams · dependency and agent audit">
+<meta property="og:description" content="A person reviews what your team's agents depend on and load, with a written keep / replace / pin report.">
+<meta property="og:image" content="https://repohunter.dev/og.png">
+<link rel="stylesheet" href="/rh.css">
+<style>
+  .teams{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:56px;align-items:start;padding-top:56px}
+  .teams ul{margin:0;padding:0;list-style:none}
+  .teams li{padding:12px 0;border-top:1px solid var(--line);color:var(--soft);font-size:15px}
+  .teams li b{color:var(--text);font-weight:700}
+  .teams .cta{margin-top:8px}
+  @media(max-width:920px){.teams{grid-template-columns:minmax(0,1fr);gap:28px}}
+</style>
+</head>
+<body>
+<div id="rh-live" aria-live="polite" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)"></div>
+<div class="wrap">
+  <nav aria-label="Main">
+    <a class="brand" href="/"><img src="/logo.svg" alt="" width="30" height="30">RepoHunter</a>
+    <span class="spacer"></span>
+    <form class="navcheck" id="navcheck" role="search"><input aria-label="Check a GitHub repo" placeholder="Check a repo…" spellcheck="false"><button type="submit">Go</button></form>
+    <div class="links">
+      <a href="/install">Install</a>
+      <a href="/field-notes/01-token-optimization">Field notes</a>
+      <a class="hide-sm" href="/teams" aria-current="page">Teams</a>
+      <a href="/learn">Learn</a>
+      <a class="hide-sm" href="https://github.com/meetziggy/repohunter">GitHub</a>
+    </div>
+  </nav>
+  <section id="teams" style="border-top:0;padding-top:0">
+    <div class="teams">
+      <div>
+        <h1>For teams: a dependency and agent supply-chain audit</h1>
+        <p class="sub">Your agents install code and load skills and MCP servers every day. I'll run RepoHunter across
+          what your team depends on, triage every finding by hand, and give you a written report with what to keep,
+          replace or pin.</p>
+        <a class="btn primary cta" id="audit-cta" href="mailto:bgorzelic@gmail.com?subject=RepoHunter%20audit">Book an audit</a>
+      </div>
+      <ul>
+        <li><b>Dependencies:</b> maintenance, license and resale risk for what you ship.</li>
+        <li><b>Agent config:</b> skills, commands, hooks and MCP servers your agents load, reviewed by a person. Automated scanning is pattern-based and still being validated.</li>
+        <li><b>A written report:</b> findings triaged by a person, with a keep / replace / pin call on each.</li>
+        <li><b>Your process:</b> RepoHunter wired into your agents so new dependencies get checked before they land.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <span>RepoHunter · MIT · built by Brian Gorzelic, AI-assisted</span>
+    <span class="spacer"></span>
+    <a href="/">Home</a><a href="/install">Install</a><a href="/field-notes/01-token-optimization">Field notes</a><a href="/teams">Teams</a><a href="/badge">Badge</a><a href="/about">About</a><a href="/terms">Terms</a><a href="https://github.com/meetziggy/repohunter">GitHub</a>
+  </footer>
+</div>
+<script src="/rh.js"></script>
+
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"03db8d874ff44447832e44f5533aedbd"}'></script>
+</body>
+</html>
