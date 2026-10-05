@@ -30,7 +30,9 @@ Results carry an `evidence` block (sources, method, limits) and mark repo-author
 
 ## Links
 
-- [Homepage](https://repohunter.dev/): what it is, a live agent transcript, install
+- [Homepage](https://repohunter.dev/): what it is, a live check, install
+- [Field Notes 01](https://repohunter.dev/field-notes/01-token-optimization): a build-vs-reuse token test, 23 agent runs, raw data
+- [Install, every client](https://repohunter.dev/install)
 - [README and docs](https://github.com/meetziggy/repohunter#readme)
 - [MCP install guide, per client](https://github.com/meetziggy/repohunter/blob/main/MCP-INSTALL.md)
 - [Source code](https://github.com/meetziggy/repohunter) (MIT)

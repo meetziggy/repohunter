@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RepoHunter badge for your README</title>
+<meta name="description" content="A live RepoHunter verdict for your README, computed from current GitHub data. You can embed it; you can't edit what it says.">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#070b16">
+<link rel="canonical" href="https://repohunter.dev/badge">
+<meta property="og:title" content="RepoHunter badge for your README">
+<meta property="og:description" content="A live RepoHunter verdict for your README, computed from current GitHub data. You can embed it; you can't edit what it says.">
+<meta property="og:image" content="https://repohunter.dev/og.png">
+<link rel="stylesheet" href="/rh.css">
+<style>
+  .badgebox{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:start;padding-top:56px}
+  .badgebox .row{display:flex;gap:10px}
+  .badgebox input{flex:1;min-width:0;background:var(--bg2);border:1px solid var(--line2);border-radius:12px;padding:11px 14px;color:var(--text);font:14px var(--mono)}
+  .badgebox .md{display:flex;gap:8px;margin-top:14px}
+  .badgebox .md code{flex:1;min-width:0;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;overflow-x:auto;white-space:nowrap;color:var(--cyan)}
+  .badgebox .prev{display:flex;flex-direction:column;gap:14px}
+  .badgebox .prev img.card{width:100%;border:1px solid var(--line);border-radius:12px;display:block}
+  @media(max-width:920px){.badgebox{grid-template-columns:minmax(0,1fr);gap:28px}}
+</style>
+</head>
+<body>
+<div id="rh-live" aria-live="polite" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)"></div>
+<div class="wrap">
+  <nav aria-label="Main">
+    <a class="brand" href="/"><img src="/logo.svg" alt="" width="30" height="30">RepoHunter</a>
+    <span class="spacer"></span>
+    <form class="navcheck" id="navcheck" role="search"><input aria-label="Check a GitHub repo" placeholder="Check a repo…" spellcheck="false"><button type="submit">Go</button></form>
+    <div class="links">
+      <a href="/install">Install</a>
+      <a href="/field-notes/01-token-optimization">Field notes</a>
+      <a class="hide-sm" href="/teams">Teams</a>
+      <a href="/learn">Learn</a>
+      <a class="hide-sm" href="https://github.com/meetziggy/repohunter">GitHub</a>
+    </div>
+  </nav>
+  <section id="badge" style="border-top:0;padding-top:0">
+    <div class="badgebox">
+      <div>
+        <h1>Maintain a repo? Add the badge.</h1>
+        <p class="sub">A live verdict for your README, computed from current GitHub data. You can embed it; you can't edit what it says.</p>
+        <div class="row"><input id="bg_repo" aria-label="Your repo" value="ollama/ollama" spellcheck="false" autocomplete="off"><button id="bg_go" class="btn ghost" type="button">Preview</button></div>
+        <div class="md"><code id="bg_md">[![RepoHunter](https://img.repohunter.dev/badge/ollama/ollama.svg)](https://repohunter.dev/r/ollama/ollama)</code><button id="bg_copy" class="copy" type="button">Copy</button></div>
+        <p class="note">Shareable report: <a id="bg_report" href="/r/ollama/ollama">repohunter.dev/r/ollama/ollama</a>.
+          The badge scores public GitHub data; it is not a safety rating. Run <code>repohunter scan</code> for that.</p>
+      </div>
+      <div class="prev">
+        <img id="bg_badge" src="https://img.repohunter.dev/badge/ollama/ollama.svg" alt="RepoHunter badge preview" height="22" style="height:22px;align-self:flex-start">
+        <img id="bg_card" class="card" src="https://img.repohunter.dev/card/ollama/ollama.svg" loading="lazy" alt="RepoHunter report card preview">
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>RepoHunter · MIT · built by Brian Gorzelic, AI-assisted</span>
+    <span class="spacer"></span>
+    <a href="/">Home</a><a href="/install">Install</a><a href="/field-notes/01-token-optimization">Field notes</a><a href="/teams">Teams</a><a href="/badge">Badge</a><a href="/about">About</a><a href="/terms">Terms</a><a href="https://github.com/meetziggy/repohunter">GitHub</a>
+  </footer>
+</div>
+<script src="/rh.js"></script>
+<script>
+/* Badge previewer — type a repo, get a live badge + card + copy-paste README markdown.
+   Points at the img.repohunter.dev worker, so even the prefilled preview is live data. */
+(function(){
+  var repo=document.getElementById('bg_repo'), go=document.getElementById('bg_go'),
+      badge=document.getElementById('bg_badge'), card=document.getElementById('bg_card'),
+      md=document.getElementById('bg_md'), copy=document.getElementById('bg_copy');
+  if(!repo) return;
+  var BASE='https://img.repohunter.dev';
+  function slug(){ var raw=(repo.value||'').trim(), u=raw.match(/github\.com[\/:]([\w.\-]+\/[\w.\-]+)/i);
+    return (u?u[1]:raw).replace(/\.git$/i,'').replace(/\.+$/,'').replace(/^\/+|\/+$/g,''); }
+  var report=document.getElementById('bg_report');
+  function render(){
+    var s=slug(); if(!/^[\w.\-]+\/[\w.\-]+$/.test(s)) return;
+    badge.src=BASE+'/badge/'+s+'.svg';
+    card.src=BASE+'/card/'+s+'.svg';
+    md.textContent='[![RepoHunter]('+BASE+'/badge/'+s+'.svg)](https://repohunter.dev/r/'+s+')';
+    if(report){ report.href='/r/'+s; report.textContent='repohunter.dev/r/'+s; }
+  }
+  go.onclick=render; repo.addEventListener('keydown',function(e){ if(e.key==='Enter') render(); });
+  copy.onclick=function(){ navigator.clipboard&&navigator.clipboard.writeText(md.textContent||'').then(function(){
+    copy.textContent='Copied'; copy.classList.add('done'); setTimeout(function(){ copy.textContent='Copy'; copy.classList.remove('done'); },1500); }); };
+})();
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"03db8d874ff44447832e44f5533aedbd"}'></script>
+</body>
+</html>
