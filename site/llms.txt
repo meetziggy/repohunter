@@ -37,7 +37,7 @@ Results carry an `evidence` block (sources, method, limits) and mark repo-author
 - [MCP install guide, per client](https://github.com/meetziggy/repohunter/blob/main/MCP-INSTALL.md)
 - [Source code](https://github.com/meetziggy/repohunter) (MIT)
 - [Per-repo report](https://repohunter.dev/r/ollama/ollama): `https://repohunter.dev/r/<owner>/<repo>`, a shareable live verdict
-- [Teams: dependency and agent supply-chain audit](mailto:bgorzelic@gmail.com?subject=RepoHunter%20audit)
+- [Teams: dependency and agent supply-chain audit](https://gorzelic.net/contact)
 
 ## Optional
 
