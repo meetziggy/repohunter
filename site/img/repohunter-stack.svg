@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1160" width="900" height="1160" role="img" aria-labelledby="t d">
+  <title id="t">Where RepoHunter sits in an AI coding stack</title>
+  <desc id="d">You ask a coding agent (Claude Code, Cursor, Codex or any MCP client) for something. Before it builds or installs, it makes one call to RepoHunter, which runs locally: find_repos asks whether it already exists, evaluate_repo asks whether to adopt it (maintenance, license, fit), and the CLI scan looks for injection, hidden text, piped installs and leaked secrets. RepoHunter reads public GitHub data and your machine's specs, read-only. The verdict is GO (reuse it, pinned), MAYBE (check the license or the finding first) or SKIP (build it or pick another), and the result lands in your project. Guardrails: read-only, never installs anything, runs on your machine, your GitHub token stays local, about 1,000 tokens of context when loaded. Measured: a Markdown renderer cost 56.0k tokens to build and fix versus 28.6k to reuse a library, which passed 16 of 16 unseen cases versus 5 to 6.</desc>
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5b7099"/></marker>
+    <marker id="ahl" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#b8ff3c"/></marker>
+    <style>
+      text{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;fill:#e6edf7}
+      .mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+      .h{font-size:19px;font-weight:700}
+      .s{font-size:13.5px;fill:#94a5c2}
+      .c{font-size:14px;font-weight:600}
+      .k{font-size:12px;font-weight:700;fill:#94a5c2;letter-spacing:.04em}
+      .line{stroke:#5b7099;stroke-width:1.6;fill:none;stroke-dasharray:5 4}
+      .flow{stroke:#b8ff3c;stroke-width:1.8;fill:none}
+    </style>
+  </defs>
+
+  <rect width="900" height="1160" fill="#070b16"/>
+
+  <!-- title -->
+  <text x="450" y="66" text-anchor="middle" style="font-size:36px;font-weight:800;letter-spacing:-.02em">Where <tspan fill="#b8ff3c">RepoHunter</tspan> sits in an AI coding stack</text>
+  <text x="450" y="98" text-anchor="middle" class="s" style="font-size:15px">The check between "the agent decided to build or install" and "it happened"</text>
+  <text x="450" y="124" text-anchor="middle" class="mono" style="font-size:13px;fill:#b8ff3c">Brian Gorzelic · repohunter.dev</text>
+
+  <!-- you -->
+  <rect x="40" y="166" width="150" height="110" rx="14" fill="#0b1220" stroke="#22304a"/>
+  <circle cx="115" cy="200" r="13" fill="none" stroke="#c9d5ea" stroke-width="2"/>
+  <path d="M93 236c4-12 13-18 22-18s18 6 22 18" fill="none" stroke="#c9d5ea" stroke-width="2"/>
+  <text x="115" y="262" text-anchor="middle" class="c">You</text>
+  <path class="line" d="M190 221H226" marker-end="url(#ah)"/>
+
+  <!-- coding agent layer -->
+  <rect x="230" y="150" width="630" height="142" rx="16" fill="#111a2b" stroke="#2e4064"/>
+  <text x="254" y="184" class="h">Coding agent</text>
+  <text x="254" y="206" class="s">Plans the work, writes the code, installs what it needs</text>
+  <g class="c">
+    <rect x="254" y="226" width="106" height="44" rx="10" fill="#0b1220" stroke="#22304a"/><text x="307" y="253" text-anchor="middle">Claude Code</text>
+    <rect x="370" y="226" width="82" height="44" rx="10" fill="#0b1220" stroke="#22304a"/><text x="411" y="253" text-anchor="middle">Cursor</text>
+    <rect x="462" y="226" width="82" height="44" rx="10" fill="#0b1220" stroke="#22304a"/><text x="503" y="253" text-anchor="middle">Codex</text>
+    <rect x="554" y="226" width="96" height="44" rx="10" fill="#0b1220" stroke="#22304a"/><text x="602" y="253" text-anchor="middle">VS Code</text>
+    <rect x="660" y="226" width="176" height="44" rx="10" fill="#0b1220" stroke="#22304a"/><text x="748" y="253" text-anchor="middle">any MCP client</text>
+  </g>
+
+  <!-- decision -->
+  <path class="line" d="M545 292V318" marker-end="url(#ah)"/>
+  <path d="M545 322L655 372L545 422L435 372Z" fill="#0b1220" stroke="#fbbf24" stroke-width="1.6"/>
+  <text x="545" y="368" text-anchor="middle" class="c">About to build</text>
+  <text x="545" y="386" text-anchor="middle" class="c">or install?</text>
+  <path class="flow" d="M545 422V466" marker-end="url(#ahl)"/>
+  <rect x="560" y="432" width="196" height="26" rx="13" fill="#0b1220" stroke="#b8ff3c"/>
+  <text x="658" y="450" text-anchor="middle" class="mono" style="font-size:12px;fill:#b8ff3c">yes: check first · 1 call</text>
+
+  <!-- repohunter layer -->
+  <rect x="230" y="470" width="630" height="262" rx="16" fill="#111a2b" stroke="#b8ff3c" stroke-width="1.6"/>
+  <rect x="254" y="492" width="18" height="18" rx="5" fill="#b8ff3c"/>
+  <text x="282" y="507" class="h">RepoHunter</text>
+  <rect x="690" y="488" width="146" height="26" rx="13" fill="#0b1220" stroke="#22304a"/>
+  <text x="763" y="506" text-anchor="middle" class="mono" style="font-size:12px;fill:#c9d5ea">runs locally · MIT</text>
+  <g>
+    <rect x="254" y="530" width="186" height="120" rx="12" fill="#0b1220" stroke="#22304a"/>
+    <text x="270" y="556" class="mono" style="font-size:13px;fill:#38bdf8">find_repos</text>
+    <text x="270" y="582" class="c">Does it already exist?</text>
+    <text x="270" y="604" class="s">Live GitHub search,</text>
+    <text x="270" y="622" class="s">ranked for your need</text>
+    <rect x="452" y="530" width="186" height="120" rx="12" fill="#0b1220" stroke="#22304a"/>
+    <text x="468" y="556" class="mono" style="font-size:13px;fill:#38bdf8">evaluate_repo</text>
+    <text x="468" y="582" class="c">Should I adopt it?</text>
+    <text x="468" y="604" class="s">Maintenance · license</text>
+    <text x="468" y="622" class="s">fit · a verdict, with reasons</text>
+    <rect x="650" y="530" width="186" height="120" rx="12" fill="#0b1220" stroke="#22304a"/>
+    <text x="666" y="556" class="mono" style="font-size:13px;fill:#38bdf8">scan <tspan style="fill:#94a5c2">(CLI)</tspan></text>
+    <text x="666" y="582" class="c">Anything risky in it?</text>
+    <text x="666" y="604" class="s">Injection · hidden text</text>
+    <text x="666" y="622" class="s">curl | sh · leaked secrets</text>
+  </g>
+  <text x="254" y="680" class="k">READS, READ-ONLY</text>
+  <g class="s">
+    <rect x="400" y="664" width="156" height="26" rx="13" fill="#0b1220" stroke="#22304a"/><text x="478" y="682" text-anchor="middle" style="fill:#c9d5ea">public GitHub data</text>
+    <rect x="564" y="664" width="128" height="26" rx="13" fill="#0b1220" stroke="#22304a"/><text x="628" y="682" text-anchor="middle" style="fill:#c9d5ea">your machine</text>
+    <rect x="698" y="664" width="138" height="26" rx="13" fill="#0b1220" stroke="#22304a"/><text x="767" y="682" text-anchor="middle" style="fill:#c9d5ea">license files</text>
+  </g>
+  <text x="254" y="716" class="s">Agent-callable over MCP; the scan runs in the CLI.</text>
+
+  <!-- verdicts -->
+  <path class="line" d="M545 732V752H335V776" marker-end="url(#ah)"/>
+  <path class="line" d="M545 752V776" marker-end="url(#ah)"/>
+  <path class="line" d="M545 752H755V776" marker-end="url(#ah)"/>
+  <g>
+    <rect x="240" y="780" width="190" height="124" rx="14" fill="#0b1220" stroke="#b8ff3c"/>
+    <rect x="258" y="798" width="44" height="24" rx="6" fill="#b8ff3c" fill-opacity=".14"/><text x="280" y="815" text-anchor="middle" class="mono" style="font-size:13px;font-weight:800;fill:#b8ff3c">GO</text>
+    <text x="258" y="848" class="c">Reuse it</text>
+    <text x="258" y="870" class="s">Install the library,</text>
+    <text x="258" y="888" class="s">pinned to a version</text>
+    <rect x="450" y="780" width="190" height="124" rx="14" fill="#0b1220" stroke="#fbbf24"/>
+    <rect x="468" y="798" width="66" height="24" rx="6" fill="#fbbf24" fill-opacity=".14"/><text x="501" y="815" text-anchor="middle" class="mono" style="font-size:13px;font-weight:800;fill:#fbbf24">MAYBE</text>
+    <text x="468" y="848" class="c">Check first</text>
+    <text x="468" y="870" class="s">Read the license or</text>
+    <text x="468" y="888" class="s">the scan finding</text>
+    <rect x="660" y="780" width="190" height="124" rx="14" fill="#0b1220" stroke="#fb7185"/>
+    <rect x="678" y="798" width="54" height="24" rx="6" fill="#fb7185" fill-opacity=".15"/><text x="705" y="815" text-anchor="middle" class="mono" style="font-size:13px;font-weight:800;fill:#fb7185">SKIP</text>
+    <text x="678" y="848" class="c">Build or pick another</text>
+    <text x="678" y="870" class="s">Archived, unlicensed</text>
+    <text x="678" y="888" class="s">or weak signals</text>
+  </g>
+
+  <!-- your project -->
+  <path class="line" d="M335 904V922H755V904"/>
+  <path class="line" d="M545 922V942" marker-end="url(#ah)"/>
+  <rect x="230" y="946" width="630" height="70" rx="16" fill="#111a2b" stroke="#2e4064"/>
+  <text x="254" y="976" class="h">Your project</text>
+  <text x="254" y="999" class="s">A maintained library where one exists. Code you chose to write where it doesn't.</text>
+
+  <!-- guardrails column -->
+  <rect x="40" y="320" width="150" height="696" rx="16" fill="#0b1220" stroke="#22304a"/>
+  <text x="115" y="352" text-anchor="middle" class="h">Guardrails</text>
+  <g class="s" text-anchor="middle">
+    <text x="115" y="398" style="fill:#e6edf7;font-weight:600">Read-only</text>
+    <text x="115" y="418">never installs</text>
+    <text x="115" y="436">anything itself</text>
+    <path d="M70 462H160" stroke="#22304a"/>
+    <text x="115" y="494" style="fill:#e6edf7;font-weight:600">Runs locally</text>
+    <text x="115" y="514">no server, no</text>
+    <text x="115" y="532">account</text>
+    <path d="M70 558H160" stroke="#22304a"/>
+    <text x="115" y="590" style="fill:#e6edf7;font-weight:600">Token stays</text>
+    <text x="115" y="610" style="fill:#e6edf7;font-weight:600">on your machine</text>
+    <text x="115" y="630">sent only to GitHub</text>
+    <path d="M70 656H160" stroke="#22304a"/>
+    <text x="115" y="688" style="fill:#e6edf7;font-weight:600">Pinned installs</text>
+    <text x="115" y="708">a release tag,</text>
+    <text x="115" y="726">not "main"</text>
+    <path d="M70 752H160" stroke="#22304a"/>
+    <text x="115" y="784" style="fill:#e6edf7;font-weight:600">≈1k tokens</text>
+    <text x="115" y="804">of context when</text>
+    <text x="115" y="822">loaded (measured)</text>
+    <path d="M70 848H160" stroke="#22304a"/>
+    <text x="115" y="880" style="fill:#e6edf7;font-weight:600">Untrusted text</text>
+    <text x="115" y="900">repo descriptions</text>
+    <text x="115" y="918">never fed to your</text>
+    <text x="115" y="936">agent as instructions</text>
+  </g>
+
+  <!-- measured bar -->
+  <rect x="40" y="1040" width="820" height="72" rx="16" fill="#111a2b" stroke="#2e4064"/>
+  <rect x="60" y="1063" width="92" height="26" rx="13" fill="#b8ff3c"/>
+  <text x="106" y="1081" text-anchor="middle" class="mono" style="font-size:12px;font-weight:800;fill:#08101f">MEASURED</text>
+  <text x="168" y="1072" class="c">Markdown renderer: build + fix <tspan class="mono">56.0k</tspan> tokens vs reuse <tspan class="mono" fill="#b8ff3c">28.6k</tspan></text>
+  <text x="168" y="1094" class="s">Unseen everyday cases: 5–6 of 16 built vs 16 of 16 reused · Field Notes 01</text>
+
+  <text x="40" y="1142" class="mono" style="font-size:12px;fill:#94a5c2">repohunter.dev</text>
+  <text x="860" y="1142" text-anchor="end" class="mono" style="font-size:12px;fill:#94a5c2">free · MIT · open source</text>
+</svg>

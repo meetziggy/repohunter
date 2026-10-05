@@ -34,7 +34,8 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--lime); outline-
 nav { display: flex; justify-content: space-between; align-items: center; padding-block: 22px; border-bottom: 1px solid var(--hair); font-family: var(--mono); font-size: 13px; color: var(--muted); }
 nav a { color: var(--text); text-decoration: none; font-weight: 700; display: inline-flex; gap: 10px; align-items: center; }
 nav i { width: 12px; height: 12px; border-radius: 3px; background: var(--lime); }
-header.hero { padding-block: 64px 40px; display: grid; gap: 20px; }
+header.hero { padding-block: 64px 40px; display: grid; grid-template-columns: minmax(0,1fr); gap: 20px; }
+.weekend, .lanes, .lane { min-width: 0; }
 .kicker { font-family: var(--mono); font-size: 13px; color: var(--muted); }
 h1 { font-size: clamp(40px, 7vw, 68px); line-height: 1.02; letter-spacing: -0.04em; font-weight: 800; margin: 0; text-wrap: balance; }
 h2 { font-size: clamp(28px, 4vw, 38px); line-height: 1.1; letter-spacing: -0.03em; font-weight: 800; margin: 72px 0 16px; text-wrap: balance; }
@@ -143,6 +144,23 @@ h2.first { margin-top: 48px; }
 .hf b.g { background: rgba(184,255,60,.14); color: var(--lime); } .hf b.m { background: rgba(251,191,36,.14); color: var(--maybe); } .hf b.s { background: rgba(251,113,133,.15); color: var(--skip); }
 .hfa { width: 28px; height: 28px; align-self: center; }
 @media (max-width: 720px) { .howflow { grid-template-columns: minmax(0,1fr); } .hfa { transform: rotate(90deg); justify-self: center; } }
+.weekend { margin: 16px 0 0; background: var(--raised); border: 1px solid var(--hair); border-radius: 16px; padding: 20px; display: grid; gap: 12px; }
+.wk-h { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; }
+.wk-t { font-weight: 700; font-size: 16px; } .wk-s { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.wk-nums { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; }
+.wn { display: block; font-size: 30px; font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.wl { display: block; font-size: 13px; color: var(--muted); margin-top: 4px; }
+.wk-bar-l { font-size: 13px; font-weight: 700; color: var(--soft); margin-top: 4px; }
+.wk-bar { display: flex; height: 26px; gap: 2px; }
+.wb { display: flex; align-items: center; padding: 0 10px; font: 700 12px var(--mono); color: #08101f; white-space: nowrap; overflow: hidden; }
+.wb:first-child { border-radius: 6px 0 0 6px; } .wb:last-child { border-radius: 0 6px 6px 0; min-width: 6px; }
+.wb.cache { background: #94a5c2; } .wb.new { background: var(--lime); }
+.wb.sub { background: var(--scratch); } .wb.free { background: var(--reuse); }
+.wk-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--soft); }
+.wk-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.wk-legend i.cache { background: #94a5c2; } .wk-legend i.new { background: var(--lime); } .wk-legend i.sub { background: var(--scratch); } .wk-legend i.free { background: var(--reuse); }
+.weekend figcaption { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+@media (max-width: 720px) { .wk-nums { grid-template-columns: repeat(2, minmax(0,1fr)); } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
@@ -177,11 +195,30 @@ h2.first { margin-top: 48px; }
       </div>
       <figcaption>Markdown renderer · median of 3 runs per arm · same model, harness and tests · bars drawn to scale</figcaption>
     </figure>
+    <figure class="weekend" aria-label="My weekend in tokens, Friday to Sunday, from my own logs: 3.28 billion tokens. 96.9% were cache reads, agents re-reading context they had already seen; 3.1% was new work. By billing: 92.3% on flat subscriptions, 7.7% on free and local models, 0.02% on pay-per-use API. Actual API spend 21 cents. The subscription usage would have cost about 1,166 dollars at API list prices. One unattended security hook accounted for about 97 dollars of that.">
+      <div class="wk-h"><span class="wk-t">My weekend in tokens</span><span class="wk-s">Fri–Sun · from my own session logs</span></div>
+      <div class="wk-nums">
+        <div><span class="wn">3.28B</span><span class="wl">tokens, all harnesses</span></div>
+        <div><span class="wn hl">$0.21</span><span class="wl">actual pay-per-use API spend</span></div>
+        <div><span class="wn">≈$1,166</span><span class="wl">the subscription usage at API list prices (not billed)</span></div>
+        <div><span class="wn">≈$97</span><span class="wl">of that from one unattended hook</span></div>
+      </div>
+      <div class="wk-bar-l">Where the tokens went</div>
+      <div class="wk-bar"><span class="wb cache" style="width:96.9%">re-reading context they'd already seen · 96.9%</span><span class="wb new" style="width:3.1%"></span></div>
+      <div class="wk-legend"><span><i class="cache"></i>cache reads 96.9%</span><span><i class="new"></i>new work 3.1% (≈100M tokens)</span></div>
+      <div class="wk-bar-l">How it was paid for</div>
+      <div class="wk-bar"><span class="wb sub" style="width:92.3%">flat subscriptions, frontier models · 92.3%</span><span class="wb free" style="width:7.7%"></span></div>
+      <div class="wk-legend"><span><i class="sub"></i>Claude Code + Codex subscriptions 92.3%</span><span><i class="free"></i>free and local models 7.7%</span><span>pay-per-use API 0.02%</span></div>
+      <figcaption>Claude Code, Codex and opencode logs, deduplicated · list prices from OpenRouter, Oct 4 · chat apps not included</figcaption>
+    </figure>
   </header>
 
   <div class="col">
     <h2 class="first">The architecture question</h2>
     <p>Build or reuse is one of the oldest decisions in system design. AI agents changed its cost model. Generating code is now cheap at the moment you ask for it, so the cost moved downstream: into the cases nobody tested, the fixes that follow, and the context every agent carries on every call. The question isn't "can the agent write it?" anymore. It's "what does it cost to own what it wrote?"</p>
+    <h2>My weekend, by the numbers</h2>
+    <p>Since Friday I've run about 3.3 billion tokens through Claude Code, Codex and opencode. Before that sounds like bragging: 97% of it was the agents re-reading context they'd already seen. The new work was closer to 100 million. I'd also just started testing free models in a new harness, so some of this was me learning where the edges are.</p>
+    <p>My actual cash outlay for API calls was 21 cents. The rest ran on flat subscriptions, worth about $1,166 at API list prices. The surprise was a security-review hook I'd installed: it quietly called a frontier model 316 times on its own, about $97 of that. You don't see the bill for the things you didn't ask for. That's the carrying cost this piece is about.</p>
     <p>I built RepoHunter to stop AI agents from rewriting code that already exists as maintained open source. The pitch writes itself: reuse instead of regenerate, save tokens. I had never measured it. So I did, and I'm publishing the results, including the parts that didn't go my way.</p>
     <p>I ran out of money for AI subscriptions this year. One terminal running about 20 agents, each with around six subagents, emptied a $200 plan in roughly six hours (before weekly caps existed). Since then I've treated tokens like a budget, and this is what I've learned about where they actually go.</p>
 

@@ -101,17 +101,8 @@
   .provenance{padding:10px 18px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
 
   /* how it works */
-  .flow{display:grid;grid-template-columns:minmax(0,1fr) 40px minmax(0,1.15fr) 40px minmax(0,1fr);align-items:stretch;margin-top:8px}
-  .stage{border:1px solid var(--line);border-radius:14px;background:var(--bg2);padding:18px 18px 16px}
-  .stage.mid{border-color:var(--line2);background:var(--card)}
-  .stage h3{margin:0 0 10px;font-size:13px;font-weight:700;color:var(--muted)}
-  .stage ul{margin:0;padding:0;list-style:none;display:grid;gap:9px}
-  .stage li{color:var(--text);font-size:15px;line-height:1.4}
-  .stage li small{display:block;color:var(--muted);font-size:13px}
-  .stage .brand2{display:flex;align-items:center;gap:8px;margin:-2px 0 12px;font-weight:800}
-  .stage .brand2 img{width:22px;height:22px}
-  .arrow{display:flex;align-items:center;justify-content:center}
-  .arrow svg{width:28px;height:28px}
+  .stackfig{margin:8px 0 0;max-width:900px}
+  .stackfig img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:16px}
   .uses{margin-top:40px;border-top:1px solid var(--line)}
   .use{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px;padding:20px 0;border-bottom:1px solid var(--line)}
   .use h3{margin:0 0 4px;font-size:16px}
@@ -145,9 +136,7 @@
     .hero{grid-template-columns:minmax(0,1fr);gap:32px;padding:40px 0 56px}
     .hero .copy-col{display:contents}
     .hero h1{order:1}.hero .lede{order:2}.panel{order:3}.hero .install-wrap{order:4}
-    .flow{grid-template-columns:minmax(0,1fr)}
-    .arrow{height:36px}.arrow svg{transform:rotate(90deg)}
-    .use{grid-template-columns:minmax(0,1fr);gap:8px}
+        .use{grid-template-columns:minmax(0,1fr);gap:8px}
     .proof{grid-template-columns:minmax(0,1fr);padding:24px}
   }
   @media(hover:none){.drag-only{display:none}}
@@ -241,37 +230,7 @@
   <section id="how">
     <h2>What RepoHunter does</h2>
     <p class="sub">It sits between your agent's plan and the install. One question, asked every time: does a good version of this already exist, and is it safe to bring in?</p>
-    <div class="flow" role="list">
-      <div class="stage" role="listitem">
-        <h3>Your agent is about to…</h3>
-        <ul>
-          <li>write a feature from scratch<small>"add a Markdown renderer"</small></li>
-          <li>install a plugin, skill or MCP server<small>"set up a token saver"</small></li>
-          <li>add a dependency you'll ship<small>"use this for invoices"</small></li>
-        </ul>
-      </div>
-      <div class="arrow" aria-hidden="true"><svg viewBox="0 0 28 28" fill="none" stroke="#2e4064" stroke-width="2"><path d="M4 14h18M16 8l6 6-6 6"/></svg></div>
-      <div class="stage mid" role="listitem">
-        <div class="brand2"><img src="/logo.svg" alt="">RepoHunter checks</div>
-        <ul>
-          <li>Does it already exist?<small>live GitHub search, ranked</small></li>
-          <li>Is it maintained, or archived?<small>last push, releases, contributors</small></li>
-          <li>Can you ship its license?<small>copyleft, source-available, none</small></li>
-          <li>Anything sketchy in it?<small>pattern-based scan of its text and agent files (CLI)</small></li>
-          <li>Will it run on your machine?<small>reads your RAM; flags GPU-only projects</small></li>
-        </ul>
-      </div>
-      <div class="arrow" aria-hidden="true"><svg viewBox="0 0 28 28" fill="none" stroke="#2e4064" stroke-width="2"><path d="M4 14h18M16 8l6 6-6 6"/></svg></div>
-      <div class="stage" role="listitem">
-        <h3>You get</h3>
-        <ul>
-          <li><span class="v v-GO">GO</span> reuse it<small>maintained, licensed, fits</small></li>
-          <li><span class="v v-MAYBE">MAYBE</span> check first<small>with the reason to check</small></li>
-          <li><span class="v v-SKIP">SKIP</span> build or pick another<small>archived, unlicensed or weak</small></li>
-        </ul>
-      </div>
-    </div>
-
+    <figure class="stackfig"><a href="/img/repohunter-stack.svg" aria-label="Open the diagram full size"><img src="/img/repohunter-stack.svg" width="900" height="1160" alt="Where RepoHunter sits in an AI coding stack. You ask a coding agent such as Claude Code, Cursor or Codex for something. Before it builds or installs, it makes one call to RepoHunter, which runs locally: find_repos checks whether it already exists, evaluate_repo checks maintenance, license and fit, and the CLI scan looks for injection, hidden text, piped installs and leaked secrets. The verdict is GO (reuse it, pinned), MAYBE (check first) or SKIP (build or pick another). Guardrails: read-only, runs locally, token stays on your machine, pinned installs, about 1k tokens of context, untrusted text never fed to your agent. Measured: 56.0k tokens to build and fix versus 28.6k to reuse."></a></figure>
     <div class="uses">
       <div class="use"><div><h3>Before your agent writes a component</h3><p>Reuse beats regenerating once the job is real.</p></div>
         <p class="ex">A from-scratch Markdown renderer passed 5–6 of 16 everyday cases; the reused library passed 16. <a href="/field-notes/01-token-optimization">Field Notes 01</a></p></div>
